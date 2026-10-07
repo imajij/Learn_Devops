@@ -1,0 +1,26 @@
+$ kubectl apply -f ingress/backend.yaml -f ingress/frontend.yaml
+deployment.apps/yatri-backend unchanged
+service/yatri-backend-service unchanged
+deployment.apps/yatri-frontend unchanged
+service/yatri-frontend-service unchanged
+$ kubectl rollout status deployment/yatri-backend --timeout=180s
+deployment "yatri-backend" successfully rolled out
+$ kubectl rollout status deployment/yatri-frontend --timeout=180s
+deployment "yatri-frontend" successfully rolled out
+$ kubectl get pods -l 'app in (yatri-backend,yatri-frontend)' -o wide
+NAME                             READY   STATUS    RESTARTS   AGE   IP             NODE    NOMINATED NODE   READINESS GATES
+yatri-backend-6c58cb99c7-d2zw8   1/1     Running   0          51s   10.244.0.136   k8s-a   <none>           <none>
+yatri-backend-6c58cb99c7-hdnv8   1/1     Running   0          52s   10.244.0.134   k8s-a   <none>           <none>
+yatri-frontend-ddcfc4b5f-trddl   1/1     Running   0          51s   10.244.0.135   k8s-a   <none>           <none>
+yatri-frontend-ddcfc4b5f-vjhct   1/1     Running   0          51s   10.244.0.137   k8s-a   <none>           <none>
+$ kubectl get svc yatri-backend-service yatri-frontend-service
+NAME                     TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+yatri-backend-service    ClusterIP   10.106.202.89    <none>        80/TCP    53s
+yatri-frontend-service   ClusterIP   10.105.193.178   <none>        80/TCP    52s
+### the backend got its config from the ConfigMap and Secret:
+$ kubectl exec deploy/yatri-backend -- sh -c 'env | sort | grep -E "ENVIRONMENT|LOG_LEVEL|CURRENCY|POSTGRES_(USER|DB)"'
+DEFAULT_CURRENCY=INR
+ENVIRONMENT=production
+LOG_LEVEL=INFO
+POSTGRES_DB=yatri_production_db
+POSTGRES_USER=yatri_admin

@@ -1,0 +1,30 @@
+### reach the ingress-nginx controller from the Mac: port-forward its Service (port 18081 -> 80)
+$ (kubectl -n ingress-nginx port-forward svc/ingress-nginx-controller 18081:80 > ~/devops-lab/k8s-a/pf.log 2>&1 &); until grep -q Forwarding ~/devops-lab/k8s-a/pf.log; do sleep 1; done; cat ~/devops-lab/k8s-a/pf.log
+Forwarding from 127.0.0.1:18081 -> 80
+Forwarding from [::1]:18081 -> 80
+### path routing on host yatri.local
+$ curl -s -H "Host: yatri.local" http://127.0.0.1:18081/ | grep -o "<title>.*</title>"
+<title>Welcome to nginx!</title>
+$ curl -s -H "Host: yatri.local" http://127.0.0.1:18081/api/
+Yatri Backend API
+=================
+ENVIRONMENT     : production
+LOG_LEVEL       : INFO
+DEFAULT_CURRENCY: INR
+POSTGRES_USER   : yatri_admin
+POSTGRES_DB     : yatri_production_db
+### host routing: api.yatri.local goes straight to the backend
+$ curl -s -H "Host: api.yatri.local" http://127.0.0.1:18081/ | head -3
+Yatri Backend API
+=================
+ENVIRONMENT     : production
+### unknown host -> no rule matches -> controller default backend
+$ curl -s -o /dev/null -w "%{http_code}\n" -H "Host: unknown.local" http://127.0.0.1:18081/
+404
+$ curl -s -H "Host: unknown.local" http://127.0.0.1:18081/ | grep -o "<title>.*</title>"
+<title>404 Not Found</title>
+### the controller access log proves every request went through it
+$ kubectl -n ingress-nginx logs deploy/ingress-nginx-controller --since=60s | grep -E '"GET' | awk '{print $7, $9, $(NF-4), $(NF-3)}' | tail -6
+/ 200 10.244.0.137:80 615
+/api/ 200 10.244.0.136:5000 178
+/ 200 10.244.0.134:5000 178

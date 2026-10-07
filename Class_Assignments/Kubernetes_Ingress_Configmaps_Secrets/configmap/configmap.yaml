@@ -1,0 +1,17 @@
+# Plain, non-sensitive settings. The five env-style keys are the instructor's (04-full-demo/configmap.yaml);
+# app.properties is an extra file-style key to show mounting a ConfigMap as a file.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yatri-app-config
+  labels:
+    app: yatri-app
+data:
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  APP_PORT: "5000"
+  DEFAULT_CURRENCY: "INR"
+  MAX_BOOKING_DAYS: "30"
+  app.properties: |
+    feature.dark_mode=false
+    cache.ttl_seconds=300

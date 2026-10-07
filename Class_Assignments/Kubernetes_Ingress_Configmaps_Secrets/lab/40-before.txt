@@ -1,0 +1,29 @@
+$ kubectl apply -f broken/app.yaml
+namespace/troubleshoot created
+configmap/orders-config created
+secret/orders-db created
+deployment.apps/orders created
+service/orders-service created
+ingress.networking.k8s.io/orders created
+$ sleep 20
+### the reported problem:
+$ curl -s -o /dev/null -w "HTTP %{http_code}\n" -H "Host: orders.local" http://127.0.0.1:18081/
+HTTP 503
+$ curl -s -H "Host: orders.local" http://127.0.0.1:18081/ | grep -o "<title>.*</title>"
+<title>503 Service Temporarily Unavailable</title>
+$ kubectl -n troubleshoot get deploy,rs,pods,svc,ingress
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/orders   0/2     2            0           20s
+
+NAME                                DESIRED   CURRENT   READY   AGE
+replicaset.apps/orders-656cd65f78   2         2         0       20s
+
+NAME                          READY   STATUS                       RESTARTS   AGE
+pod/orders-656cd65f78-2d5vk   0/1     CreateContainerConfigError   0          20s
+pod/orders-656cd65f78-6cqv7   0/1     CreateContainerConfigError   0          20s
+
+NAME                     TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+service/orders-service   ClusterIP   10.105.115.94   <none>        80/TCP    20s
+
+NAME                               CLASS   HOSTS          ADDRESS   PORTS   AGE
+ingress.networking.k8s.io/orders   nginx   orders.local             80      20s

@@ -1,0 +1,14 @@
+### layer 2: where does the Ingress send traffic?
+$ kubectl -n troubleshoot describe ingress orders | sed -n '/^Rules:/,/^Annotations:/p'
+Rules:
+  Host          Path  Backends
+  ----          ----  --------
+  orders.local  
+                /   orders-svc:80 (<error: services "orders-svc" not found>)
+Annotations:    <none>
+$ kubectl -n troubleshoot get svc
+NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+orders-service   ClusterIP   10.105.115.94   <none>        80/TCP    35s
+$ kubectl -n ingress-nginx logs deploy/ingress-nginx-controller --since=10m | grep -i 'orders-svc' | tail -2 | cut -c1-180
+127.0.0.1 - - [07/Oct/2026:17:16:00 +0000] "GET / HTTP/1.1" 503 190 "-" "curl/8.7.1" 75 0.000 [troubleshoot-orders-svc-80] [] - - - - fd2a4fe4f0d6e10aa4252b07db2a606c
+127.0.0.1 - - [07/Oct/2026:17:16:00 +0000] "GET / HTTP/1.1" 503 190 "-" "curl/8.7.1" 75 0.000 [troubleshoot-orders-svc-80] [] - - - - dcadce0a8e37266ecc6e015da1bca49b

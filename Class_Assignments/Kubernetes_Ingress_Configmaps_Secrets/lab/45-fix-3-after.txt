@@ -1,0 +1,28 @@
+### FIX 3: Service targetPort 8080 -> 5000 (the port the app really listens on)
+$ kubectl -n troubleshoot patch service orders-service -p '{"spec":{"ports":[{"port":80,"targetPort":5000}]}}'
+service/orders-service patched
+$ kubectl -n troubleshoot get endpointslices
+NAME                   ADDRESSTYPE   PORTS   ENDPOINTS                   AGE
+orders-service-ggcg9   IPv4          5000    10.244.0.140,10.244.0.141   46s
+$ sleep 3
+### AFTER: the original request
+$ curl -s -o /dev/null -w "HTTP %{http_code}\n" -H "Host: orders.local" http://127.0.0.1:18081/
+HTTP 200
+$ curl -s -H "Host: orders.local" http://127.0.0.1:18081/
+orders API OK | env=staging | db_user=orders_app | password set=True
+$ kubectl -n troubleshoot get deploy,pods,svc,ingress
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/orders   2/2     2            2           49s
+
+NAME                         READY   STATUS    RESTARTS   AGE
+pod/orders-57c9d8c9d-4cg6q   1/1     Running   0          12s
+pod/orders-57c9d8c9d-77mhb   1/1     Running   0          12s
+
+NAME                     TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+service/orders-service   ClusterIP   10.105.115.94   <none>        80/TCP    49s
+
+NAME                               CLASS   HOSTS          ADDRESS   PORTS   AGE
+ingress.networking.k8s.io/orders   nginx   orders.local             80      49s
+### the patched live objects now match troubleshooting/fixed/app.yaml (no diff = nothing left to change)
+$ kubectl diff -f fixed/app.yaml && echo "kubectl diff: no differences"
+kubectl diff: no differences

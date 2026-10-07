@@ -1,0 +1,33 @@
+# Host-based routing: the Host header picks the backend.
+#   api.yatri.local          -> backend  (no /api prefix needed)
+#   yatri.127.0.0.1.nip.io   -> frontend (nip.io resolves to 127.0.0.1, so a normal browser can open it
+#                                         through the port-forward without editing /etc/hosts)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: yatri-hosts
+  labels:
+    app: yatri-app
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: api.yatri.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: yatri-backend-service
+                port:
+                  number: 80
+    - host: yatri.127.0.0.1.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: yatri-frontend-service
+                port:
+                  number: 80

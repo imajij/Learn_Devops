@@ -1,0 +1,23 @@
+$ minikube -p k8s-a addons enable ingress
+* ingress is an addon maintained by Kubernetes. For any concerns contact minikube on GitHub.
+You can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS
+* After the addon is enabled, please run "minikube tunnel" and your ingress resources would be available at "127.0.0.1"
+  - Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.9
+  - Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.9
+  - Using image registry.k8s.io/ingress-nginx/controller:v1.15.1
+* Verifying ingress addon...
+* The 'ingress' addon is enabled
+$ kubectl -n ingress-nginx wait --for=condition=Ready pod -l app.kubernetes.io/component=controller --timeout=240s
+pod/ingress-nginx-controller-d7cd8c989-j4bhm condition met
+$ kubectl -n ingress-nginx get pods,svc -o wide
+NAME                                           READY   STATUS      RESTARTS      AGE   IP             NODE    NOMINATED NODE   READINESS GATES
+pod/ingress-nginx-admission-create-vnpv5       0/1     Completed   0             43s   10.244.0.128   k8s-a   <none>           <none>
+pod/ingress-nginx-admission-patch-c7vhs        0/1     Completed   1 (36s ago)   43s   10.244.0.129   k8s-a   <none>           <none>
+pod/ingress-nginx-controller-d7cd8c989-j4bhm   1/1     Running     0             43s   10.244.0.130   k8s-a   <none>           <none>
+
+NAME                                         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE   SELECTOR
+service/ingress-nginx-controller             NodePort    10.99.200.221   <none>        80:31884/TCP,443:32623/TCP   43s   app.kubernetes.io/component=controller,app.kubernetes.io/instance=ingress-nginx,app.kubernetes.io/name=ingress-nginx
+service/ingress-nginx-controller-admission   ClusterIP   10.104.255.95   <none>        443/TCP                      43s   app.kubernetes.io/component=controller,app.kubernetes.io/instance=ingress-nginx,app.kubernetes.io/name=ingress-nginx
+$ kubectl get ingressclass
+NAME              CONTROLLER             PARAMETERS   AGE
+nginx (default)   k8s.io/ingress-nginx   <none>       43s

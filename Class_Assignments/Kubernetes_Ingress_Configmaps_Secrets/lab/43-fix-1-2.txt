@@ -1,0 +1,24 @@
+### FIX 1: Deployment asks for key DB_PASSWORD, the Secret only has DB_USER and DB_PASS
+$ kubectl -n troubleshoot patch deployment orders --type=json -p='[{"op":"replace","path":"/spec/template/spec/containers/0/env/1/valueFrom/secretKeyRef/key","value":"DB_PASS"}]'
+deployment.apps/orders patched
+$ kubectl -n troubleshoot rollout status deployment/orders --timeout=180s
+Waiting for deployment "orders" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "orders" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "orders" rollout to finish: 1 old replicas are pending termination...
+deployment "orders" successfully rolled out
+$ kubectl -n troubleshoot get pods -l app=orders
+NAME                      READY   STATUS        RESTARTS   AGE
+orders-57c9d8c9d-4cg6q    1/1     Running       0          1s
+orders-57c9d8c9d-77mhb    1/1     Running       0          1s
+orders-656cd65f78-6cqv7   0/1     Terminating   0          38s
+### FIX 2: Ingress backend points at Service "orders-svc", the real name is "orders-service"
+$ kubectl -n troubleshoot patch ingress orders --type=json -p='[{"op":"replace","path":"/spec/rules/0/http/paths/0/backend/service/name","value":"orders-service"}]'
+ingress.networking.k8s.io/orders patched
+$ sleep 5
+$ curl -s -o /dev/null -w "HTTP %{http_code}\n" -H "Host: orders.local" http://127.0.0.1:18081/
+HTTP 502
+### progress: 503 (no backend) became 502 (backend exists but the connection fails)

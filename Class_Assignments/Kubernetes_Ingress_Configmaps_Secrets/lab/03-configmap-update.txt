@@ -1,0 +1,21 @@
+### change a value: env vars are fixed at container start, mounted files are refreshed by the kubelet
+$ kubectl patch configmap yatri-app-config --type merge -p '{"data":{"LOG_LEVEL":"DEBUG"}}'
+configmap/yatri-app-config patched
+$ date +%T; until [ "$(kubectl exec configmap-demo -- cat /etc/yatri/LOG_LEVEL)" = DEBUG ]; do sleep 2; done; date +%T
+22:42:34
+22:42:37
+$ kubectl exec configmap-demo -- cat /etc/yatri/LOG_LEVEL; echo
+DEBUG
+$ kubectl exec configmap-demo -- sh -c 'echo LOG_LEVEL=$LOG_LEVEL CURRENT_LOG_LEVEL=$CURRENT_LOG_LEVEL'
+LOG_LEVEL=INFO CURRENT_LOG_LEVEL=INFO
+### restart the pod to pick up the new env value
+$ kubectl delete pod configmap-demo && kubectl apply -f configmap/pod.yaml && kubectl wait --for=condition=Ready pod/configmap-demo --timeout=90s
+pod "configmap-demo" deleted from default namespace
+pod/configmap-demo created
+pod/configmap-demo condition met
+$ kubectl exec configmap-demo -- sh -c 'echo LOG_LEVEL=$LOG_LEVEL CURRENT_LOG_LEVEL=$CURRENT_LOG_LEVEL'
+LOG_LEVEL=DEBUG CURRENT_LOG_LEVEL=DEBUG
+$ kubectl patch configmap yatri-app-config --type merge -p '{"data":{"LOG_LEVEL":"INFO"}}'
+configmap/yatri-app-config patched
+$ kubectl delete pod configmap-demo --grace-period=1
+pod "configmap-demo" deleted from default namespace

@@ -1,0 +1,20 @@
+### what the controller did with the Ingress objects: generated nginx.conf
+$ kubectl -n ingress-nginx exec deploy/ingress-nginx-controller -- sh -c 'grep -E "server_name \"" /etc/nginx/nginx.conf'
+		server_name "_" ;
+		server_name "api.yatri.local" ;
+		server_name "yatri.127.0.0.1.nip.io" ;
+		server_name "yatri.local" ;
+$ kubectl -n ingress-nginx exec deploy/ingress-nginx-controller -- sh -c 'grep -E "location ~\* " /etc/nginx/nginx.conf | head -4'
+		location ~* "^/api(/|$)(.*)" {
+		location ~* "^/" {
+$ kubectl -n ingress-nginx get deploy ingress-nginx-controller -o jsonpath='{.spec.template.spec.containers[0].args}' | tr ',' '\n' | head -12
+["/nginx-ingress-controller"
+"--election-id=ingress-nginx-leader"
+"--controller-class=k8s.io/ingress-nginx"
+"--watch-ingress-without-class=true"
+"--configmap=$(POD_NAMESPACE)/ingress-nginx-controller"
+"--tcp-services-configmap=$(POD_NAMESPACE)/tcp-services"
+"--udp-services-configmap=$(POD_NAMESPACE)/udp-services"
+"--validating-webhook=:8443"
+"--validating-webhook-certificate=/usr/local/certificates/cert"
+"--validating-webhook-key=/usr/local/certificates/key"]

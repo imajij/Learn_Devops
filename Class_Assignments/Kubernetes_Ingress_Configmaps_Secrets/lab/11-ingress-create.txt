@@ -1,0 +1,36 @@
+$ kubectl apply -f ingress/ingress.yaml -f ingress/ingress-hosts.yaml
+ingress.networking.k8s.io/yatri-ingress created
+ingress.networking.k8s.io/yatri-hosts created
+$ until kubectl get ingress yatri-ingress -o jsonpath="{.status.loadBalancer.ingress[0].ip}" | grep -q .; do sleep 2; done; kubectl get ingress
+NAME            CLASS   HOSTS                                    ADDRESS        PORTS   AGE
+yatri-hosts     nginx   api.yatri.local,yatri.127.0.0.1.nip.io   192.168.49.2   80      46s
+yatri-ingress   nginx   yatri.local                              192.168.49.2   80      46s
+$ kubectl describe ingress yatri-ingress
+Name:             yatri-ingress
+Labels:           app=yatri-app
+Namespace:        default
+Address:          192.168.49.2
+Ingress Class:    nginx
+Default backend:  <default>
+Rules:
+  Host         Path  Backends
+  ----         ----  --------
+  yatri.local  
+               /api(/|$)(.*)   yatri-backend-service:80 (10.244.0.134:5000,10.244.0.136:5000)
+               /               yatri-frontend-service:80 (10.244.0.135:80,10.244.0.137:80)
+Annotations:   nginx.ingress.kubernetes.io/rewrite-target: /$2
+               nginx.ingress.kubernetes.io/ssl-redirect: false
+               nginx.ingress.kubernetes.io/use-regex: true
+Events:
+  Type    Reason  Age               From                      Message
+  ----    ------  ----              ----                      -------
+  Normal  Sync    0s (x2 over 46s)  nginx-ingress-controller  Scheduled for sync
+$ kubectl describe ingress yatri-hosts | sed -n '/^Rules:/,/^Annotations:/p'
+Rules:
+  Host                    Path  Backends
+  ----                    ----  --------
+  api.yatri.local         
+                          /   yatri-backend-service:80 (10.244.0.134:5000,10.244.0.136:5000)
+  yatri.127.0.0.1.nip.io  
+                          /   yatri-frontend-service:80 (10.244.0.135:80,10.244.0.137:80)
+Annotations:              <none>

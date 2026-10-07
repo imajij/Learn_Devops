@@ -1,0 +1,15 @@
+### layer 1: why are the pods not running?
+$ kubectl -n troubleshoot describe pod -l app=orders | grep -E '^Name:|State:|Reason:' | head -4
+Name:             orders-656cd65f78-2d5vk
+    State:          Waiting
+      Reason:       CreateContainerConfigError
+Name:             orders-656cd65f78-6cqv7
+$ kubectl -n troubleshoot get events --field-selector reason=Failed -o custom-columns=OBJECT:.involvedObject.name,MESSAGE:.message | head -3
+OBJECT                    MESSAGE
+orders-656cd65f78-2d5vk   Error: couldn't find key DB_PASSWORD in Secret troubleshoot/orders-db
+orders-656cd65f78-6cqv7   Error: couldn't find key DB_PASSWORD in Secret troubleshoot/orders-db
+$ kubectl -n troubleshoot get secret orders-db -o jsonpath='{.data}'; echo
+{"DB_PASS":"ZmFrZS1kZW1vLXBhc3N3b3Jk","DB_USER":"b3JkZXJzX2FwcA=="}
+$ kubectl -n troubleshoot get deploy orders -o jsonpath='{range .spec.template.spec.containers[0].env[*]}{.name} <- secret {.valueFrom.secretKeyRef.name} key {.valueFrom.secretKeyRef.key}{"\n"}{end}'
+DB_USER <- secret orders-db key DB_USER
+DB_PASSWORD <- secret orders-db key DB_PASSWORD

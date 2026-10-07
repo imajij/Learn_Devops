@@ -1,0 +1,26 @@
+$ kubectl apply -f configmap/pod.yaml
+pod/configmap-demo created
+$ kubectl wait --for=condition=Ready pod/configmap-demo --timeout=90s
+pod/configmap-demo condition met
+### env vars inside the container (envFrom + single key):
+$ kubectl exec configmap-demo -- sh -c 'env | sort | grep -E "ENVIRONMENT|LOG_LEVEL|APP_PORT|CURRENCY|BOOKING"'
+APP_PORT=5000
+CURRENT_LOG_LEVEL=INFO
+DEFAULT_CURRENCY=INR
+ENVIRONMENT=production
+LOG_LEVEL=INFO
+MAX_BOOKING_DAYS=30
+### files inside the container (volume):
+$ kubectl exec configmap-demo -- ls -l /etc/yatri
+total 0
+lrwxrwxrwx    1 root     root            15 Oct  7 17:12 APP_PORT -> ..data/APP_PORT
+lrwxrwxrwx    1 root     root            23 Oct  7 17:12 DEFAULT_CURRENCY -> ..data/DEFAULT_CURRENCY
+lrwxrwxrwx    1 root     root            18 Oct  7 17:12 ENVIRONMENT -> ..data/ENVIRONMENT
+lrwxrwxrwx    1 root     root            16 Oct  7 17:12 LOG_LEVEL -> ..data/LOG_LEVEL
+lrwxrwxrwx    1 root     root            23 Oct  7 17:12 MAX_BOOKING_DAYS -> ..data/MAX_BOOKING_DAYS
+lrwxrwxrwx    1 root     root            21 Oct  7 17:12 app.properties -> ..data/app.properties
+$ kubectl exec configmap-demo -- cat /etc/yatri/app.properties
+feature.dark_mode=false
+cache.ttl_seconds=300
+$ kubectl exec configmap-demo -- cat /etc/yatri/LOG_LEVEL; echo
+INFO

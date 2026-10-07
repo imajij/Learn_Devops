@@ -1,0 +1,105 @@
+# INTENTIONALLY BROKEN - Session 12 troubleshooting scenario (written by me; the instructor's
+# session-12 "troubleshooting/" folder is referenced in lab.md but is not in the course repo).
+# Story: a teammate deployed the "orders" API behind Ingress and says "it doesn't work".
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: troubleshoot
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orders-config
+  namespace: troubleshoot
+data:
+  ENVIRONMENT: "staging"
+  LOG_LEVEL: "DEBUG"
+---
+apiVersion: v1
+kind: Secret  # gitleaks:allow (fake demo values)
+metadata:
+  name: orders-db
+  namespace: troubleshoot
+type: Opaque
+stringData:                 # stringData = plain text, the API server base64-encodes it
+  DB_USER: "orders_app"
+  DB_PASS: "fake-demo-password"     # gitleaks:allow
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+  namespace: troubleshoot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+    spec:
+      containers:
+        - name: orders
+          image: python:3.11-alpine3.19
+          command: ["sh", "-c"]
+          args:
+            - |
+              python3 -c "
+              import os
+              from http.server import HTTPServer, BaseHTTPRequestHandler
+              class H(BaseHTTPRequestHandler):
+                  def do_GET(self):
+                      body = ('orders API OK | env=%s | db_user=%s | password set=%s\n' % (
+                          os.environ['ENVIRONMENT'], os.environ['DB_USER'], bool(os.environ['DB_PASSWORD']))).encode()
+                      self.send_response(200); self.end_headers(); self.wfile.write(body)
+              HTTPServer(('0.0.0.0', 5000), H).serve_forever()
+              "
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: orders-config
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: orders-db
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: orders-db
+                  key: DB_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-service
+  namespace: troubleshoot
+spec:
+  selector:
+    app: orders
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: orders
+  namespace: troubleshoot
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: orders.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: orders-svc
+                port:
+                  number: 80

@@ -1,0 +1,14 @@
+### layer 3: Service -> pod port
+$ kubectl -n troubleshoot describe ingress orders | grep -A1 'orders.local' | tail -1
+                /   orders-service:80 (10.244.0.140:8080,10.244.0.141:8080)
+$ kubectl -n troubleshoot get endpointslices
+NAME                   ADDRESSTYPE   PORTS   ENDPOINTS                   AGE
+orders-service-ggcg9   IPv4          8080    10.244.0.140,10.244.0.141   43s
+$ kubectl -n troubleshoot get pods -l app=orders -o jsonpath='{.items[0].spec.containers[0].ports[0].containerPort}'; echo '  <- containerPort'
+5000  <- containerPort
+$ kubectl -n troubleshoot get svc orders-service -o jsonpath='{.spec.ports[0].targetPort}'; echo '  <- Service targetPort'
+8080  <- Service targetPort
+$ kubectl -n ingress-nginx logs deploy/ingress-nginx-controller --since=2m | grep -E 'connect\(\) failed' | tail -1 | cut -c1-200
+2026/10/07 17:16:23 [error] 1074#1074: *9016 connect() failed (111: Connection refused) while connecting to upstream, client: 127.0.0.1, server: orders.local, request: "GET / HTTP/1.1", upstream: "htt
+$ POD_IP=$(kubectl -n troubleshoot get pods -l app=orders -o jsonpath="{.items[0].status.podIP}"); kubectl -n troubleshoot run tmp-curl --image=curlimages/curl:8.10.1 --rm -i --restart=Never --quiet -- sh -c "curl -s -m 3 http://orders-service/ || echo via Service port 80 to pod 8080: curl exit \$?; echo -n direct to pod $POD_IP:5000 gives: ; curl -s -m 3 http://$POD_IP:5000/"
+orders API OK | env=staging | db_user=orders_app | password set=True
