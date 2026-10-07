@@ -1,0 +1,16 @@
+$ docker images --format 'table {{.Repository}}	{{.Tag}}	{{.Size}}' | grep -E 'REPOSITORY|ajij-ms-|ajij-multistage'
+REPOSITORY                         TAG             SIZE
+ajij-multistage-webapp             single          1.65GB
+ajij-ms-java-app                   single          756MB
+ajij-ms-java-app                   multi           286MB
+ajij-ms-python-app                 single          1.63GB
+ajij-ms-python-app                 multi           230MB
+ajij-ms-node-app                   single          1.65GB
+ajij-ms-node-app                   multi           239MB
+ajij-multistage-webapp             latest          249MB
+$ docker ps --filter name=ajij-m --format 'table {{.Names}}	{{.Image}}	{{.Ports}}'
+NAMES                 IMAGE                           PORTS
+ajij-ms-java-app      ajij-ms-java-app:multi          0.0.0.0:8113->8080/tcp, [::]:8113->8080/tcp
+ajij-ms-python-app    ajij-ms-python-app:multi        0.0.0.0:8112->5000/tcp, [::]:8112->5000/tcp
+ajij-ms-node-app      ajij-ms-node-app:multi          0.0.0.0:8111->3000/tcp, [::]:8111->3000/tcp
+ajij-multistage-app   ajij-multistage-webapp:latest   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp

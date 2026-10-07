@@ -1,0 +1,119 @@
+$ docker build -t ajij-ms-python-app:multi ./apps/python-app
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  5.632kB
+Step 1/14 : FROM python:3.12 AS build
+3.12: Pulling from library/python
+86f385aa2c76: Pulling fs layer
+df9831efb49c: Pulling fs layer
+ced845076efa: Pulling fs layer
+a7389fada30b: Pulling fs layer
+7a419dbc1b41: Pulling fs layer
+a7f73cdbf7c7: Pulling fs layer
+21752e08707a: Pulling fs layer
+ced845076efa: Download complete
+d5622456fdb7: Download complete
+86f385aa2c76: Download complete
+a7389fada30b: Download complete
+bd23e06dd88f: Download complete
+df9831efb49c: Download complete
+df9831efb49c: Pull complete
+86f385aa2c76: Pull complete
+7a419dbc1b41: Download complete
+a7f73cdbf7c7: Download complete
+a7f73cdbf7c7: Pull complete
+21752e08707a: Download complete
+21752e08707a: Pull complete
+a7389fada30b: Pull complete
+ced845076efa: Pull complete
+7a419dbc1b41: Pull complete
+Digest: sha256:63828510c8b5ccce3bf0d6fabd6f3d17d4effa1ffe690f80a67c8e2d394e03ee
+Status: Downloaded newer image for python:3.12
+ ---> 63828510c8b5
+Step 2/14 : RUN python -m venv /opt/venv
+ ---> Running in 2640903a167e
+ ---> Removed intermediate container 2640903a167e
+ ---> 78c723dabf88
+Step 3/14 : ENV PATH="/opt/venv/bin:$PATH"
+ ---> Running in 722bb6829f93
+ ---> Removed intermediate container 722bb6829f93
+ ---> 33ec403a2023
+Step 4/14 : COPY requirements.txt .
+ ---> de79380e0473
+Step 5/14 : RUN pip install --no-cache-dir -r requirements.txt
+ ---> Running in 9b6a7637c20b
+Collecting flask==3.1.* (from -r requirements.txt (line 1))
+  Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+Collecting gunicorn==23.* (from -r requirements.txt (line 2))
+  Downloading gunicorn-23.0.0-py3-none-any.whl.metadata (4.4 kB)
+Collecting blinker>=1.9.0 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting click>=8.1.3 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting itsdangerous>=2.2.0 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+Collecting jinja2>=3.1.2 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting markupsafe>=2.1.1 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.7 kB)
+Collecting werkzeug>=3.1.0 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading werkzeug-3.1.9-py3-none-any.whl.metadata (4.1 kB)
+Collecting packaging (from gunicorn==23.*->-r requirements.txt (line 2))
+  Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+Downloading gunicorn-23.0.0-py3-none-any.whl (85 kB)
+Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+Downloading click-8.5.0-py3-none-any.whl (125 kB)
+Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (24 kB)
+Downloading werkzeug-3.1.9-py3-none-any.whl (228 kB)
+Downloading packaging-26.3-py3-none-any.whl (129 kB)
+Installing collected packages: packaging, markupsafe, itsdangerous, click, blinker, werkzeug, jinja2, gunicorn, flask
+Successfully installed blinker-1.9.0 click-8.5.0 flask-3.1.3 gunicorn-23.0.0 itsdangerous-2.2.0 jinja2-3.1.6 markupsafe-3.0.4 packaging-26.3 werkzeug-3.1.9
+[91m
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+[0m ---> Removed intermediate container 9b6a7637c20b
+ ---> 9280bf55c077
+Step 6/14 : FROM python:3.12-slim
+ ---> 05cda9777409
+Step 7/14 : COPY --from=build /opt/venv /opt/venv
+ ---> 124a458ad5b1
+Step 8/14 : ENV PATH="/opt/venv/bin:$PATH"
+ ---> Running in 808da15ae71e
+ ---> Removed intermediate container 808da15ae71e
+ ---> 7af18f7f517c
+Step 9/14 : WORKDIR /app
+ ---> Running in 6afa89dcbd98
+ ---> Removed intermediate container 6afa89dcbd98
+ ---> 8fee83abfa0a
+Step 10/14 : COPY app.py .
+ ---> 0ae84138670c
+Step 11/14 : RUN useradd --create-home appuser
+ ---> Running in 4e49af36004a
+ ---> Removed intermediate container 4e49af36004a
+ ---> 894f308dd960
+Step 12/14 : USER appuser
+ ---> Running in a1d365c32e11
+ ---> Removed intermediate container a1d365c32e11
+ ---> 3deb1ba889da
+Step 13/14 : EXPOSE 5000
+ ---> Running in bbad72534dce
+ ---> Removed intermediate container bbad72534dce
+ ---> a6448783408b
+Step 14/14 : CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "app:app"]
+ ---> Running in f11bf662c46d
+ ---> Removed intermediate container f11bf662c46d
+ ---> 6c29f863e46c
+Successfully built 6c29f863e46c
+Successfully tagged ajij-ms-python-app:multi
+$ docker run -d --name ajij-ms-python-app -p 8112:5000 ajij-ms-python-app:multi
+3150fe2454a013c079fcc1e4326934cf8914a44b253c90d18a70b2576a69d3fb
+$ docker ps --filter name=ajij-ms-python-app --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+NAMES                IMAGE                      STATUS         PORTS
+ajij-ms-python-app   ajij-ms-python-app:multi   Up 4 seconds   0.0.0.0:8112->5000/tcp, [::]:8112->5000/tcp
+$ curl -s http://localhost:8112
+<h1>Hello World from Docker multi-stage build</h1><p>Python 3.12.15 + Flask, served by gunicorn</p>

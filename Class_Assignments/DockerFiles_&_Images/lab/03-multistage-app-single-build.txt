@@ -1,0 +1,58 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon   5.12kB
+Step 1/7 : FROM node:24
+24: Pulling from library/node
+064051a853d2: Pulling fs layer
+58509fb435f7: Pulling fs layer
+0a24d4095d0b: Pulling fs layer
+07dd704887ce: Pulling fs layer
+6a7f0287af6c: Download complete
+064051a853d2: Download complete
+58509fb435f7: Download complete
+58509fb435f7: Pull complete
+210e210dda5f: Download complete
+0a24d4095d0b: Download complete
+07dd704887ce: Download complete
+0a24d4095d0b: Pull complete
+07dd704887ce: Pull complete
+064051a853d2: Pull complete
+Digest: sha256:3d27e5c11e5786e309ec3e03f93ae536eb36e6e5eb3714d5eb3300a36157add0
+Status: Downloaded newer image for node:24
+ ---> 3d27e5c11e57
+Step 2/7 : WORKDIR /app
+ ---> Running in b484ecaf92fe
+ ---> Removed intermediate container b484ecaf92fe
+ ---> 0452dbcb5dc9
+Step 3/7 : COPY package*.json ./
+ ---> be4361c1e0ca
+Step 4/7 : RUN npm install
+ ---> Running in 9d0a1bec991e
+
+added 68 packages, and audited 69 packages in 4s
+
+28 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+[91mnpm notice
+npm notice New major version of npm available! 11.19.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+[0m ---> Removed intermediate container 9d0a1bec991e
+ ---> 63309003b1ad
+Step 5/7 : COPY . .
+ ---> 19aabba76792
+Step 6/7 : EXPOSE 8080
+ ---> Running in 3f414fc87b59
+ ---> Removed intermediate container 3f414fc87b59
+ ---> 6c9ba7b7cf07
+Step 7/7 : CMD ["npm", "start"]
+ ---> Running in 9c832ab47d7e
+ ---> Removed intermediate container 9c832ab47d7e
+ ---> bedb2930e9dd
+Successfully built bedb2930e9dd
+Successfully tagged ajij-multistage-webapp:single

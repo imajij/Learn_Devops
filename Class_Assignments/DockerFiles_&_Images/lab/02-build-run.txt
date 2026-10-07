@@ -1,0 +1,109 @@
+### my only changes to the instructor's files: the message and the port
+$ diff "$CLONE/server.js" multi-stage-app/server.js
+4c4
+< const PORT = 3000;
+---
+> const PORT = process.env.PORT || 8080;
+7c7
+<   res.send("<h1>Aryen Mukundam 10198</h1>");
+---
+>   res.send("<h1>Hello World from Docker multi-stage build</h1><p>Ajij Uttam (24bcs10103)</p>");
+12c12
+< });
+\ No newline at end of file
+---
+> });
+$ diff "$CLONE/Dockerfile" multi-stage-app/Dockerfile
+27c27
+< EXPOSE 3000
+---
+> EXPOSE 8080
+$ docker build -t ajij-multistage-webapp ./multi-stage-app
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon   5.12kB
+Step 1/12 : FROM node:24-alpine AS builder
+24-alpine: Pulling from library/node
+6680b19ad074: Pulling fs layer
+e2f4a003057d: Pulling fs layer
+d4a23e25aa71: Pulling fs layer
+594c453576ad: Download complete
+b4af8cff4b07: Download complete
+e2f4a003057d: Download complete
+d4a23e25aa71: Download complete
+6680b19ad074: Download complete
+e2f4a003057d: Pull complete
+d4a23e25aa71: Pull complete
+6680b19ad074: Pull complete
+Digest: sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+Status: Downloaded newer image for node:24-alpine
+ ---> ebfe2f904627
+Step 2/12 : WORKDIR /app
+ ---> Running in 37870fa220fa
+ ---> Removed intermediate container 37870fa220fa
+ ---> 77b6f4d3b967
+Step 3/12 : COPY package*.json ./
+ ---> 670a1cdb060b
+Step 4/12 : RUN npm install
+ ---> Running in bea9b0a60700
+
+added 68 packages, and audited 69 packages in 5s
+
+28 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+[91mnpm notice
+npm notice New major version of npm available! 11.19.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+[0m ---> Removed intermediate container bea9b0a60700
+ ---> a7c06e43f6d3
+Step 5/12 : COPY . .
+ ---> 4aef952d1399
+Step 6/12 : FROM node:24-alpine AS production
+ ---> ebfe2f904627
+Step 7/12 : WORKDIR /app
+ ---> Using cache
+ ---> 77b6f4d3b967
+Step 8/12 : COPY --from=builder /app/package*.json ./
+ ---> 6099a44c3117
+Step 9/12 : RUN npm install --omit=dev
+ ---> Running in 03dff1bea2cb
+
+added 68 packages, and audited 69 packages in 1s
+
+28 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+ ---> Removed intermediate container 03dff1bea2cb
+ ---> fb6e7ad0453c
+Step 10/12 : COPY --from=builder /app/server.js ./
+ ---> fc1945f0c3f5
+Step 11/12 : EXPOSE 8080
+ ---> Running in f65248134ad5
+ ---> Removed intermediate container f65248134ad5
+ ---> a15080f08975
+Step 12/12 : CMD ["npm", "start"]
+ ---> Running in afe12be828ec
+ ---> Removed intermediate container afe12be828ec
+ ---> 3d05615eb344
+Successfully built 3d05615eb344
+Successfully tagged ajij-multistage-webapp:latest
+$ docker run -d -p 8080:8080 --name ajij-multistage-app ajij-multistage-webapp:latest
+f0844b8d6bedbc6912a76c0efde9b5723cdf0a695fa81792f5fb2436ad8d6eb6
+$ docker ps --filter name=ajij-multistage-app
+CONTAINER ID   IMAGE                           COMMAND                  CREATED         STATUS         PORTS                                         NAMES
+f0844b8d6bed   ajij-multistage-webapp:latest   "docker-entrypoint.s…"   3 seconds ago   Up 3 seconds   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp   ajij-multistage-app
+$ curl -s http://localhost:8080
+<h1>Hello World from Docker multi-stage build</h1><p>Ajij Uttam (24bcs10103)</p>
+$ docker logs ajij-multistage-app
+
+> docker-hello-world@1.0.0 start
+> node server.js
+
+Server running on port 8080

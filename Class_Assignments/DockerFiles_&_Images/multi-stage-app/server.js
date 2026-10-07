@@ -1,0 +1,12 @@
+const express = require("express");
+
+const app = express();
+const PORT = process.env.PORT || 8080;
+
+app.get("/", (req, res) => {
+  res.send("<h1>Hello World from Docker multi-stage build</h1><p>Ajij Uttam (24bcs10103)</p>");
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

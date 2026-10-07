@@ -1,0 +1,60 @@
+$ cd ~/devops-lab/docker && rm -rf clone
+$ git clone --depth 1 --filter=blob:none --sparse https://github.com/aryen1101/Learn_DEVOPS.git clone
+Cloning into 'clone'...
+$ git -C clone sparse-checkout set 'Docker Concepts/multi-stage-dockerfile'
+$ ls 'clone/Docker Concepts/multi-stage-dockerfile'
+Dockerfile
+image-1.png
+image.png
+package.json
+server.js
+test.md
+$ cat 'clone/Docker Concepts/multi-stage-dockerfile/Dockerfile'; echo
+# -------------------------
+# Stage 1: Build
+# -------------------------
+FROM node:24-alpine AS builder
+
+WORKDIR /app
+    
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+# -------------------------
+# Stage 2: Production
+# -------------------------
+FROM node:24-alpine AS production
+
+WORKDIR /app
+
+COPY --from=builder /app/package*.json ./
+
+RUN npm install --omit=dev
+
+COPY --from=builder /app/server.js ./
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
+$ cat 'clone/Docker Concepts/multi-stage-dockerfile/server.js'; echo
+const express = require("express");
+
+const app = express();
+const PORT = 3000;
+
+app.get("/", (req, res) => {
+  res.send("<h1>Aryen Mukundam 10198</h1>");
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+### copy only the app files (not the instructor's notes/images) into this assignment
+$ mkdir -p "/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DockerFiles_&_Images/multi-stage-app" && cp 'clone/Docker Concepts/multi-stage-dockerfile/'{Dockerfile,package.json,server.js} "/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DockerFiles_&_Images/multi-stage-app/"
+$ ls "/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DockerFiles_&_Images/multi-stage-app"
+Dockerfile
+package.json
+server.js

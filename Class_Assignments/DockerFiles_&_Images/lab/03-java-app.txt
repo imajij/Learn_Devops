@@ -1,0 +1,77 @@
+$ docker build -t ajij-ms-java-app:multi ./apps/java-app
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon   5.12kB
+Step 1/9 : FROM eclipse-temurin:21-jdk-alpine AS build
+21-jdk-alpine: Pulling from library/eclipse-temurin
+166f645a3063: Pulling fs layer
+8438b55bfa39: Pulling fs layer
+794d8b8fb47b: Pulling fs layer
+c807d060ae33: Pulling fs layer
+e44f7682965b: Download complete
+166f645a3063: Download complete
+bf66ad52d41a: Download complete
+794d8b8fb47b: Download complete
+c807d060ae33: Download complete
+c807d060ae33: Pull complete
+8438b55bfa39: Download complete
+166f645a3063: Pull complete
+794d8b8fb47b: Pull complete
+8438b55bfa39: Pull complete
+Digest: sha256:0bfc69a4758a86710e5c474032d28400a8bd00874766f9e8b1642ac2fd293159
+Status: Downloaded newer image for eclipse-temurin:21-jdk-alpine
+ ---> 0bfc69a4758a
+Step 2/9 : WORKDIR /src
+ ---> Running in d521d7a311f8
+ ---> Removed intermediate container d521d7a311f8
+ ---> 34e62418c91d
+Step 3/9 : COPY src/ .
+ ---> 93b712e19952
+Step 4/9 : RUN javac -d out HelloApp.java  && jar --create --file app.jar --main-class HelloApp -C out .
+ ---> Running in c7d38c1d7cf3
+ ---> Removed intermediate container c7d38c1d7cf3
+ ---> 552731be8228
+Step 5/9 : FROM eclipse-temurin:21-jre-alpine
+21-jre-alpine: Pulling from library/eclipse-temurin
+89353c5827a6: Pulling fs layer
+23e2976f95e6: Pulling fs layer
+fc16cce3c3e4: Pulling fs layer
+c5063e83da68: Pulling fs layer
+d27d558240d8: Download complete
+23e2976f95e6: Download complete
+8d24d6e65b97: Download complete
+fc16cce3c3e4: Download complete
+c5063e83da68: Download complete
+c5063e83da68: Pull complete
+89353c5827a6: Download complete
+23e2976f95e6: Pull complete
+fc16cce3c3e4: Pull complete
+89353c5827a6: Pull complete
+Digest: sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555
+Status: Downloaded newer image for eclipse-temurin:21-jre-alpine
+ ---> 51ab5e3302e7
+Step 6/9 : WORKDIR /app
+ ---> Running in 3a32314513af
+ ---> Removed intermediate container 3a32314513af
+ ---> 97f140fe1629
+Step 7/9 : COPY --from=build /src/app.jar .
+ ---> e0af667f29a1
+Step 8/9 : EXPOSE 8080
+ ---> Running in 2377dc4bca84
+ ---> Removed intermediate container 2377dc4bca84
+ ---> d009b03fa91a
+Step 9/9 : CMD ["java", "-jar", "app.jar"]
+ ---> Running in 2bbede503b58
+ ---> Removed intermediate container 2bbede503b58
+ ---> 05f3b05fa4ea
+Successfully built 05f3b05fa4ea
+Successfully tagged ajij-ms-java-app:multi
+$ docker run -d --name ajij-ms-java-app -p 8113:8080 ajij-ms-java-app:multi
+be05412671f0878b5f031d8a9f91e0c55e288f7c4f07acf336610151d5b1000a
+$ docker ps --filter name=ajij-ms-java-app --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+NAMES              IMAGE                    STATUS         PORTS
+ajij-ms-java-app   ajij-ms-java-app:multi   Up 4 seconds   0.0.0.0:8113->8080/tcp, [::]:8113->8080/tcp
+$ curl -s http://localhost:8113
+<h1>Hello World from Docker multi-stage build</h1><p>Java 21.0.12.1 (JRE only at runtime)</p>

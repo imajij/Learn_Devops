@@ -1,0 +1,62 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon   5.12kB
+Step 1/7 : FROM python:3.12
+ ---> 63828510c8b5
+Step 2/7 : WORKDIR /app
+ ---> Running in 6bc596cac662
+ ---> Removed intermediate container 6bc596cac662
+ ---> 264a1e2d4807
+Step 3/7 : COPY requirements.txt .
+ ---> c82bcf67b7e7
+Step 4/7 : RUN pip install -r requirements.txt
+ ---> Running in 08a9f64530d8
+Collecting flask==3.1.* (from -r requirements.txt (line 1))
+  Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+Collecting gunicorn==23.* (from -r requirements.txt (line 2))
+  Downloading gunicorn-23.0.0-py3-none-any.whl.metadata (4.4 kB)
+Collecting blinker>=1.9.0 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting click>=8.1.3 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting itsdangerous>=2.2.0 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+Collecting jinja2>=3.1.2 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting markupsafe>=2.1.1 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.7 kB)
+Collecting werkzeug>=3.1.0 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading werkzeug-3.1.9-py3-none-any.whl.metadata (4.1 kB)
+Collecting packaging (from gunicorn==23.*->-r requirements.txt (line 2))
+  Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+Downloading gunicorn-23.0.0-py3-none-any.whl (85 kB)
+Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+Downloading click-8.5.0-py3-none-any.whl (125 kB)
+Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (24 kB)
+Downloading werkzeug-3.1.9-py3-none-any.whl (228 kB)
+Downloading packaging-26.3-py3-none-any.whl (129 kB)
+Installing collected packages: packaging, markupsafe, itsdangerous, click, blinker, werkzeug, jinja2, gunicorn, flask
+Successfully installed blinker-1.9.0 click-8.5.0 flask-3.1.3 gunicorn-23.0.0 itsdangerous-2.2.0 jinja2-3.1.6 markupsafe-3.0.4 packaging-26.3 werkzeug-3.1.9
+[91mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+[0m[91m
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+[0m ---> Removed intermediate container 08a9f64530d8
+ ---> fb8f513b7f2b
+Step 5/7 : COPY app.py .
+ ---> 4c260444c713
+Step 6/7 : EXPOSE 5000
+ ---> Running in 93edf8f10c9a
+ ---> Removed intermediate container 93edf8f10c9a
+ ---> 99c0f37ea267
+Step 7/7 : CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "app:app"]
+ ---> Running in 08334a0ab1f3
+ ---> Removed intermediate container 08334a0ab1f3
+ ---> 30942df63512
+Successfully built 30942df63512
+Successfully tagged ajij-ms-python-app:single

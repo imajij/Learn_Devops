@@ -1,0 +1,9 @@
+# Single-stage version of the same app, only used to compare image size.
+# Uses the full node:24 image and keeps dev tooling and the npm cache in the final image.
+FROM node:24
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 8080
+CMD ["npm", "start"]

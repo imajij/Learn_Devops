@@ -1,0 +1,7 @@
+# Single-stage version, only for the size comparison: the JDK stays in the final image.
+FROM eclipse-temurin:21-jdk
+WORKDIR /src
+COPY src/ .
+RUN javac -d out HelloApp.java && jar --create --file app.jar --main-class HelloApp -C out .
+EXPOSE 8080
+CMD ["java", "-jar", "app.jar"]

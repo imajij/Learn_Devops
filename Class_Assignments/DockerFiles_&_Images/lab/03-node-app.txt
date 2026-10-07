@@ -1,0 +1,91 @@
+$ docker build -t ajij-ms-node-app:multi ./apps/node-app
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  5.632kB
+Step 1/15 : FROM node:22-alpine AS build
+ ---> 0a7108bf6c7b
+Step 2/15 : WORKDIR /app
+ ---> Using cache
+ ---> 14d7c0365133
+Step 3/15 : COPY package*.json ./
+ ---> df6b709d7e25
+Step 4/15 : RUN npm install
+ ---> Running in 73a6c39d5cdf
+
+added 94 packages, and audited 95 packages in 6s
+
+33 packages are looking for funding
+  run `npm fund` for details
+
+3 high severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+[91mnpm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+[0m ---> Removed intermediate container 73a6c39d5cdf
+ ---> 138ac4b02fb6
+Step 5/15 : COPY server.js ./
+ ---> a7a096362a13
+Step 6/15 : RUN npm test
+ ---> Running in dd51dd384998
+
+> node-multistage@1.0.0 test
+> node --check server.js
+
+ ---> Removed intermediate container dd51dd384998
+ ---> c7c7c02ccd01
+Step 7/15 : RUN npm prune --omit=dev
+ ---> Running in d8b3399097cc
+
+up to date, audited 69 packages in 620ms
+
+28 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+ ---> Removed intermediate container d8b3399097cc
+ ---> 3a6c2febf5ea
+Step 8/15 : FROM node:22-alpine
+ ---> 0a7108bf6c7b
+Step 9/15 : ENV NODE_ENV=production
+ ---> Running in 7622489bb7c8
+ ---> Removed intermediate container 7622489bb7c8
+ ---> 29b7a87662fa
+Step 10/15 : WORKDIR /app
+ ---> Running in 661f63bd52ac
+ ---> Removed intermediate container 661f63bd52ac
+ ---> 9a9c8d24c33e
+Step 11/15 : COPY --from=build /app/node_modules ./node_modules
+ ---> 209750e31311
+Step 12/15 : COPY --from=build /app/server.js /app/package.json ./
+ ---> e6a5432db7b9
+Step 13/15 : USER node
+ ---> Running in dabc456a9854
+ ---> Removed intermediate container dabc456a9854
+ ---> c155e0cae2b2
+Step 14/15 : EXPOSE 3000
+ ---> Running in 090977abe45e
+ ---> Removed intermediate container 090977abe45e
+ ---> 328d5ffeb8d3
+Step 15/15 : CMD ["node", "server.js"]
+ ---> Running in a5a58256c0a2
+ ---> Removed intermediate container a5a58256c0a2
+ ---> 4157c240868a
+Successfully built 4157c240868a
+Successfully tagged ajij-ms-node-app:multi
+$ docker run -d --name ajij-ms-node-app -p 8111:3000 ajij-ms-node-app:multi
+c9597edfbc9470b6fc3ebf2fedf23142ff0f4bbe94804b5d02f1b6a458a922bc
+$ docker ps --filter name=ajij-ms-node-app --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+NAMES              IMAGE                    STATUS         PORTS
+ajij-ms-node-app   ajij-ms-node-app:multi   Up 4 seconds   0.0.0.0:8111->3000/tcp, [::]:8111->3000/tcp
+$ curl -s http://localhost:8111
+<h1>Hello World from Docker multi-stage build</h1>
+<p>Node.js v22.23.3 + Express</p>

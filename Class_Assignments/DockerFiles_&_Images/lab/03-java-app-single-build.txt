@@ -1,0 +1,27 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon   5.12kB
+Step 1/6 : FROM eclipse-temurin:21-jdk
+ ---> 3e3c176ffed1
+Step 2/6 : WORKDIR /src
+ ---> Running in e06c245e0955
+ ---> Removed intermediate container e06c245e0955
+ ---> fcbefab3ef05
+Step 3/6 : COPY src/ .
+ ---> 1f6fa889c3fd
+Step 4/6 : RUN javac -d out HelloApp.java && jar --create --file app.jar --main-class HelloApp -C out .
+ ---> Running in 113d6ca9523a
+ ---> Removed intermediate container 113d6ca9523a
+ ---> 5f1d1f0fb109
+Step 5/6 : EXPOSE 8080
+ ---> Running in c17f7714c971
+ ---> Removed intermediate container c17f7714c971
+ ---> b78a4d65336e
+Step 6/6 : CMD ["java", "-jar", "app.jar"]
+ ---> Running in cefe57ed688f
+ ---> Removed intermediate container cefe57ed688f
+ ---> e3a041c06447
+Successfully built e3a041c06447
+Successfully tagged ajij-ms-java-app:single
