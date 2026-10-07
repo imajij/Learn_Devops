@@ -1,0 +1,60 @@
+$ docker build -t ajij-java-app ./java-app
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  4.096kB
+Step 1/6 : FROM eclipse-temurin:21-jdk
+21-jdk: Pulling from library/eclipse-temurin
+0a7d72162cd6: Pulling fs layer
+5fa77813dc56: Pulling fs layer
+c8537097331f: Pulling fs layer
+2dff556bf912: Pulling fs layer
+e12971b8d00e: Pulling fs layer
+06db5ba23986: Pulling fs layer
+4d702f0a2aae: Download complete
+0a7d72162cd6: Download complete
+5fa77813dc56: Download complete
+2dff556bf912: Download complete
+74de304cb98a: Download complete
+06db5ba23986: Download complete
+5fa77813dc56: Pull complete
+06db5ba23986: Pull complete
+e12971b8d00e: Download complete
+e12971b8d00e: Pull complete
+c8537097331f: Download complete
+0a7d72162cd6: Pull complete
+2dff556bf912: Pull complete
+c8537097331f: Pull complete
+Digest: sha256:3e3c176ffed168beb42c607be9bc1639b466cf00261a0fb04425562c9d0c5c2b
+Status: Downloaded newer image for eclipse-temurin:21-jdk
+ ---> 3e3c176ffed1
+Step 2/6 : WORKDIR /app
+ ---> Running in 572c02283146
+ ---> Removed intermediate container 572c02283146
+ ---> cfc228d9c6ec
+Step 3/6 : COPY HelloWorld.java .
+ ---> 6f8c45c78756
+Step 4/6 : RUN javac HelloWorld.java
+ ---> Running in 91ab6b569062
+ ---> Removed intermediate container 91ab6b569062
+ ---> 0de8320bc501
+Step 5/6 : EXPOSE 8080
+ ---> Running in 285398bda2fe
+ ---> Removed intermediate container 285398bda2fe
+ ---> 77a33af5969a
+Step 6/6 : CMD ["java", "HelloWorld"]
+ ---> Running in 9b9db69e96b1
+ ---> Removed intermediate container 9b9db69e96b1
+ ---> baf23439de24
+Successfully built baf23439de24
+Successfully tagged ajij-java-app:latest
+$ docker run -d --name ajij-java-app -p 8103:8080 ajij-java-app
+b275ff87608667e063c91bcaa016a0062d47f09226d0a4e41b7a58791f9b7765
+$ docker ps --filter name=^ajij-java-app$ --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+NAMES           IMAGE           STATUS         PORTS
+ajij-java-app   ajij-java-app   Up 4 seconds   0.0.0.0:8103->8080/tcp, [::]:8103->8080/tcp
+$ curl -s http://localhost:8103 | grep -o '<h1>.*</h1>'
+<h1>Hello World</h1>
+$ docker logs ajij-java-app
+Java app listening on port 8080

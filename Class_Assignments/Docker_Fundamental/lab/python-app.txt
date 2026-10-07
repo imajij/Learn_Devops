@@ -1,0 +1,90 @@
+$ docker build -t ajij-python-app ./python-app
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon   5.12kB
+Step 1/7 : FROM python:3.12-slim
+3.12-slim: Pulling from library/python
+6e2fcafe72a4: Pulling fs layer
+4dbdca1a513d: Pulling fs layer
+bbeda6b4abb7: Pulling fs layer
+387b25ff7b94: Pulling fs layer
+e5bc9678f6a8: Download complete
+6e2fcafe72a4: Download complete
+387b25ff7b94: Download complete
+ba62fc866f1e: Download complete
+4dbdca1a513d: Download complete
+bbeda6b4abb7: Download complete
+387b25ff7b94: Pull complete
+bbeda6b4abb7: Pull complete
+6e2fcafe72a4: Pull complete
+4dbdca1a513d: Pull complete
+Digest: sha256:05cda9777409a9c3ffddd94a4c476b79f0769a0b4857f0c7ed9226b6800b0d6f
+Status: Downloaded newer image for python:3.12-slim
+ ---> 05cda9777409
+Step 2/7 : WORKDIR /app
+ ---> Running in 1e2ee00ab52e
+ ---> Removed intermediate container 1e2ee00ab52e
+ ---> 8b2bf73ff2c2
+Step 3/7 : COPY requirements.txt .
+ ---> efe908ed66e3
+Step 4/7 : RUN pip install --no-cache-dir -r requirements.txt
+ ---> Running in 964f29f6fca9
+Collecting flask==3.1.* (from -r requirements.txt (line 1))
+  Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+Collecting blinker>=1.9.0 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting click>=8.1.3 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting itsdangerous>=2.2.0 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+Collecting jinja2>=3.1.2 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting markupsafe>=2.1.1 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.7 kB)
+Collecting werkzeug>=3.1.0 (from flask==3.1.*->-r requirements.txt (line 1))
+  Downloading werkzeug-3.1.9-py3-none-any.whl.metadata (4.1 kB)
+Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+Downloading click-8.5.0-py3-none-any.whl (125 kB)
+Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (24 kB)
+Downloading werkzeug-3.1.9-py3-none-any.whl (228 kB)
+Installing collected packages: markupsafe, itsdangerous, click, blinker, werkzeug, jinja2, flask
+Successfully installed blinker-1.9.0 click-8.5.0 flask-3.1.3 itsdangerous-2.2.0 jinja2-3.1.6 markupsafe-3.0.4 werkzeug-3.1.9
+[91mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+[0m[91m
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+[0m ---> Removed intermediate container 964f29f6fca9
+ ---> 0b91cb10541a
+Step 5/7 : COPY app.py .
+ ---> d7f0af859764
+Step 6/7 : EXPOSE 5000
+ ---> Running in 0e27346a0857
+ ---> Removed intermediate container 0e27346a0857
+ ---> 52c466c17cae
+Step 7/7 : CMD ["python", "app.py"]
+ ---> Running in b7ef0deb9acf
+ ---> Removed intermediate container b7ef0deb9acf
+ ---> a5660cb65a62
+Successfully built a5660cb65a62
+Successfully tagged ajij-python-app:latest
+$ docker run -d --name ajij-python-app -p 8102:5000 ajij-python-app
+b8f492b7d165e1472364a9e08048cabba5d1010cd2c36c23c2126beb485f044c
+$ docker ps --filter name=^ajij-python-app$ --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+NAMES             IMAGE             STATUS         PORTS
+ajij-python-app   ajij-python-app   Up 4 seconds   0.0.0.0:8102->5000/tcp, [::]:8102->5000/tcp
+$ curl -s http://localhost:8102 | grep -o '<h1>.*</h1>'
+<h1>Hello World</h1>
+$ docker logs ajij-python-app
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.17.0.4:5000
+[33mPress CTRL+C to quit[0m
+172.17.0.1 - - [07/Oct/2026 16:23:04] "GET / HTTP/1.1" 200 -

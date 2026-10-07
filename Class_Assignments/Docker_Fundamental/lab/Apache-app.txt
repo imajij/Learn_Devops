@@ -1,0 +1,49 @@
+$ docker build -t ajij-apache-app ./Apache-app
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  3.072kB
+Step 1/3 : FROM httpd:2.4
+2.4: Pulling from library/httpd
+902e2a8a7274: Pulling fs layer
+e71ac08dcbc4: Pulling fs layer
+2bfba9b8d1a6: Pulling fs layer
+16216c3fcaf0: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+4f4fb700ef54: Already exists
+595cc0f8833f: Download complete
+2bfba9b8d1a6: Download complete
+4f4fb700ef54: Pull complete
+2bfba9b8d1a6: Pull complete
+16216c3fcaf0: Download complete
+902e2a8a7274: Download complete
+902e2a8a7274: Pull complete
+2468c11e8512: Download complete
+e71ac08dcbc4: Download complete
+16216c3fcaf0: Pull complete
+e71ac08dcbc4: Pull complete
+Digest: sha256:c842ac797bd1fe8b3cd26d002ac9d948aa2814097544600600b35aef42e6785a
+Status: Downloaded newer image for httpd:2.4
+ ---> c842ac797bd1
+Step 2/3 : COPY index.html /usr/local/apache2/htdocs/index.html
+ ---> 281d8b091a7e
+Step 3/3 : EXPOSE 80
+ ---> Running in 3e5db0abf6a5
+ ---> Removed intermediate container 3e5db0abf6a5
+ ---> 7af3a5a826d5
+Successfully built 7af3a5a826d5
+Successfully tagged ajij-apache-app:latest
+$ docker run -d --name ajij-apache-app -p 8104:80 ajij-apache-app
+41fa8ccc2e74bba7e29705ca6f2143b9f638b0960de1249e9ce6ad8265460533
+$ docker ps --filter name=^ajij-apache-app$ --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+NAMES             IMAGE             STATUS         PORTS
+ajij-apache-app   ajij-apache-app   Up 4 seconds   0.0.0.0:8104->80/tcp, [::]:8104->80/tcp
+$ curl -s http://localhost:8104 | grep -o '<h1>.*</h1>'
+<h1>Hello World</h1>
+$ docker logs ajij-apache-app
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 172.17.0.6. Set the 'ServerName' directive globally to suppress this message
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 172.17.0.6. Set the 'ServerName' directive globally to suppress this message
+[Wed Oct 07 16:24:38.579965 2026] [mpm_event:notice] [pid 1:tid 1] AH00489: Apache/2.4.69 (Unix) configured -- resuming normal operations
+[Wed Oct 07 16:24:38.580023 2026] [core:notice] [pid 1:tid 1] AH00094: Command line: 'httpd -D FOREGROUND'
+172.17.0.1 - - [07/Oct/2026:16:24:42 +0000] "GET / HTTP/1.1" 200 217

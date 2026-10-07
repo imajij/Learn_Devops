@@ -1,0 +1,55 @@
+$ docker build -t ajij-nodejs-app ./nodejs-app
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  5.632kB
+Step 1/6 : FROM node:22-alpine
+22-alpine: Pulling from library/node
+66fa63c7a061: Pulling fs layer
+a9986cd6f37d: Pulling fs layer
+87919ed734a3: Pulling fs layer
+74849c662da7: Pulling fs layer
+d8d82d0aea6f: Download complete
+7f21e41e3cdc: Download complete
+66fa63c7a061: Download complete
+74849c662da7: Download complete
+a9986cd6f37d: Download complete
+a9986cd6f37d: Pull complete
+87919ed734a3: Download complete
+87919ed734a3: Pull complete
+66fa63c7a061: Pull complete
+74849c662da7: Pull complete
+Digest: sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
+Status: Downloaded newer image for node:22-alpine
+ ---> 0a7108bf6c7b
+Step 2/6 : WORKDIR /app
+ ---> Running in c0fcecee551d
+ ---> Removed intermediate container c0fcecee551d
+ ---> 14d7c0365133
+Step 3/6 : COPY package.json server.js ./
+ ---> d81385e6afe3
+Step 4/6 : USER node
+ ---> Running in b8d32e9aa263
+ ---> Removed intermediate container b8d32e9aa263
+ ---> 6f14a08bed85
+Step 5/6 : EXPOSE 3000
+ ---> Running in d9605b767acd
+ ---> Removed intermediate container d9605b767acd
+ ---> 4488bdd79423
+Step 6/6 : CMD ["node", "server.js"]
+ ---> Running in 7b6e14a15f60
+ ---> Removed intermediate container 7b6e14a15f60
+ ---> 4b82f02fbc02
+Successfully built 4b82f02fbc02
+Successfully tagged ajij-nodejs-app:latest
+$ docker run -d --name ajij-nodejs-app -p 8101:3000 ajij-nodejs-app
+a382d9a4767de456f7ad773644cc08e6b7c78211ac0d46dc87a7b53f697b73b9
+$ docker ps --filter name=^ajij-nodejs-app$ --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+NAMES             IMAGE             STATUS         PORTS
+ajij-nodejs-app   ajij-nodejs-app   Up 4 seconds   0.0.0.0:8101->3000/tcp, [::]:8101->3000/tcp
+$ curl -s http://localhost:8101 | grep -o '<h1>.*</h1>'
+<h1>Hello World</h1>
+$ docker logs ajij-nodejs-app
+Node.js app listening on port 3000
+GET /

@@ -1,0 +1,18 @@
+$ docker ps --filter name=-app --format 'table {{.Names}}	{{.Image}}	{{.Status}}	{{.Ports}}'
+NAMES             IMAGE             STATUS              PORTS
+ajij-nginx-app    ajij-nginx-app    Up 19 seconds       0.0.0.0:8106->80/tcp, [::]:8106->80/tcp
+ajij-react-app    ajij-react-app    Up 23 seconds       0.0.0.0:8105->80/tcp, [::]:8105->80/tcp
+ajij-apache-app   ajij-apache-app   Up About a minute   0.0.0.0:8104->80/tcp, [::]:8104->80/tcp
+ajij-java-app     ajij-java-app     Up About a minute   0.0.0.0:8103->8080/tcp, [::]:8103->8080/tcp
+ajij-python-app   ajij-python-app   Up 2 minutes        0.0.0.0:8102->5000/tcp, [::]:8102->5000/tcp
+ajij-nodejs-app   ajij-nodejs-app   Up 3 minutes        0.0.0.0:8101->3000/tcp, [::]:8101->3000/tcp
+$ docker images --format 'table {{.Repository}}	{{.Tag}}	{{.Size}}' | grep -E 'REPOSITORY|ajij-.*-app'
+REPOSITORY              TAG          SIZE
+ajij-nginx-app          latest       93MB
+ajij-react-app          latest       93.3MB
+ajij-apache-app         latest       205MB
+ajij-java-app           latest       756MB
+ajij-python-app         latest       223MB
+ajij-nodejs-app         latest       234MB
+$ curl -s http://localhost:8105 | grep -o '<div id="root"></div>'
+<div id="root"></div>
