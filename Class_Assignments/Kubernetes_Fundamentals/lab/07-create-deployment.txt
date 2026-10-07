@@ -1,0 +1,25 @@
+$ kubectl create deployment kubernetes-bootcamp --image=gcr.io/google-samples/kubernetes-bootcamp:v1
+deployment.apps/kubernetes-bootcamp created
+$ kubectl rollout status deployment/kubernetes-bootcamp --timeout=180s
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 0 of 1 updated replicas are available...
+deployment "kubernetes-bootcamp" successfully rolled out
+$ kubectl get deployments
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+kubernetes-bootcamp   1/1     1            1           1s
+$ kubectl get replicasets
+NAME                             DESIRED   CURRENT   READY   AGE
+kubernetes-bootcamp-5cc66bcc9b   1         1         1       1s
+$ kubectl get pods -o wide
+NAME                                   READY   STATUS        RESTARTS   AGE   IP           NODE    NOMINATED NODE   READINESS GATES
+kubernetes-bootcamp-5cc66bcc9b-8qxzf   1/1     Running       0          1s    10.244.0.5   k8s-a   <none>           <none>
+kubernetes-bootcamp-5cc66bcc9b-sghgw   1/1     Terminating   0          34s   10.244.0.4   k8s-a   <none>           <none>
+$ POD=$(kubectl get pods -l app=kubernetes-bootcamp -o jsonpath="{.items[0].metadata.name}"); echo POD=$POD
+POD=kubernetes-bootcamp-5cc66bcc9b-8qxzf
+### The bootcamp image is amd64-only; on this arm64 node it runs under qemu emulation and takes a few seconds to start listening
+$ until kubectl logs $POD | grep -q Started; do sleep 2; done; kubectl logs $POD
+Kubernetes Bootcamp App Started At: 2026-10-07T16:37:03.840Z | Running On:  kubernetes-bootcamp-5cc66bcc9b-8qxzf 
+
+$ kubectl exec $POD -- uname -m
+x86_64
+$ kubectl exec $POD -- curl -s localhost:8080
+Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5cc66bcc9b-8qxzf | v=1

@@ -1,0 +1,16 @@
+### Right after "minikube start" the node was NotReady (CNI still starting). Waiting for Ready:
+$ kubectl wait --for=condition=Ready node/k8s-a --timeout=180s
+node/k8s-a condition met
+$ kubectl get nodes -o wide
+NAME    STATUS   ROLES           AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION              CONTAINER-RUNTIME
+k8s-a   Ready    control-plane   42s   v1.37.0   192.168.49.2   <none>        Debian GNU/Linux 12 (bookworm)   6.8.0-117-generic (arm64)   containerd://2.3.4
+$ kubectl describe node k8s-a | grep -E 'Ready|cpu:|memory:|Container Runtime|Kubelet Version|PodCIDR:'
+  Ready            True    Wed, 07 Oct 2026 22:05:30 +0530   Wed, 07 Oct 2026 22:05:30 +0530   KubeletReady                 kubelet is posting ready status
+  cpu:                10
+  memory:             16340012Ki
+  cpu:                10
+  memory:             16340012Ki
+  Container Runtime Version:  containerd://2.3.4
+  Kubelet Version:            v1.37.0
+PodCIDR:                      10.244.0.0/24
+  Normal  NodeReady                8s    kubelet          Node k8s-a status is now: NodeReady

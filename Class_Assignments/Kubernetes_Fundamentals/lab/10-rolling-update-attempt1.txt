@@ -1,0 +1,43 @@
+$ kubectl set image deployment/kubernetes-bootcamp kubernetes-bootcamp=docker.io/jocatalin/kubernetes-bootcamp:v2
+deployment.apps/kubernetes-bootcamp image updated
+$ kubectl rollout status deployment/kubernetes-bootcamp --timeout=180s
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 old replicas are pending termination...
+deployment "kubernetes-bootcamp" successfully rolled out
+$ kubectl get replicasets
+NAME                             DESIRED   CURRENT   READY   AGE
+kubernetes-bootcamp-5b97597885   2         2         2       6s
+kubernetes-bootcamp-5cc66bcc9b   0         0         0       64s
+$ kubectl exec client -- curl -s http://kubernetes-bootcamp:8080
+Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5cc66bcc9b-qhnh4 | v=1
+$ kubectl set image deployment/kubernetes-bootcamp kubernetes-bootcamp=gcr.io/google-samples/kubernetes-bootcamp:v10
+deployment.apps/kubernetes-bootcamp image updated
+$ sleep 20; kubectl get pods
+NAME                                   READY   STATUS             RESTARTS   AGE
+client                                 1/1     Running            0          42s
+kubernetes-bootcamp-556487b4d4-b4bhx   0/1     ImagePullBackOff   0          20s
+kubernetes-bootcamp-5b97597885-57bwn   1/1     Running            0          21s
+kubernetes-bootcamp-5b97597885-pt96n   1/1     Running            0          26s
+kubernetes-bootcamp-5cc66bcc9b-8qxzf   1/1     Terminating        0          84s
+kubernetes-bootcamp-5cc66bcc9b-qhnh4   1/1     Terminating        0          33s
+$ kubectl describe pods | grep -m2 -E "Failed|ErrImagePull|not found"
+$ kubectl rollout undo deployment/kubernetes-bootcamp
+deployment.apps/kubernetes-bootcamp rolled back
+$ kubectl rollout status deployment/kubernetes-bootcamp --timeout=180s
+deployment "kubernetes-bootcamp" successfully rolled out
+$ kubectl rollout history deployment/kubernetes-bootcamp
+deployment.apps/kubernetes-bootcamp 
+REVISION  CHANGE-CAUSE
+1         <none>
+3         <none>
+4         <none>
+
+$ kubectl describe deployment kubernetes-bootcamp | grep Image
+    Image:         docker.io/jocatalin/kubernetes-bootcamp:v2
+$ kubectl delete service/kubernetes-bootcamp deployment/kubernetes-bootcamp pod/client
+service "kubernetes-bootcamp" deleted from default namespace
+deployment.apps "kubernetes-bootcamp" deleted from default namespace
+pod "client" deleted from default namespace

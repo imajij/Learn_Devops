@@ -1,0 +1,64 @@
+$ kubectl api-resources --namespaced=true | head -20
+NAME                        SHORTNAMES   APIVERSION                     NAMESPACED   KIND
+bindings                                 v1                             true         Binding
+configmaps                  cm           v1                             true         ConfigMap
+endpoints                   ep           v1                             true         Endpoints
+events                      ev           v1                             true         Event
+limitranges                 limits       v1                             true         LimitRange
+persistentvolumeclaims      pvc          v1                             true         PersistentVolumeClaim
+pods                        po           v1                             true         Pod
+podtemplates                             v1                             true         PodTemplate
+replicationcontrollers      rc           v1                             true         ReplicationController
+resourcequotas              quota        v1                             true         ResourceQuota
+secrets                                  v1                             true         Secret
+serviceaccounts             sa           v1                             true         ServiceAccount
+services                    svc          v1                             true         Service
+controllerrevisions                      apps/v1                        true         ControllerRevision
+daemonsets                  ds           apps/v1                        true         DaemonSet
+deployments                 deploy       apps/v1                        true         Deployment
+replicasets                 rs           apps/v1                        true         ReplicaSet
+statefulsets                sts          apps/v1                        true         StatefulSet
+localsubjectaccessreviews                authorization.k8s.io/v1        true         LocalSubjectAccessReview
+$ kubectl get namespaces
+NAME              STATUS   AGE
+default           Active   65s
+kube-node-lease   Active   65s
+kube-public       Active   65s
+kube-system       Active   65s
+$ kubectl run hello-pod --image=nginx:1.27 --labels=app=hello
+pod/hello-pod created
+$ kubectl wait --for=condition=Ready pod/hello-pod --timeout=120s
+pod/hello-pod condition met
+$ kubectl get pods -o wide --show-labels
+NAME        READY   STATUS    RESTARTS   AGE   IP           NODE    NOMINATED NODE   READINESS GATES   LABELS
+hello-pod   1/1     Running   0          26s   10.244.0.3   k8s-a   <none>           <none>            app=hello
+$ kubectl describe pod hello-pod | sed -n '/^Events:/,$p'
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  26s   default-scheduler  Successfully assigned default/hello-pod to k8s-a
+  Normal  Pulling    26s   kubelet            spec.containers{hello-pod}: Pulling image "nginx:1.27"
+  Normal  Pulled     0s    kubelet            spec.containers{hello-pod}: Successfully pulled image "nginx:1.27" in 25.531s (25.531s including waiting). Image size: 68857691 bytes.
+  Normal  Created    0s    kubelet            spec.containers{hello-pod}: Container created
+  Normal  Started    0s    kubelet            spec.containers{hello-pod}: Container started
+$ kubectl exec hello-pod -- nginx -v
+nginx version: nginx/1.27.5
+$ kubectl logs hello-pod | tail -3
+2026/10/07 16:36:27 [notice] 1#1: start worker process 36
+2026/10/07 16:36:27 [notice] 1#1: start worker process 37
+2026/10/07 16:36:27 [notice] 1#1: start worker process 38
+$ kubectl explain pod.spec.containers.image | head -12
+KIND:       Pod
+VERSION:    v1
+
+FIELD: image <string>
+
+
+DESCRIPTION:
+    Container image name. More info:
+    https://kubernetes.io/docs/concepts/containers/images This field is optional
+    to allow higher level config management to default or override container
+    images in workload controllers like Deployments and StatefulSets.
+    
+$ kubectl delete pod hello-pod
+pod "hello-pod" deleted from default namespace

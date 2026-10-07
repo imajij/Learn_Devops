@@ -1,0 +1,42 @@
+### Second run of steps 09-10 (the first run is in *-attempt1.txt). Recreate the deployment, Service and client pod from steps 07-08:
+$ kubectl create deployment kubernetes-bootcamp --image=gcr.io/google-samples/kubernetes-bootcamp:v1
+deployment.apps/kubernetes-bootcamp created
+$ kubectl expose deployment/kubernetes-bootcamp --type=NodePort --port 8080
+service/kubernetes-bootcamp exposed
+$ kubectl run client --image=curlimages/curl:8.10.1 -- sleep 3600; kubectl wait --for=condition=Ready pod/client --timeout=90s
+pod/client created
+pod/client condition met
+$ kubectl scale deployment/kubernetes-bootcamp --replicas=4
+deployment.apps/kubernetes-bootcamp scaled
+$ kubectl rollout status deployment/kubernetes-bootcamp --timeout=180s
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 of 4 updated replicas are available...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 2 of 4 updated replicas are available...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 3 of 4 updated replicas are available...
+deployment "kubernetes-bootcamp" successfully rolled out
+$ kubectl get deployments
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+kubernetes-bootcamp   4/4     4            4           1s
+$ kubectl get pods -o wide
+NAME                                   READY   STATUS    RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES
+client                                 1/1     Running   0          1s    10.244.0.16   k8s-a   <none>           <none>
+kubernetes-bootcamp-5cc66bcc9b-4p5dw   1/1     Running   0          1s    10.244.0.19   k8s-a   <none>           <none>
+kubernetes-bootcamp-5cc66bcc9b-c9ctn   1/1     Running   0          1s    10.244.0.15   k8s-a   <none>           <none>
+kubernetes-bootcamp-5cc66bcc9b-j6bpb   1/1     Running   0          1s    10.244.0.18   k8s-a   <none>           <none>
+kubernetes-bootcamp-5cc66bcc9b-ldsfk   1/1     Running   0          1s    10.244.0.17   k8s-a   <none>           <none>
+### The bootcamp Deployment has no readinessProbe, so a pod is "Ready" before the emulated app listens. Wait for every pod to log "Started" first:
+$ for p in $(kubectl get pods -l app=kubernetes-bootcamp -o name); do until kubectl logs $p | grep -q Started; do sleep 2; done; done; echo all 4 apps listening
+all 4 apps listening
+$ kubectl exec client -- sh -c "for i in \$(seq 1 20); do curl -s http://kubernetes-bootcamp:8080; done" | sort | uniq -c
+   7 Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5cc66bcc9b-4p5dw | v=1
+   8 Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5cc66bcc9b-c9ctn | v=1
+   2 Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5cc66bcc9b-j6bpb | v=1
+   3 Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5cc66bcc9b-ldsfk | v=1
+$ kubectl scale deployment/kubernetes-bootcamp --replicas=2
+deployment.apps/kubernetes-bootcamp scaled
+$ sleep 5; kubectl get pods
+NAME                                   READY   STATUS        RESTARTS   AGE
+client                                 1/1     Running       0          9s
+kubernetes-bootcamp-5cc66bcc9b-4p5dw   1/1     Terminating   0          9s
+kubernetes-bootcamp-5cc66bcc9b-c9ctn   1/1     Running       0          9s
+kubernetes-bootcamp-5cc66bcc9b-j6bpb   1/1     Running       0          9s
+kubernetes-bootcamp-5cc66bcc9b-ldsfk   1/1     Terminating   0          9s

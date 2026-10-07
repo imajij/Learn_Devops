@@ -1,0 +1,57 @@
+$ kubectl set image deployment/kubernetes-bootcamp kubernetes-bootcamp=docker.io/jocatalin/kubernetes-bootcamp:v2
+deployment.apps/kubernetes-bootcamp image updated
+$ kubectl rollout status deployment/kubernetes-bootcamp --timeout=180s
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 0 out of 2 new replicas have been updated...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "kubernetes-bootcamp" rollout to finish: 1 old replicas are pending termination...
+deployment "kubernetes-bootcamp" successfully rolled out
+$ kubectl get replicasets
+NAME                             DESIRED   CURRENT   READY   AGE
+kubernetes-bootcamp-5b97597885   2         2         2       1s
+kubernetes-bootcamp-5cc66bcc9b   0         0         0       10s
+$ kubectl wait --for=delete pod -l pod-template-hash=$(kubectl get rs -l app=kubernetes-bootcamp --sort-by=.metadata.creationTimestamp -o jsonpath="{.items[0].metadata.labels.pod-template-hash}") --timeout=120s
+pod/kubernetes-bootcamp-5cc66bcc9b-4p5dw condition met
+pod/kubernetes-bootcamp-5cc66bcc9b-c9ctn condition met
+pod/kubernetes-bootcamp-5cc66bcc9b-j6bpb condition met
+pod/kubernetes-bootcamp-5cc66bcc9b-ldsfk condition met
+$ for p in $(kubectl get pods -l app=kubernetes-bootcamp -o name); do until kubectl logs $p | grep -q Started; do sleep 2; done; done
+$ kubectl exec client -- sh -c "for i in \$(seq 1 6); do curl -s http://kubernetes-bootcamp:8080; done"
+Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5b97597885-bbtnf | v=2
+Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5b97597885-bbtnf | v=2
+Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5b97597885-bbtnf | v=2
+Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5b97597885-bbtnf | v=2
+Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5b97597885-bbtnf | v=2
+Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5b97597885-k65rm | v=2
+### Now a bad update: tag v10 does not exist
+$ kubectl set image deployment/kubernetes-bootcamp kubernetes-bootcamp=gcr.io/google-samples/kubernetes-bootcamp:v10
+deployment.apps/kubernetes-bootcamp image updated
+$ sleep 20; kubectl get pods
+NAME                                   READY   STATUS             RESTARTS      AGE
+client                                 1/1     Running            0             62s
+kubernetes-bootcamp-556487b4d4-9nqh6   0/1     ImagePullBackOff   0             21s
+kubernetes-bootcamp-5b97597885-bbtnf   1/1     Running            1 (52s ago)   52s
+kubernetes-bootcamp-5b97597885-k65rm   1/1     Running            0             53s
+$ kubectl get events --field-selector reason=Failed -o custom-columns=MESSAGE:.message | head -3 | cut -c1-160
+MESSAGE
+Failed to pull image "gcr.io/google-samples/kubernetes-bootcamp:v10": rpc error: code = NotFound desc = failed to pull and unpack image "gcr.io/google-samples/k
+Error: ErrImagePull
+$ kubectl rollout undo deployment/kubernetes-bootcamp
+deployment.apps/kubernetes-bootcamp rolled back
+$ kubectl rollout status deployment/kubernetes-bootcamp --timeout=180s
+deployment "kubernetes-bootcamp" successfully rolled out
+$ kubectl rollout history deployment/kubernetes-bootcamp
+deployment.apps/kubernetes-bootcamp 
+REVISION  CHANGE-CAUSE
+1         <none>
+3         <none>
+4         <none>
+
+$ kubectl describe deployment kubernetes-bootcamp | grep Image
+    Image:         docker.io/jocatalin/kubernetes-bootcamp:v2
+$ kubectl delete service/kubernetes-bootcamp deployment/kubernetes-bootcamp pod/client
+service "kubernetes-bootcamp" deleted from default namespace
+deployment.apps "kubernetes-bootcamp" deleted from default namespace
+pod "client" deleted from default namespace

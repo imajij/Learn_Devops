@@ -1,0 +1,14 @@
+$ minikube start -p k8s-a --driver=docker --cpus=2 --memory=3072
+* [k8s-a] minikube v1.39.0 on Darwin 26.6.2 (arm64)
+* Using the docker driver based on user configuration
+* Using Docker Desktop driver with root privileges
+* Starting "k8s-a" primary control-plane node in "k8s-a" cluster
+* Pulling base image v0.0.51 ...
+### (470.53 MiB kicbase image download progress bar trimmed)
+! minikube was unable to download gcr.io/k8s-minikube/kicbase:v0.0.51, but successfully downloaded docker.io/kicbase/stable:v0.0.51@sha256:4a1c825b61479e6c898851ea66f13c620aaeab6002746e95067fc2c4b38a0b24 as a fallback image
+* Preparing Kubernetes v1.37.0 on containerd 2.3.4 ...
+* Configuring CNI (Container Networking Interface) ...
+* Verifying Kubernetes components...
+  - Using image gcr.io/k8s-minikube/storage-provisioner:v5
+* Enabled addons: storage-provisioner, default-storageclass
+* Done! kubectl is now configured to use "k8s-a" cluster and "default" namespace by default

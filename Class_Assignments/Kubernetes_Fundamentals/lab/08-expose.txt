@@ -1,0 +1,41 @@
+$ kubectl run client --image=curlimages/curl:8.10.1 -- sleep 3600; kubectl wait --for=condition=Ready pod/client --timeout=90s
+pod/client created
+pod/client condition met
+$ kubectl expose deployment/kubernetes-bootcamp --type=NodePort --port 8080
+service/kubernetes-bootcamp exposed
+$ kubectl get services
+NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+kubernetes            ClusterIP   10.96.0.1       <none>        443/TCP          2m48s
+kubernetes-bootcamp   NodePort    10.110.165.43   <none>        8080:32055/TCP   0s
+$ kubectl describe service kubernetes-bootcamp
+Name:                     kubernetes-bootcamp
+Namespace:                default
+Labels:                   app=kubernetes-bootcamp
+Annotations:              <none>
+Selector:                 app=kubernetes-bootcamp
+Type:                     NodePort
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.110.165.43
+IPs:                      10.110.165.43
+Port:                     <unset>  8080/TCP
+TargetPort:               8080/TCP
+NodePort:                 <unset>  32055/TCP
+Endpoints:                10.244.0.5:8080
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Internal Traffic Policy:  Cluster
+Events:                   <none>
+$ kubectl get endpointslices -l kubernetes.io/service-name=kubernetes-bootcamp
+NAME                        ADDRESSTYPE   PORTS   ENDPOINTS    AGE
+kubernetes-bootcamp-4vmfk   IPv4          8080    10.244.0.5   0s
+### Docker driver on macOS: the node IP 192.168.49.2 is not reachable from the Mac, so "minikube service --url" opens a tunnel and must stay running
+$ (minikube -p k8s-a service kubernetes-bootcamp --url > ~/devops-lab/k8s-a/url.txt 2>/dev/null &) ; until grep -q http ~/devops-lab/k8s-a/url.txt; do sleep 1; done; URL=$(head -1 ~/devops-lab/k8s-a/url.txt); echo $URL
+http://127.0.0.1:55882
+$ curl -s $URL
+Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5cc66bcc9b-8qxzf | v=1
+$ curl -s --max-time 3 http://$(minikube -p k8s-a ip):$(kubectl get svc kubernetes-bootcamp -o jsonpath={.spec.ports[0].nodePort}) || echo "direct NodePort from macOS: timed out (exit $?)"
+direct NodePort from macOS: timed out (exit 28)
+$ pkill -f "minikube -p k8s-a service kubernetes-bootcamp"; rm -f ~/devops-lab/k8s-a/url.txt
+$ kubectl exec client -- curl -s http://kubernetes-bootcamp:8080
+Hello Kubernetes bootcamp! | Running on: kubernetes-bootcamp-5cc66bcc9b-8qxzf | v=1

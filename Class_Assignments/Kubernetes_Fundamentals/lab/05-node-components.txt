@@ -1,0 +1,25 @@
+$ minikube -p k8s-a ssh -- systemctl is-active kubelet containerd
+active
+active
+$ minikube -p k8s-a ssh -- sudo crictl ps -o json | jq -r '.containers[] | [.metadata.name, .state, .labels["io.kubernetes.pod.name"]] | @tsv' | column -t
+coredns                  CONTAINER_RUNNING  coredns-559f6c778d-rn5zl
+storage-provisioner      CONTAINER_RUNNING  storage-provisioner
+kindnet-cni              CONTAINER_RUNNING  kindnet-dwqls
+kube-proxy               CONTAINER_RUNNING  kube-proxy-qlrb4
+etcd                     CONTAINER_RUNNING  etcd-k8s-a
+kube-controller-manager  CONTAINER_RUNNING  kube-controller-manager-k8s-a
+kube-scheduler           CONTAINER_RUNNING  kube-scheduler-k8s-a
+kube-apiserver           CONTAINER_RUNNING  kube-apiserver-k8s-a
+$ kubectl get daemonset -n kube-system
+NAME         DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+kindnet      1         1         1       1            1           <none>                   59s
+kube-proxy   1         1         1       1            1           kubernetes.io/os=linux   60s
+$ kubectl describe node k8s-a | sed -n '/^Conditions:/,/^Addresses:/p'
+Conditions:
+  Type             Status  LastHeartbeatTime                 LastTransitionTime                Reason                       Message
+  ----             ------  -----------------                 ------------------                ------                       -------
+  MemoryPressure   False   Wed, 07 Oct 2026 22:05:30 +0530   Wed, 07 Oct 2026 22:04:55 +0530   KubeletHasSufficientMemory   kubelet has sufficient memory available
+  DiskPressure     False   Wed, 07 Oct 2026 22:05:30 +0530   Wed, 07 Oct 2026 22:04:55 +0530   KubeletHasNoDiskPressure     kubelet has no disk pressure
+  PIDPressure      False   Wed, 07 Oct 2026 22:05:30 +0530   Wed, 07 Oct 2026 22:04:55 +0530   KubeletHasSufficientPID      kubelet has sufficient PID available
+  Ready            True    Wed, 07 Oct 2026 22:05:30 +0530   Wed, 07 Oct 2026 22:05:30 +0530   KubeletReady                 kubelet is posting ready status
+Addresses:

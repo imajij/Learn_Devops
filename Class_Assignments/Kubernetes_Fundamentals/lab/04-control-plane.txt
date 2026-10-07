@@ -1,0 +1,20 @@
+$ kubectl get pods -n kube-system -o wide
+NAME                            READY   STATUS    RESTARTS   AGE   IP             NODE    NOMINATED NODE   READINESS GATES
+coredns-559f6c778d-rn5zl        1/1     Running   0          40s   10.244.0.2     k8s-a   <none>           <none>
+etcd-k8s-a                      1/1     Running   0          47s   192.168.49.2   k8s-a   <none>           <none>
+kindnet-dwqls                   1/1     Running   0          41s   192.168.49.2   k8s-a   <none>           <none>
+kube-apiserver-k8s-a            1/1     Running   0          47s   192.168.49.2   k8s-a   <none>           <none>
+kube-controller-manager-k8s-a   1/1     Running   0          47s   192.168.49.2   k8s-a   <none>           <none>
+kube-proxy-qlrb4                1/1     Running   0          41s   192.168.49.2   k8s-a   <none>           <none>
+kube-scheduler-k8s-a            1/1     Running   0          47s   192.168.49.2   k8s-a   <none>           <none>
+storage-provisioner             1/1     Running   0          46s   192.168.49.2   k8s-a   <none>           <none>
+$ minikube -p k8s-a ssh -- sudo ls /etc/kubernetes/manifests
+etcd.yaml	     kube-controller-manager.yaml
+kube-apiserver.yaml  kube-scheduler.yaml
+$ kubectl get --raw='/readyz?verbose' | tail -6
+[+]poststarthook/kube-apiserver-autoregistration ok
+[+]autoregister-completion ok
+[+]poststarthook/apiservice-openapi-controller ok
+[+]poststarthook/apiservice-openapiv3-controller ok
+[+]shutdown ok
+readyz check passed
