@@ -1,0 +1,38 @@
+$ git switch main
+Switched to branch 'main'
+$ PICK=$(git log feature --format=%h --grep="footer.html")
+$ echo $PICK
+aaa3cac
+$ git cherry-pick $PICK
+[main 7eed459] feature: add footer.html
+ Date: Wed Oct 7 21:36:32 2026 +0530
+ 1 file changed, 1 insertion(+)
+ create mode 100644 footer.html
+$ git log --oneline -3
+7eed459 feature: add footer.html
+7c10f81 main: add style.css
+a701f58 main: add about.html
+$ ls
+about.html
+footer.html
+index.html
+style.css
+tracked.txt
+untracked.txt
+$ cat footer.html
+footer v1
+$ git log --oneline --graph --all
+* fe99984 feature: add beta.html
+* aaa3cac feature: add footer.html
+* 47f5a9e feature: add contact.html
+| * 7eed459 feature: add footer.html
+|/  
+* 7c10f81 main: add style.css
+* a701f58 main: add about.html
+* 09f10e8 main: add index.html
+* fa02bb9 Add untracked.txt with explicit add
+* 58ecdd0 Update tracked.txt using -a
+* 57163e7 Add tracked.txt
+$ git log --all --format="%h %s" | grep footer
+7eed459 feature: add footer.html
+aaa3cac feature: add footer.html

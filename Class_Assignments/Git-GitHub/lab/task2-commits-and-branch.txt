@@ -1,0 +1,20 @@
+$ echo "home page" > index.html && git add . && git commit -q -m "main: add index.html"
+$ echo "about page" > about.html && git add . && git commit -q -m "main: add about.html"
+$ echo "styles" > style.css && git add . && git commit -q -m "main: add style.css"
+$ git log --oneline
+7c10f81 main: add style.css
+a701f58 main: add about.html
+09f10e8 main: add index.html
+fa02bb9 Add untracked.txt with explicit add
+58ecdd0 Update tracked.txt using -a
+57163e7 Add tracked.txt
+$ git switch -c feature
+Switched to a new branch 'feature'
+$ echo "contact page" > contact.html && git add . && git commit -q -m "feature: add contact.html"
+$ echo "footer v1" > footer.html && git add . && git commit -q -m "feature: add footer.html"
+$ echo "experimental" > beta.html && git add . && git commit -q -m "feature: add beta.html"
+$ git log --oneline -4
+fe99984 feature: add beta.html
+aaa3cac feature: add footer.html
+47f5a9e feature: add contact.html
+7c10f81 main: add style.css
