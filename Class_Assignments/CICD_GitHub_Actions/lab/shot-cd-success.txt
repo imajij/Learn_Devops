@@ -1,0 +1,28 @@
+$ lab/act-run.sh push lab/events/push-main.json | grep ...   ### CD part (same run)
+[CD 1/2 - Docker build and push]   ✅  Success - Main Checkout source code [9.970958ms]
+[CD 1/2 - Docker build and push]   ✅  Success - Main Download the CI build artifact [409.21225ms]
+[CD 1/2 - Docker build and push]   | version=1.0.0
+[CD 1/2 - Docker build and push]   | commit=a0601dc04209fc79f52130e9a6b3ec44c42cd573
+[CD 1/2 - Docker build and push]   ✅  Success - Main Show which build is being released [36.713041ms]
+[CD 1/2 - Docker build and push]   ✅  Success - Main Compute image tags [31.154459ms]
+[CD 1/2 - Docker build and push]   | Login Succeeded
+[CD 1/2 - Docker build and push]   ✅  Success - Main Log in to container registry [68.481125ms]
+[CD 1/2 - Docker build and push]   ✅  Success - Main Build image [314.527166ms]
+[CD 1/2 - Docker build and push]   | a0601dc: digest: sha256:72d8fb299c623cb35dc6304bd64da7c9f075daee44a6e660b309bafc12c24514 size: 856
+[CD 1/2 - Docker build and push]   | latest: digest: sha256:72d8fb299c623cb35dc6304bd64da7c9f075daee44a6e660b309bafc12c24514 size: 856
+[CD 1/2 - Docker build and push]   ✅  Success - Main Push image [157.783958ms]
+[CD 1/2 - Docker build and push] 🏁  Job succeeded
+[CD 2/2 - Deploy to staging    ]   | using deploy token: ***
+[CD 2/2 - Deploy to staging    ]   ✅  Success - Main Authenticate to the deployment target [39.332083ms]
+[CD 2/2 - Deploy to staging    ]   | Login Succeeded
+[CD 2/2 - Deploy to staging    ]   ✅  Success - Main Pull released image from registry [91.185375ms]
+[CD 2/2 - Deploy to staging    ]   | task-tracker-staging
+[CD 2/2 - Deploy to staging    ]   ✅  Success - Main Replace the running container [291.210125ms]
+[CD 2/2 - Deploy to staging    ]   | {"status":"ok"}
+[CD 2/2 - Deploy to staging    ]   | {"done":0,"open":0,"percent_done":0,"total":0}
+[CD 2/2 - Deploy to staging    ]   | {"build":"a0601dc","environment":"staging","service":"task-tracker","version":"1.0.0"}
+[CD 2/2 - Deploy to staging    ]   | NAMES                  IMAGE                                      STATUS                           PORTS
+[CD 2/2 - Deploy to staging    ]   | task-tracker-staging   localhost:5050/ajij/task-tracker:a0601dc   Up 1 second (health: starting)   0.0.0.0:8085->5000/tcp, [::]:8085->5000/tcp
+[CD 2/2 - Deploy to staging    ]   ✅  Success - Main Smoke test [1.083198875s]
+[CD 2/2 - Deploy to staging    ] 🏁  Job succeeded
+### exit code: 0

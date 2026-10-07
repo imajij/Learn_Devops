@@ -1,0 +1,11 @@
+.git
+.github
+tests
+lab
+images
+dist
+build
+*.md
+__pycache__
+.pytest_cache
+.coverage

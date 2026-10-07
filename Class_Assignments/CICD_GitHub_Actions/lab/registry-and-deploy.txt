@@ -1,0 +1,17 @@
+### 2) image in the local registry (stand-in for GHCR / Docker Hub); REG_USER/REG_PASS = the same fake demo creds given to act
+$ curl -s -o /dev/null -w "HTTP %{http_code} (no credentials -> rejected)\n" http://localhost:5050/v2/_catalog
+HTTP 401 (no credentials -> rejected)
+$ curl -s -u "$REG_USER:$REG_PASS" http://localhost:5050/v2/_catalog
+{"repositories":["ajij/task-tracker"]}
+$ curl -s -u "$REG_USER:$REG_PASS" http://localhost:5050/v2/ajij/task-tracker/tags/list
+{"name":"ajij/task-tracker","tags":["a0601dc","latest"]}
+### 3) what the deploy job left running
+$ docker ps --filter name=task-tracker-staging --format 'table {{.Names}}	{{.Image}}	{{.Status}}	{{.Ports}}'
+NAMES                  IMAGE                                      STATUS                    PORTS
+task-tracker-staging   localhost:5050/ajij/task-tracker:a0601dc   Up 40 seconds (healthy)   0.0.0.0:8085->5000/tcp, [::]:8085->5000/tcp
+$ curl -s localhost:8085/
+{"build":"a0601dc","environment":"staging","service":"task-tracker","version":"1.0.0"}
+$ curl -s -X POST localhost:8085/api/tasks -H 'Content-Type: application/json' -d '{"title":"submit homework 15","priority":"high"}'
+{"done":false,"id":1,"priority":"high","title":"submit homework 15"}
+$ curl -s localhost:8085/api/stats
+{"done":0,"open":1,"percent_done":0,"total":1}

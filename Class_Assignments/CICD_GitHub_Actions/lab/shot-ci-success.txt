@@ -1,0 +1,24 @@
+$ lab/act-run.sh push lab/events/push-main.json | grep -E "Run Main|Success|Failure|passed|Job "   ### CI part
+[CI 1/2 - Lint and unit tests] ⭐ Run Main Checkout source code
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Checkout source code [14.156041ms]
+[CI 1/2 - Lint and unit tests] ⭐ Run Main Set up Python 3.12
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Set up Python 3.12 [400.561958ms]
+[CI 1/2 - Lint and unit tests] ⭐ Run Main Install dependencies
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Install dependencies [776.964958ms]
+[CI 1/2 - Lint and unit tests] ⭐ Run Main Lint (flake8)
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Lint (flake8) [158.324917ms]
+[CI 1/2 - Lint and unit tests] ⭐ Run Main Run unit tests
+[CI 1/2 - Lint and unit tests]   | ============================== 11 passed in 0.21s ==============================
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Run unit tests [461.996792ms]
+[CI 1/2 - Lint and unit tests] ⭐ Run Main Upload test report
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Upload test report [438.016292ms]
+[CI 1/2 - Lint and unit tests] 🏁  Job succeeded
+[CI 2/2 - Build package      ] ⭐ Run Main Checkout source code
+[CI 2/2 - Build package      ]   ✅  Success - Main Checkout source code [11.197209ms]
+[CI 2/2 - Build package      ] ⭐ Run Main Set up Python 3.12
+[CI 2/2 - Build package      ]   ✅  Success - Main Set up Python 3.12 [484.833958ms]
+[CI 2/2 - Build package      ] ⭐ Run Main Build application package
+[CI 2/2 - Build package      ]   ✅  Success - Main Build application package [81.235792ms]
+[CI 2/2 - Build package      ] ⭐ Run Main Upload build artifact
+[CI 2/2 - Build package      ]   ✅  Success - Main Upload build artifact [554.294375ms]
+[CI 2/2 - Build package      ] 🏁  Job succeeded

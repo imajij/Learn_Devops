@@ -1,0 +1,7 @@
+$ lab/act-run.sh pull_request lab/events/pull-request.json --verbose 2>&1 | grep -E "Skipping job|evaluated to .false.|Job succeeded"
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] 🏁  Job succeeded
+[Task Tracker CI-CD/CI 2/2 - Build package      ] 🏁  Job succeeded
+[Task Tracker CI-CD/CD 1/2 - Docker build and push] [DEBUG] expression 'github.event_name == 'push' && github.ref == 'refs/heads/main'' evaluated to 'false'
+[Task Tracker CI-CD/CD 1/2 - Docker build and push] [DEBUG] Skipping job 'CD 1/2 - Docker build and push' due to 'github.event_name == 'push' && github.ref == 'refs/heads/main''
+[Task Tracker CI-CD/CD 2/2 - Deploy to staging    ] [DEBUG] expression 'success()' evaluated to 'false'
+[Task Tracker CI-CD/CD 2/2 - Deploy to staging    ] [DEBUG] Skipping job 'CD 2/2 - Deploy to staging' due to 'success()'

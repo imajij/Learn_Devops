@@ -1,0 +1,28 @@
+### 1) artifacts uploaded by the CI jobs (act --artifact-server-path ~/devops-lab/cicd/artifacts15)
+$ find ~/devops-lab/cicd/artifacts15 -type f | sed "s#$HOME#~#"
+~/devops-lab/cicd/artifacts15/1/task-tracker-dist/task-tracker-dist.zip
+~/devops-lab/cicd/artifacts15/1/test-results/test-results.zip
+$ unzip -l ~/devops-lab/cicd/artifacts15/1/task-tracker-dist/task-tracker-dist.zip
+Archive:  /Users/ajijuttam/devops-lab/cicd/artifacts15/1/task-tracker-dist/task-tracker-dist.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+      149  10-07-2026 16:35   build-info.txt
+     1566  10-07-2026 16:35   task-tracker-1.0.0-a0601dc.tar.gz
+---------                     -------
+     1715                     2 files
+$ unzip -p ~/devops-lab/cicd/artifacts15/1/task-tracker-dist/task-tracker-dist.zip build-info.txt
+app=task-tracker
+version=1.0.0
+commit=a0601dc04209fc79f52130e9a6b3ec44c42cd573
+built_at=2026-10-07T16:35:57Z
+built_by=Task Tracker CI-CD/build run 1
+$ unzip -l ~/devops-lab/cicd/artifacts15/1/test-results/test-results.zip
+Archive:  /Users/ajijuttam/devops-lab/cicd/artifacts15/1/test-results/test-results.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+     3375  10-07-2026 16:35   coverage.xml
+     1209  10-07-2026 16:35   junit.xml
+---------                     -------
+     4584                     2 files
+$ unzip -p ~/devops-lab/cicd/artifacts15/1/test-results/test-results.zip junit.xml | grep -o "<testsuite [^>]*>"
+<testsuite name="pytest" errors="0" failures="0" skipped="0" tests="11" time="0.197" timestamp="2026-10-07T16:35:53.262165+00:00" hostname="colima">

@@ -1,0 +1,207 @@
+$ lab/act-run.sh pull_request lab/events/pull-request.json
+time="2026-10-07T22:05:11+05:30" level=info msg="Using docker host 'unix:///Users/ajijuttam/.colima/docker.sock', and daemon socket '/var/run/docker.sock'"
+level=warning msg= ⚠ You are using Apple M-series chip and you have not specified container architecture, you might encounter issues while running act. If so, try running it with '--container-architecture linux/amd64'. ⚠ 
+
+time="2026-10-07T22:05:11+05:30" level=info msg="Start server on http://100.128.164.188:34567"
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] ⭐ Run Set up job
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] 🚀  Start image=catthehacker/ubuntu:act-latest
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ✅  Success - Set up job
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ☁  git clone 'https://github.com/actions/setup-python' # ref=v5
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] ⭐ Run Main Checkout source code
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ✅  Success - Main Checkout source code [13.579625ms]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] ⭐ Run Main Set up Python 3.12
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-python@v5/ dst=/var/run/act/actions/actions-setup-python@v5/
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/setup/index.js] user= workdir=
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ❓  ::group::Installed versions
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | (node:30) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Successfully set up CPython (3.12.15)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ❓  ::endgroup::
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ❓ add-matcher /run/act/actions/actions-setup-python@v5/.github/python.json
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ✅  Success - Main Set up Python 3.12 [535.00575ms]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-env:: Python3_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-env:: LD_LIBRARY_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-env:: pythonLocation=/opt/hostedtoolcache/Python/3.12.15/arm64
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-env:: PKG_CONFIG_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib/pkgconfig
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-env:: Python_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-env:: Python2_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-output:: python-version=3.12.15
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-output:: python-path=/opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64/bin
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] ⭐ Run Main Install dependencies
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (26.2.1)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: Flask==3.1.3 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/requirements.txt (line 1)) (3.1.3)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: gunicorn==23.0.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/requirements.txt (line 2)) (23.0.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: pytest==8.4.2 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r requirements-dev.txt (line 2)) (8.4.2)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: pytest-cov==7.1.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r requirements-dev.txt (line 3)) (7.1.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: flake8==7.3.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r requirements-dev.txt (line 4)) (7.3.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: blinker>=1.9.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/requirements.txt (line 1)) (1.9.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: click>=8.1.3 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/requirements.txt (line 1)) (8.5.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: itsdangerous>=2.2.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/requirements.txt (line 1)) (2.2.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: jinja2>=3.1.2 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/requirements.txt (line 1)) (3.1.6)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: markupsafe>=2.1.1 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/requirements.txt (line 1)) (3.0.4)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: werkzeug>=3.1.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/requirements.txt (line 1)) (3.1.9)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from gunicorn==23.0.0->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/requirements.txt (line 2)) (26.3)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: iniconfig>=1 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pytest==8.4.2->-r requirements-dev.txt (line 2)) (2.3.1)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: pluggy<2,>=1.5 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pytest==8.4.2->-r requirements-dev.txt (line 2)) (1.6.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: pygments>=2.7.2 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pytest==8.4.2->-r requirements-dev.txt (line 2)) (2.21.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: coverage>=7.10.6 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from coverage[toml]>=7.10.6->pytest-cov==7.1.0->-r requirements-dev.txt (line 3)) (7.16.2)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: mccabe<0.8.0,>=0.7.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from flake8==7.3.0->-r requirements-dev.txt (line 4)) (0.7.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: pycodestyle<2.15.0,>=2.14.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from flake8==7.3.0->-r requirements-dev.txt (line 4)) (2.14.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Requirement already satisfied: pyflakes<3.5.0,>=3.4.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from flake8==7.3.0->-r requirements-dev.txt (line 4)) (3.4.0)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ✅  Success - Main Install dependencies [895.071ms]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] ⭐ Run Main Lint (flake8)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ✅  Success - Main Lint (flake8) [114.871916ms]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] ⭐ Run Main Run unit tests
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/4] user= workdir=
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | ============================= test session starts ==============================
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | platform linux -- Python 3.12.15, pytest-8.4.2, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | cachedir: .pytest_cache
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | rootdir: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | configfile: pytest.ini
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | testpaths: tests
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | plugins: cov-7.1.0
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | collecting ... collected 11 items
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | 
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_api.py::test_health PASSED                                    [  9%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_api.py::test_index_reports_version PASSED                     [ 18%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_api.py::test_create_list_and_complete PASSED                  [ 27%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_api.py::test_validation_error_returns_400 PASSED              [ 36%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_api.py::test_unknown_task_returns_404 PASSED                  [ 45%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_tasks.py::test_add_task_gets_incrementing_ids PASSED          [ 54%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_tasks.py::test_empty_title_is_rejected PASSED                 [ 63%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_tasks.py::test_bad_priority_is_rejected PASSED                [ 72%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_tasks.py::test_complete_and_stats PASSED                      [ 81%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_tasks.py::test_stats_on_empty_store PASSED                    [ 90%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | tests/test_tasks.py::test_complete_unknown_task PASSED                   [100%]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | 
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | - generated xml file: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/test-results/junit.xml -
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | ================================ tests coverage ================================
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | _______________ coverage: platform linux, python 3.12.15-final-0 _______________
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | 
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Name              Stmts   Miss  Cover   Missing
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | -----------------------------------------------
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | app/__init__.py       1      0   100%
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | app/main.py          37      1    97%   57
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | app/tasks.py         27      0   100%
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | -----------------------------------------------
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | TOTAL                65      1    98%
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Coverage XML written to file test-results/coverage.xml
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | ============================== 11 passed in 0.17s ==============================
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ✅  Success - Main Run unit tests [379.408333ms]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] ⭐ Run Main Upload test report
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | (node:107) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | With the provided path, there will be 2 files uploaded
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Artifact name is valid!
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Root directory input is valid!
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Beginning upload of artifact content to blob storage
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | (node:107) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Uploaded bytes 1223
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Finished uploading artifact content to blob storage!
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | SHA256 digest of uploaded artifact zip is 4156e468f5b0e45105e688d116c179914e64715a86dfc73a66fb14f65fd9e3fc
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Finalizing artifact upload
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Artifact test-results.zip successfully finalized. Artifact ID 3486992502
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Artifact test-results has been successfully uploaded! Final size is 1223 bytes. Artifact ID is 3486992502
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/3486992502
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ✅  Success - Main Upload test report [418.184625ms]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-output:: artifact-digest=4156e468f5b0e45105e688d116c179914e64715a86dfc73a66fb14f65fd9e3fc
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/3486992502
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ⚙  ::set-output:: artifact-id=3486992502
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] ⭐ Run Post Set up Python 3.12
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/cache-save/index.js] user= workdir=
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | (node:124) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ✅  Success - Post Set up Python 3.12 [196.122958ms]
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] ⭐ Run Complete job
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] Cleaning up container for job CI 1/2 - Lint and unit tests
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests]   ✅  Success - Complete job
+[Task Tracker CI-CD/CI 1/2 - Lint and unit tests] 🏁  Job succeeded
+[Task Tracker CI-CD/CI 2/2 - Build package      ] ⭐ Run Set up job
+[Task Tracker CI-CD/CI 2/2 - Build package      ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ✅  Success - Set up job
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ☁  git clone 'https://github.com/actions/setup-python' # ref=v5
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[Task Tracker CI-CD/CI 2/2 - Build package      ] ⭐ Run Main Checkout source code
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/CICD_GitHub_Actions
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ✅  Success - Main Checkout source code [12.9205ms]
+[Task Tracker CI-CD/CI 2/2 - Build package      ] ⭐ Run Main Set up Python 3.12
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-python@v5/ dst=/var/run/act/actions/actions-setup-python@v5/
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/setup/index.js] user= workdir=
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ❓  ::group::Installed versions
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | (node:30) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Successfully set up CPython (3.12.15)
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ❓  ::endgroup::
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ❓ add-matcher /run/act/actions/actions-setup-python@v5/.github/python.json
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ✅  Success - Main Set up Python 3.12 [469.868917ms]
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-env:: pythonLocation=/opt/hostedtoolcache/Python/3.12.15/arm64
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-env:: PKG_CONFIG_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib/pkgconfig
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-env:: Python_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-env:: Python2_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-env:: Python3_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-env:: LD_LIBRARY_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-output:: python-version=3.12.15
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-output:: python-path=/opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64/bin
+[Task Tracker CI-CD/CI 2/2 - Build package      ] ⭐ Run Main Build application package
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Build output:
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | total 8
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | -rw-r--r-- 1 root root  149 Oct  7 16:35 build-info.txt
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | -rw-r--r-- 1 root root 1569 Oct  7 16:35 task-tracker-1.0.0-a0601dc.tar.gz
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | app=task-tracker
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | version=1.0.0
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | commit=a0601dc04209fc79f52130e9a6b3ec44c42cd573
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | built_at=2026-10-07T16:35:22Z
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | built_by=Task Tracker CI-CD/build run 1
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ✅  Success - Main Build application package [71.206333ms]
+[Task Tracker CI-CD/CI 2/2 - Build package      ] ⭐ Run Main Upload build artifact
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | (node:60) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | With the provided path, there will be 2 files uploaded
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Artifact name is valid!
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Root directory input is valid!
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Beginning upload of artifact content to blob storage
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | (node:60) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Uploaded bytes 2005
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Finished uploading artifact content to blob storage!
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | SHA256 digest of uploaded artifact zip is a442f659a18a645186820b447bd9b28e5e1efe0b1026eac19bdcc2d3362da91c
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Finalizing artifact upload
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Artifact task-tracker-dist.zip successfully finalized. Artifact ID 1983372248
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Artifact task-tracker-dist has been successfully uploaded! Final size is 2005 bytes. Artifact ID is 1983372248
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/1983372248
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ✅  Success - Main Upload build artifact [415.73525ms]
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-output:: artifact-id=1983372248
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-output:: artifact-digest=a442f659a18a645186820b447bd9b28e5e1efe0b1026eac19bdcc2d3362da91c
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/1983372248
+[Task Tracker CI-CD/CI 2/2 - Build package      ] ⭐ Run Post Set up Python 3.12
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/cache-save/index.js] user= workdir=
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | (node:77) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ✅  Success - Post Set up Python 3.12 [167.819208ms]
+[Task Tracker CI-CD/CI 2/2 - Build package      ] ⭐ Run Complete job
+[Task Tracker CI-CD/CI 2/2 - Build package      ] Cleaning up container for job CI 2/2 - Build package
+[Task Tracker CI-CD/CI 2/2 - Build package      ]   ✅  Success - Complete job
+[Task Tracker CI-CD/CI 2/2 - Build package      ] 🏁  Job succeeded
+### exit code: 0

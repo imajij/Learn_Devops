@@ -1,0 +1,23 @@
+$ lab/act-run.sh pull_request lab/events/pull-request.json
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Checkout source code [13.579625ms]
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Set up Python 3.12 [535.00575ms]
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Install dependencies [895.071ms]
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Lint (flake8) [114.871916ms]
+[CI 1/2 - Lint and unit tests]   | ============================== 11 passed in 0.17s ==============================
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Run unit tests [379.408333ms]
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Upload test report [418.184625ms]
+[CI 1/2 - Lint and unit tests] 🏁  Job succeeded
+[CI 2/2 - Build package      ]   ✅  Success - Main Checkout source code [12.9205ms]
+[CI 2/2 - Build package      ]   ✅  Success - Main Set up Python 3.12 [469.868917ms]
+[CI 2/2 - Build package      ]   ✅  Success - Main Build application package [71.206333ms]
+[CI 2/2 - Build package      ]   ✅  Success - Main Upload build artifact [415.73525ms]
+[CI 2/2 - Build package      ] 🏁  Job succeeded
+### exit code: 0
+
+$ lab/act-run.sh pull_request lab/events/pull-request.json --verbose 2>&1 | grep -E "Skipping job|evaluated to .false.|Job succeeded"
+[CI 1/2 - Lint and unit tests] 🏁  Job succeeded
+[CI 2/2 - Build package      ] 🏁  Job succeeded
+[CD 1/2 - Docker build and push] [DEBUG] expression 'github.event_name == 'push' && github.ref == 'refs/heads/main'' evaluated to 'false'
+[CD 1/2 - Docker build and push] [DEBUG] Skipping job 'CD 1/2 - Docker build and push' due to 'github.event_name == 'push' && github.ref == 'refs/heads/main''
+[CD 2/2 - Deploy to staging    ] [DEBUG] expression 'success()' evaluated to 'false'
+[CD 2/2 - Deploy to staging    ] [DEBUG] Skipping job 'CD 2/2 - Deploy to staging' due to 'success()'

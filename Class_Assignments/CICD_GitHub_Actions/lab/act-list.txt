@@ -1,0 +1,7 @@
+$ act -l -W .github/workflows/ci-cd.yml
+
+Stage  Job ID  Job name                        Workflow name       Workflow file  Events                             
+0      test    CI 1/2 - Lint and unit tests    Task Tracker CI-CD  ci-cd.yml      push,pull_request,workflow_dispatch
+1      build   CI 2/2 - Build package          Task Tracker CI-CD  ci-cd.yml      pull_request,workflow_dispatch,push
+2      docker  CD 1/2 - Docker build and push  Task Tracker CI-CD  ci-cd.yml      workflow_dispatch,push,pull_request
+3      deploy  CD 2/2 - Deploy to staging      Task Tracker CI-CD  ci-cd.yml      push,pull_request,workflow_dispatch

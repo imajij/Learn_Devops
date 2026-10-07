@@ -1,0 +1,10 @@
+{
+  "action": "opened",
+  "number": 7,
+  "pull_request": {
+    "number": 7,
+    "title": "Add priority filter",
+    "head": {"ref": "feature/priority-filter"},
+    "base": {"ref": "main"}
+  }
+}

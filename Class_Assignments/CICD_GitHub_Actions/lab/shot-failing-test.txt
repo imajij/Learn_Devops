@@ -1,0 +1,22 @@
+### introduce a bug on purpose: "open" forgets to subtract finished tasks
+$ sed -i '' 's/"open": len(tasks) - done/"open": len(tasks)/' app/tasks.py
+$ grep -n "\"open\"" app/tasks.py
+37:        return {"total": len(tasks), "done": done, "open": len(tasks), "percent_done": percent}
+$ lab/act-run.sh push lab/events/push-main.json
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Checkout source code [11.936666ms]
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Set up Python 3.12 [654.863875ms]
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Install dependencies [1.077840667s]
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Lint (flake8) [153.707125ms]
+[CI 1/2 - Lint and unit tests]   | tests/test_tasks.py::test_complete_and_stats FAILED                      [ 81%]
+[CI 1/2 - Lint and unit tests]   | E         Differing items:
+[CI 1/2 - Lint and unit tests]   | E         {'open': 3} != {'open': 2}
+[CI 1/2 - Lint and unit tests]   | FAILED tests/test_tasks.py::test_complete_and_stats - AssertionError: assert {'done': 1, '...3, 'total': 3} == {'done': 1, '...3, 'total': 3}
+[CI 1/2 - Lint and unit tests]   |   Differing items:
+[CI 1/2 - Lint and unit tests]   |   {'open': 3} != {'open': 2}
+[CI 1/2 - Lint and unit tests]   | ========================= 1 failed, 10 passed in 0.22s =========================
+[CI 1/2 - Lint and unit tests]   ❌  Failure - Main Run unit tests [484.317584ms]
+[CI 1/2 - Lint and unit tests]   ✅  Success - Main Upload test report [473.220459ms]
+[CI 1/2 - Lint and unit tests] 🏁  Job failed
+Error: Job 'CI 1/2 - Lint and unit tests' failed
+### exit code: 1
+### the build, docker and deploy jobs never started (they all depend on the test job)
