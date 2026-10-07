@@ -1,0 +1,14 @@
+$ helm --kube-context k8s-b list
+NAME	NAMESPACE	REVISION	UPDATED                             	STATUS  	CHART           	APP VERSION
+demo	default  	1       	2026-10-07 23:09:00.973211 +0530 IST	deployed	demo-chart-0.1.0	1.16.0     
+$ helm --kube-context k8s-b list -A
+NAME	NAMESPACE	REVISION	UPDATED                             	STATUS  	CHART           	APP VERSION
+demo	default  	1       	2026-10-07 23:09:00.973211 +0530 IST	deployed	demo-chart-0.1.0	1.16.0     
+$ helm --kube-context k8s-b list -o yaml
+- app_version: 1.16.0
+  chart: demo-chart-0.1.0
+  name: demo
+  namespace: default
+  revision: "1"
+  status: deployed
+  updated: 2026-10-07 23:09:00.973211 +0530 IST

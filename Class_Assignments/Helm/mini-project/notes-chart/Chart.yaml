@@ -1,0 +1,11 @@
+apiVersion: v2
+name: notes-chart
+description: Notes App - a small notes web page served by nginx, deployed with Helm
+type: application
+version: 0.1.0
+appVersion: "1.27"
+keywords:
+  - notes
+  - nginx
+maintainers:
+  - name: Ajij Uttam

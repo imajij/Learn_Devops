@@ -1,0 +1,32 @@
+$ cd mini-project
+$ helm --kube-context k8s-b install notes-dev notes-chart --wait --timeout 3m
+NAME: notes-dev
+LAST DEPLOYED: Wed Oct  7 23:25:33 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+NOTES:
+Notes App (dev) installed as release "notes-dev", revision 1.
+
+Open it locally:
+  kubectl port-forward svc/notes-dev-notes 8080:80
+  then browse to http://localhost:8080
+$ kubectl --context k8s-b get pods -l app.kubernetes.io/instance=notes-dev
+NAME                               READY   STATUS    RESTARTS   AGE
+notes-dev-notes-68557c85b5-tpsnk   1/1     Running   0          1s
+$ kubectl --context k8s-b get services -l app.kubernetes.io/instance=notes-dev
+NAME              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+notes-dev-notes   ClusterIP   10.108.64.162   <none>        80/TCP    1s
+$ kubectl --context k8s-b get configmaps -l app.kubernetes.io/instance=notes-dev
+NAME                   DATA   AGE
+notes-dev-notes-html   1      1s
+$ kubectl --context k8s-b port-forward svc/notes-dev-notes 8091:80 > /dev/null 2>&1 & PF=$!; sleep 3
+$ curl -s localhost:8091 | grep -E '<h1>|environment|<li>'
+  <header><h1>Ajij's Notes</h1>
+  <div>environment: <b>dev</b> | release: <b>notes-dev</b> | revision: <b>1</b></div></header>
+    <li>Learn what a Helm chart is</li>
+    <li>Write templates with {{ .Values }}</li>
+    <li>Install, upgrade and roll back a release</li>
+$ kill $PF

@@ -1,0 +1,30 @@
+$ cat 02-rollback/app-chart/values.yaml
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: "1.27"
+
+service:
+  type: ClusterIP
+  port: 80
+$ helm --kube-context k8s-b install rollback-demo 02-rollback/app-chart --wait --timeout 3m
+NAME: rollback-demo
+LAST DEPLOYED: Wed Oct  7 23:11:21 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+### VERIFY revision 1
+$ kubectl --context k8s-b get deploy,pods -l app=rollback-demo-web -o wide
+NAME                                READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES       SELECTOR
+deployment.apps/rollback-demo-web   1/1     1            1           1s    web          nginx:1.27   app=rollback-demo-web
+
+NAME                                     READY   STATUS    RESTARTS   AGE   IP             NODE    NOMINATED NODE   READINESS GATES
+pod/rollback-demo-web-58cf998969-85kvf   1/1     Running   0          1s    10.244.0.116   k8s-b   <none>           <none>
+$ kubectl --context k8s-b exec deploy/rollback-demo-web -- curl -sI localhost | grep Server
+Server: nginx/1.27.5
+$ helm --kube-context k8s-b history rollback-demo
+REVISION	UPDATED                 	STATUS  	CHART          	APP VERSION	DESCRIPTION     
+1       	Wed Oct  7 23:11:21 2026	deployed	app-chart-0.1.0	1.0        	Install complete

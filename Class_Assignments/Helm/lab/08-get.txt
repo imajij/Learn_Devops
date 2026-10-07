@@ -1,0 +1,49 @@
+$ helm --kube-context k8s-b get values demo
+USER-SUPPLIED VALUES:
+image:
+  tag: "1.27"
+$ helm --kube-context k8s-b get values demo --all | head -15
+COMPUTED VALUES:
+affinity: {}
+autoscaling:
+  enabled: false
+  maxReplicas: 100
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 80
+fullnameOverride: ""
+httpRoute:
+  annotations: {}
+  enabled: false
+  hostnames:
+  - chart-example.local
+  parentRefs:
+  - name: gateway
+$ helm --kube-context k8s-b get manifest demo | grep -E '^# Source|^kind|image:'
+# Source: demo-chart/templates/serviceaccount.yaml
+kind: ServiceAccount
+# Source: demo-chart/templates/service.yaml
+kind: Service
+# Source: demo-chart/templates/deployment.yaml
+kind: Deployment
+          image: "nginx:1.27"
+$ helm --kube-context k8s-b get notes demo
+NOTES:
+1. Get the application URL by running these commands:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=demo-chart,app.kubernetes.io/instance=demo" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace default $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace default port-forward $POD_NAME 8080:$CONTAINER_PORT
+
+$ helm --kube-context k8s-b get metadata demo
+NAME: demo
+CHART: demo-chart
+VERSION: 0.1.0
+APP_VERSION: 1.16.0
+ANNOTATIONS: 
+LABELS: modifiedAt=1791394741,name=demo,owner=helm,status=deployed,version=1
+DEPENDENCIES: 
+NAMESPACE: default
+REVISION: 1
+STATUS: deployed
+DEPLOYED_AT: 2026-10-07T23:09:00+05:30
+APPLY_METHOD: server-side apply

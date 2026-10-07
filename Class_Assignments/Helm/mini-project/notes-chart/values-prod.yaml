@@ -1,0 +1,20 @@
+# Production overrides: only the values that differ from values.yaml
+environment: prod
+replicaCount: 3
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 128Mi
+
+app:
+  title: "Ajij's Notes (PRODUCTION)"
+  bannerColor: "#c53030"
+  notes:
+    - "Learn what a Helm chart is"
+    - "Write templates with {{ .Values }}"
+    - "Install, upgrade and roll back a release"
+    - "Use values-prod.yaml for production settings"

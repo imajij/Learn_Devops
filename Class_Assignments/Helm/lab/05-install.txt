@@ -1,0 +1,22 @@
+$ helm --kube-context k8s-b install demo 01-commands/demo-chart --set image.tag=1.27 --wait --timeout 3m
+NAME: demo
+LAST DEPLOYED: Wed Oct  7 23:09:00 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+NOTES:
+1. Get the application URL by running these commands:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=demo-chart,app.kubernetes.io/instance=demo" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace default $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace default port-forward $POD_NAME 8080:$CONTAINER_PORT
+$ kubectl --context k8s-b get deploy,pods,svc -l app.kubernetes.io/instance=demo
+NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/demo-demo-chart   1/1     1            1           0s
+
+NAME                                  READY   STATUS    RESTARTS   AGE
+pod/demo-demo-chart-599df65dd-fbzqk   1/1     Running   0          0s
+
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+service/demo-demo-chart   ClusterIP   10.108.36.108   <none>        80/TCP    0s

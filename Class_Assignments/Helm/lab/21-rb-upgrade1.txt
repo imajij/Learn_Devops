@@ -1,0 +1,22 @@
+$ helm --kube-context k8s-b upgrade rollback-demo 02-rollback/app-chart --set replicaCount=3 --set image.tag=1.27-alpine --wait --timeout 3m
+Release "rollback-demo" has been upgraded. Happy Helming!
+NAME: rollback-demo
+LAST DEPLOYED: Wed Oct  7 23:11:22 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+### VERIFY revision 2
+$ kubectl --context k8s-b get pods -l app=rollback-demo-web -o custom-columns=POD:.metadata.name,IMAGE:.spec.containers[0].image,READY:.status.containerStatuses[0].ready
+POD                                 IMAGE               READY
+rollback-demo-web-786b64b99-2nz9b   nginx:1.27-alpine   true
+rollback-demo-web-786b64b99-kx2hv   nginx:1.27-alpine   true
+rollback-demo-web-786b64b99-p7gvp   nginx:1.27-alpine   true
+$ kubectl --context k8s-b exec deploy/rollback-demo-web -- cat /etc/os-release | head -2
+NAME="Alpine Linux"
+ID=alpine
+$ helm --kube-context k8s-b history rollback-demo
+REVISION	UPDATED                 	STATUS    	CHART          	APP VERSION	DESCRIPTION     
+1       	Wed Oct  7 23:11:21 2026	superseded	app-chart-0.1.0	1.0        	Install complete
+2       	Wed Oct  7 23:11:22 2026	deployed  	app-chart-0.1.0	1.0        	Upgrade complete

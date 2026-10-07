@@ -1,0 +1,5 @@
+$ helm version
+version.BuildInfo{Version:"v4.3.0", GitCommit:"bec5b06ed841fe5269972d864d5177944fd5970f", GitTreeState:"clean", GoVersion:"go1.27.1", KubeClientVersion:"v1.37"}
+$ kubectl --context k8s-b get nodes
+NAME    STATUS   ROLES           AGE   VERSION
+k8s-b   Ready    control-plane   63m   v1.37.0

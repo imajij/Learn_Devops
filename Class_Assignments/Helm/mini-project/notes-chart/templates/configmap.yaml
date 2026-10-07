@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "notes.fullname" . }}-html
+  labels:
+    {{- include "notes.labels" . | nindent 4 }}
+data:
+  index.html: |
+    <!doctype html>
+    <html>
+    <head><meta charset="utf-8"><title>{{ .Values.app.title }}</title>
+    <style>
+      body { font-family: sans-serif; margin: 0; background: #f7fafc; }
+      header { background: {{ .Values.app.bannerColor }}; color: #fff; padding: 20px 32px; }
+      main { padding: 20px 32px; }
+      li { background: #fff; margin: 8px 0; padding: 10px 14px; border-radius: 6px; list-style: none; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+      footer { color: #718096; padding: 0 32px; font-size: 13px; }
+    </style></head>
+    <body>
+      <header><h1>{{ .Values.app.title }}</h1>
+      <div>environment: <b>{{ .Values.environment }}</b> | release: <b>{{ .Release.Name }}</b> | revision: <b>{{ .Release.Revision }}</b></div></header>
+      <main><h2>My notes ({{ len .Values.app.notes }})</h2>
+      <ul>
+      {{- range .Values.app.notes }}
+        <li>{{ . }}</li>
+      {{- end }}
+      </ul></main>
+      <footer>Served by {{ .Values.image.repository }}:{{ .Values.image.tag }} | chart {{ .Chart.Name }}-{{ .Chart.Version }}</footer>
+    </body>
+    </html>

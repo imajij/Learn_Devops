@@ -1,0 +1,26 @@
+$ cd 01-commands
+$ helm create demo-chart
+Creating demo-chart
+$ find demo-chart -type f | sort
+demo-chart/.helmignore
+demo-chart/Chart.yaml
+demo-chart/templates/_helpers.tpl
+demo-chart/templates/deployment.yaml
+demo-chart/templates/hpa.yaml
+demo-chart/templates/httproute.yaml
+demo-chart/templates/ingress.yaml
+demo-chart/templates/NOTES.txt
+demo-chart/templates/service.yaml
+demo-chart/templates/serviceaccount.yaml
+demo-chart/templates/tests/test-connection.yaml
+demo-chart/values.yaml
+$ grep -E '^(name|version|appVersion)' demo-chart/Chart.yaml
+name: demo-chart
+version: 0.1.0
+appVersion: "1.16.0"
+$ grep -A3 '^image:' demo-chart/values.yaml; grep '^replicaCount' demo-chart/values.yaml
+image:
+  repository: nginx
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+replicaCount: 1

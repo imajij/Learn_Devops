@@ -1,0 +1,5 @@
+Notes App ({{ .Values.environment }}) installed as release "{{ .Release.Name }}", revision {{ .Release.Revision }}.
+
+Open it locally:
+  kubectl port-forward svc/{{ include "notes.fullname" . }} 8080:{{ .Values.service.port }}
+  then browse to http://localhost:8080

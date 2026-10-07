@@ -1,0 +1,14 @@
+$ helm --kube-context k8s-b uninstall demo
+release "demo" uninstalled
+$ helm --kube-context k8s-b list
+NAME	NAMESPACE	REVISION	UPDATED	STATUS	CHART	APP VERSION
+$ kubectl --context k8s-b get all -l app.kubernetes.io/instance=demo
+NAME                                  READY   STATUS        RESTARTS   AGE
+pod/demo-demo-chart-599df65dd-fbzqk   1/1     Terminating   0          13s
+pod/demo-demo-chart-599df65dd-fw2lz   0/1     Completed     0          7s
+pod/demo-demo-chart-599df65dd-mszds   0/1     Completed     0          7s
+$ helm --kube-context k8s-b repo remove ingress-nginx
+"ingress-nginx" has been removed from your repositories
+$ helm --kube-context k8s-b repo list
+NAME   	URL                               
+bitnami	https://charts.bitnami.com/bitnami

@@ -1,0 +1,56 @@
+$ cd mini-project
+$ cat notes-chart/values-prod.yaml
+# Production overrides: only the values that differ from values.yaml
+environment: prod
+replicaCount: 3
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 128Mi
+
+app:
+  title: "Ajij's Notes (PRODUCTION)"
+  bannerColor: "#c53030"
+  notes:
+    - "Learn what a Helm chart is"
+    - "Write templates with {{ .Values }}"
+    - "Install, upgrade and roll back a release"
+    - "Use values-prod.yaml for production settings"
+$ helm --kube-context k8s-b upgrade notes-dev notes-chart -f notes-chart/values-prod.yaml --wait --timeout 3m
+Release "notes-dev" has been upgraded. Happy Helming!
+NAME: notes-dev
+LAST DEPLOYED: Wed Oct  7 23:25:45 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+NOTES:
+Notes App (prod) installed as release "notes-dev", revision 2.
+
+Open it locally:
+  kubectl port-forward svc/notes-dev-notes 8080:80
+  then browse to http://localhost:8080
+$ kubectl --context k8s-b get pods -l app.kubernetes.io/instance=notes-dev
+NAME                               READY   STATUS        RESTARTS   AGE
+notes-dev-notes-68557c85b5-tpsnk   1/1     Terminating   0          20s
+notes-dev-notes-7cf7bd76b8-kcw6g   1/1     Running       0          8s
+notes-dev-notes-7cf7bd76b8-rbl7h   1/1     Running       0          1s
+notes-dev-notes-7cf7bd76b8-shbzb   1/1     Running       0          2s
+$ kubectl --context k8s-b port-forward svc/notes-dev-notes 8091:80 > /dev/null 2>&1 & PF=$!; sleep 3
+$ curl -s localhost:8091 | grep -E '<h1>|environment|<li>'
+  <header><h1>Ajij's Notes (PRODUCTION)</h1>
+  <div>environment: <b>prod</b> | release: <b>notes-dev</b> | revision: <b>2</b></div></header>
+    <li>Learn what a Helm chart is</li>
+    <li>Write templates with {{ .Values }}</li>
+    <li>Install, upgrade and roll back a release</li>
+    <li>Use values-prod.yaml for production settings</li>
+$ kill $PF
+$ helm --kube-context k8s-b history notes-dev
+REVISION	UPDATED                 	STATUS    	CHART            	APP VERSION	DESCRIPTION     
+1       	Wed Oct  7 23:25:33 2026	superseded	notes-chart-0.1.0	1.27       	Install complete
+2       	Wed Oct  7 23:25:45 2026	deployed  	notes-chart-0.1.0	1.27       	Upgrade complete

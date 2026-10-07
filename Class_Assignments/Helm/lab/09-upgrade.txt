@@ -1,0 +1,22 @@
+$ helm --kube-context k8s-b upgrade demo 01-commands/demo-chart --reuse-values --set replicaCount=3 --wait --timeout 3m
+Release "demo" has been upgraded. Happy Helming!
+NAME: demo
+LAST DEPLOYED: Wed Oct  7 23:09:07 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+NOTES:
+1. Get the application URL by running these commands:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=demo-chart,app.kubernetes.io/instance=demo" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace default $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace default port-forward $POD_NAME 8080:$CONTAINER_PORT
+$ kubectl --context k8s-b get pods -l app.kubernetes.io/instance=demo
+NAME                              READY   STATUS    RESTARTS   AGE
+demo-demo-chart-599df65dd-fbzqk   1/1     Running   0          7s
+demo-demo-chart-599df65dd-fw2lz   1/1     Running   0          1s
+demo-demo-chart-599df65dd-mszds   1/1     Running   0          1s
+$ helm --kube-context k8s-b list
+NAME	NAMESPACE	REVISION	UPDATED                             	STATUS  	CHART           	APP VERSION
+demo	default  	2       	2026-10-07 23:09:07.118195 +0530 IST	deployed	demo-chart-0.1.0	1.16.0     

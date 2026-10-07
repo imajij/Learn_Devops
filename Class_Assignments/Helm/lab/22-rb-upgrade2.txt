@@ -1,0 +1,35 @@
+### upgrade again with a deliberately bad image tag (reuse the other values)
+$ helm --kube-context k8s-b upgrade rollback-demo 02-rollback/app-chart --reuse-values --set image.tag=9.99-doesnotexist
+Release "rollback-demo" has been upgraded. Happy Helming!
+NAME: rollback-demo
+LAST DEPLOYED: Wed Oct  7 23:11:31 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 3
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+### VERIFY revision 3
+$ helm --kube-context k8s-b status rollback-demo | head -6
+NAME: rollback-demo
+LAST DEPLOYED: Wed Oct  7 23:11:31 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 3
+DESCRIPTION: Upgrade complete
+$ kubectl --context k8s-b get pods -l app=rollback-demo-web
+NAME                                 READY   STATUS         RESTARTS   AGE
+rollback-demo-web-5fcd5cb4d4-n9rp6   0/1     ErrImagePull   0          41s
+rollback-demo-web-786b64b99-2nz9b    1/1     Running        0          48s
+rollback-demo-web-786b64b99-kx2hv    1/1     Running        0          50s
+rollback-demo-web-786b64b99-p7gvp    1/1     Running        0          47s
+$ kubectl --context k8s-b events | grep 9.99-doesnotexist | tail -2 | cut -c1-230
+21s (x2 over 37s)       Warning   Failed                         Pod/rollback-demo-web-5fcd5cb4d4-n9rp6      Failed to pull image "nginx:9.99-doesnotexist": failed to pull and unpack image "docker.io/library/nginx:9.99-doesnotexis
+7s (x2 over 36s)        Normal    BackOff                        Pod/rollback-demo-web-5fcd5cb4d4-n9rp6      Back-off pulling image "nginx:9.99-doesnotexist"
+$ kubectl --context k8s-b rollout status deploy/rollback-demo-web --timeout=10s
+Waiting for deployment "rollback-demo-web" rollout to finish: 1 out of 3 new replicas have been updated...
+error: timed out waiting for the condition
+$ helm --kube-context k8s-b history rollback-demo
+REVISION	UPDATED                 	STATUS    	CHART          	APP VERSION	DESCRIPTION     
+1       	Wed Oct  7 23:11:21 2026	superseded	app-chart-0.1.0	1.0        	Install complete
+2       	Wed Oct  7 23:11:22 2026	superseded	app-chart-0.1.0	1.0        	Upgrade complete
+3       	Wed Oct  7 23:11:31 2026	deployed  	app-chart-0.1.0	1.0        	Upgrade complete

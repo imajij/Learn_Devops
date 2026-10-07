@@ -1,0 +1,33 @@
+$ cd mini-project
+$ helm --kube-context k8s-b upgrade notes-dev notes-chart -f notes-chart/values-prod.yaml --set image.tag=broken-tag-does-not-exist
+Release "notes-dev" has been upgraded. Happy Helming!
+NAME: notes-dev
+LAST DEPLOYED: Wed Oct  7 23:25:59 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 3
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+NOTES:
+Notes App (prod) installed as release "notes-dev", revision 3.
+
+Open it locally:
+  kubectl port-forward svc/notes-dev-notes 8080:80
+  then browse to http://localhost:8080
+$ kubectl --context k8s-b get pods -l app.kubernetes.io/instance=notes-dev
+NAME                               READY   STATUS         RESTARTS   AGE
+notes-dev-notes-64fd68768-z9tlv    0/1     ErrImagePull   0          40s
+notes-dev-notes-7cf7bd76b8-kcw6g   1/1     Running        0          55s
+notes-dev-notes-7cf7bd76b8-rbl7h   1/1     Running        0          48s
+notes-dev-notes-7cf7bd76b8-shbzb   1/1     Running        0          49s
+$ kubectl --context k8s-b get pods -l app.kubernetes.io/instance=notes-dev -o custom-columns=POD:.metadata.name,IMAGE:.spec.containers[0].image,STATUS:.status.containerStatuses[0].state.waiting.reason
+POD                                IMAGE                             STATUS
+notes-dev-notes-64fd68768-z9tlv    nginx:broken-tag-does-not-exist   ErrImagePull
+notes-dev-notes-7cf7bd76b8-kcw6g   nginx:1.27                        <none>
+notes-dev-notes-7cf7bd76b8-rbl7h   nginx:1.27                        <none>
+notes-dev-notes-7cf7bd76b8-shbzb   nginx:1.27                        <none>
+$ helm --kube-context k8s-b history notes-dev
+REVISION	UPDATED                 	STATUS    	CHART            	APP VERSION	DESCRIPTION     
+1       	Wed Oct  7 23:25:33 2026	superseded	notes-chart-0.1.0	1.27       	Install complete
+2       	Wed Oct  7 23:25:45 2026	superseded	notes-chart-0.1.0	1.27       	Upgrade complete
+3       	Wed Oct  7 23:25:59 2026	deployed  	notes-chart-0.1.0	1.27       	Upgrade complete

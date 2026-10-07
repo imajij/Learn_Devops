@@ -1,0 +1,13 @@
+### Helm 3's 'helm list --all' does not exist in Helm 4
+$ helm --kube-context k8s-b list --all
+Error: unknown flag: --all
+$ helm list --help | grep -E -- '--(deployed|failed|pending|superseded|uninstalled|uninstalling)'
+By default, it lists all releases in any status. Individual status filters like '--deployed', '--failed',
+'--pending', '--uninstalled', '--superseded', and '--uninstalling' can be used
+'--deployed --failed'.
+      --deployed             show deployed releases
+      --failed               show failed releases
+      --pending              show pending releases
+      --superseded           show superseded releases
+      --uninstalled          show uninstalled releases (if 'helm uninstall --keep-history' was used)
+      --uninstalling         show releases that are currently being uninstalled

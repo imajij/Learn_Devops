@@ -1,0 +1,17 @@
+$ helm lint 01-commands/demo-chart
+==> Linting 01-commands/demo-chart
+[INFO] Chart.yaml: icon is recommended
+
+1 chart(s) linted, 0 chart(s) failed
+$ helm template demo 01-commands/demo-chart --set image.tag=1.27 | grep -E '^kind|^# Source|image:|replicas:'
+# Source: demo-chart/templates/serviceaccount.yaml
+kind: ServiceAccount
+# Source: demo-chart/templates/service.yaml
+kind: Service
+# Source: demo-chart/templates/deployment.yaml
+kind: Deployment
+  replicas: 1
+          image: "nginx:1.27"
+# Source: demo-chart/templates/tests/test-connection.yaml
+kind: Pod
+      image: busybox

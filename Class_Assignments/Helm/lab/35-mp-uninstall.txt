@@ -1,0 +1,12 @@
+$ helm --kube-context k8s-b uninstall notes-dev
+release "notes-dev" uninstalled
+$ kubectl --context k8s-b get pods
+NAME                               READY   STATUS        RESTARTS   AGE
+notes-dev-notes-7cf7bd76b8-kcw6g   1/1     Terminating   0          62s
+notes-dev-notes-7cf7bd76b8-rbl7h   1/1     Terminating   0          55s
+notes-dev-notes-7cf7bd76b8-shbzb   1/1     Terminating   0          56s
+$ kubectl --context k8s-b get services
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   81m
+$ helm --kube-context k8s-b list
+NAME	NAMESPACE	REVISION	UPDATED	STATUS	CHART	APP VERSION

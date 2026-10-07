@@ -1,0 +1,44 @@
+$ cd mini-project
+$ find notes-chart -type f | sort
+notes-chart/Chart.yaml
+notes-chart/templates/_helpers.tpl
+notes-chart/templates/configmap.yaml
+notes-chart/templates/deployment.yaml
+notes-chart/templates/NOTES.txt
+notes-chart/templates/service.yaml
+notes-chart/values-prod.yaml
+notes-chart/values.yaml
+$ helm lint notes-chart
+==> Linting notes-chart
+[INFO] Chart.yaml: icon is recommended
+
+1 chart(s) linted, 0 chart(s) failed
+$ helm lint notes-chart -f notes-chart/values-prod.yaml
+==> Linting notes-chart
+[INFO] Chart.yaml: icon is recommended
+
+1 chart(s) linted, 0 chart(s) failed
+$ helm template notes-dev notes-chart | grep -E '^# Source|^kind|replicas:|image:|environment:'
+# Source: notes-chart/templates/configmap.yaml
+kind: ConfigMap
+    environment: dev
+      <div>environment: <b>dev</b> | release: <b>notes-dev</b> | revision: <b>1</b></div></header>
+# Source: notes-chart/templates/service.yaml
+kind: Service
+    environment: dev
+# Source: notes-chart/templates/deployment.yaml
+kind: Deployment
+    environment: dev
+  replicas: 1
+        environment: dev
+          image: "nginx:1.27"
+$ helm template notes-dev notes-chart -f notes-chart/values-prod.yaml | grep -E 'replicas:|image:|environment:|cpu:'
+    environment: prod
+      <div>environment: <b>prod</b> | release: <b>notes-dev</b> | revision: <b>1</b></div></header>
+    environment: prod
+    environment: prod
+  replicas: 3
+        environment: prod
+          image: "nginx:1.27"
+              cpu: 500m
+              cpu: 100m

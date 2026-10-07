@@ -1,0 +1,28 @@
+# Default (dev) values for the Notes App
+environment: dev
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: "1.27"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+  limits:
+    cpu: 200m
+    memory: 64Mi
+
+app:
+  title: "Ajij's Notes"
+  bannerColor: "#2b6cb0"
+  notes:
+    - "Learn what a Helm chart is"
+    - "Write templates with {{ .Values }}"
+    - "Install, upgrade and roll back a release"

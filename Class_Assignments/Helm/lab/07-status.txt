@@ -1,0 +1,31 @@
+$ helm --kube-context k8s-b status demo
+NAME: demo
+LAST DEPLOYED: Wed Oct  7 23:09:00 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+RESOURCES:
+==> v1/Deployment
+NAME              READY   UP-TO-DATE   AVAILABLE   AGE
+demo-demo-chart   1/1     1            1           0s
+
+==> v1/Pod(related)
+NAME                              READY   STATUS    RESTARTS   AGE
+demo-demo-chart-599df65dd-fbzqk   1/1     Running   0          0s
+
+==> v1/ServiceAccount
+NAME              AGE
+demo-demo-chart   0s
+
+==> v1/Service
+NAME              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+demo-demo-chart   ClusterIP   10.108.36.108   <none>        80/TCP    0s
+
+
+NOTES:
+1. Get the application URL by running these commands:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=demo-chart,app.kubernetes.io/instance=demo" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace default $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace default port-forward $POD_NAME 8080:$CONTAINER_PORT
