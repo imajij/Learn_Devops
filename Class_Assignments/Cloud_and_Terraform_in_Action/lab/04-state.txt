@@ -1,0 +1,129 @@
+$ terraform state list
+data.aws_ami.ubuntu
+data.aws_iam_policy_document.ec2_assume
+data.aws_iam_policy_document.read_assets
+aws_iam_instance_profile.ec2
+aws_iam_role.ec2
+aws_iam_role_policy.read_assets
+aws_instance.web
+aws_internet_gateway.main
+aws_route_table.public
+aws_route_table_association.public
+aws_s3_bucket.assets
+aws_s3_bucket_public_access_block.assets
+aws_s3_bucket_versioning.assets
+aws_s3_object.index
+aws_security_group.web
+aws_subnet.public
+aws_vpc.main
+
+$ terraform state show -no-color aws_instance.web
+# aws_instance.web:
+resource "aws_instance" "web" {
+    ami                                  = "ami-1e749f67"
+    arn                                  = "arn:aws:ec2:ap-south-1::instance/i-60df9e6f7e3f61c6b"
+    associate_public_ip_address          = true
+    availability_zone                    = "ap-south-1a"
+    disable_api_stop                     = false
+    disable_api_termination              = false
+    ebs_optimized                        = false
+    get_password_data                    = false
+    hibernation                          = false
+    host_id                              = null
+    iam_instance_profile                 = "ajij-cloud-tf-ec2-profile"
+    id                                   = "i-60df9e6f7e3f61c6b"
+    instance_initiated_shutdown_behavior = "stop"
+    instance_lifecycle                   = null
+    instance_state                       = "running"
+    instance_type                        = "t3.micro"
+    ipv6_address_count                   = 0
+    ipv6_addresses                       = []
+    key_name                             = null
+    monitoring                           = false
+    outpost_arn                          = null
+    password_data                        = null
+    placement_group                      = null
+    placement_partition_number           = 0
+    primary_network_interface_id         = "eni-85d60982"
+    private_dns                          = "ip-10-10-1-4.ap-south-1.compute.internal"
+    private_ip                           = "10.10.1.4"
+    public_dns                           = "ec2-54-214-154-240.ap-south-1.compute.amazonaws.com"
+    public_ip                            = "54.214.154.240"
+    secondary_private_ips                = []
+    security_groups                      = []
+    source_dest_check                    = true
+    spot_instance_request_id             = null
+    subnet_id                            = "subnet-f3f600a7"
+    tags                                 = {
+        "Name" = "ajij-cloud-tf-web"
+    }
+    tags_all                             = {
+        "ManagedBy" = "Terraform"
+        "Name"      = "ajij-cloud-tf-web"
+        "Owner"     = "ajij-uttam"
+        "Project"   = "ajij-cloud-tf"
+        "Session"   = "19"
+    }
+    tenancy                              = "default"
+    user_data                            = "0090883ac757a783655b89afde514dfb13d0f03a"
+    user_data_replace_on_change          = false
+    vpc_security_group_ids               = [
+        "sg-c05b4aee6b79b861d",
+    ]
+
+    root_block_device {
+        delete_on_termination = true
+        device_name           = "/dev/sda1"
+        encrypted             = false
+        iops                  = 3000
+        kms_key_id            = null
+        tags_all              = {
+            "ManagedBy" = "Terraform"
+            "Owner"     = "ajij-uttam"
+            "Project"   = "ajij-cloud-tf"
+            "Session"   = "19"
+        }
+        throughput            = 0
+        volume_id             = "vol-356653ee"
+        volume_size           = 8
+        volume_type           = "gp3"
+    }
+}
+
+$ terraform state show -no-color aws_route_table.public
+# aws_route_table.public:
+resource "aws_route_table" "public" {
+    arn              = "arn:aws:ec2:ap-south-1:000000000000:route-table/rtb-55ffeb47"
+    id               = "rtb-55ffeb47"
+    owner_id         = "000000000000"
+    propagating_vgws = []
+    route            = [
+        {
+            carrier_gateway_id         = null
+            cidr_block                 = "0.0.0.0/0"
+            core_network_arn           = null
+            destination_prefix_list_id = null
+            egress_only_gateway_id     = null
+            gateway_id                 = "igw-e9c5dbb8"
+            ipv6_cidr_block            = null
+            local_gateway_id           = null
+            nat_gateway_id             = null
+            network_interface_id       = null
+            transit_gateway_id         = null
+            vpc_endpoint_id            = null
+            vpc_peering_connection_id  = null
+        },
+    ]
+    tags             = {
+        "Name" = "ajij-cloud-tf-public-rt"
+    }
+    tags_all         = {
+        "ManagedBy" = "Terraform"
+        "Name"      = "ajij-cloud-tf-public-rt"
+        "Owner"     = "ajij-uttam"
+        "Project"   = "ajij-cloud-tf"
+        "Session"   = "19"
+    }
+    vpc_id           = "vpc-034a5edf"
+}
+

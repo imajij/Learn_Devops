@@ -1,0 +1,22 @@
+$ curl -s localhost:4566/_localstack/health | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[\"edition\"], d[\"version\"], {k:v for k,v in d[\"services\"].items() if v!=\"disabled\"})"
+community 4.0.3 {'ec2': 'running', 'iam': 'running', 's3': 'running', 'sts': 'available'}
+
+$ terraform version
+Terraform v1.16.4
+on darwin_arm64
++ provider registry.terraform.io/hashicorp/aws v5.100.0
+
+$ terraform init -no-color
+Initializing the backend...
+
+Initializing provider plugins...
+- Reusing previous version of hashicorp/aws from the dependency lock file
+- Using previously-installed hashicorp/aws v5.100.0
+
+Terraform has been successfully initialized!
+
+$ terraform fmt -check -recursive; echo "fmt exit code: $?"
+fmt exit code: 0
+
+$ terraform validate -no-color
+Success! The configuration is valid.

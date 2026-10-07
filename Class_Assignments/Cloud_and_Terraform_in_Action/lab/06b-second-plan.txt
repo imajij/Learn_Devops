@@ -1,0 +1,114 @@
+### a second plan right after apply should be empty. Here it is not (LocalStack quirk, see README):
+$ terraform plan -no-color -detailed-exitcode; echo "exit code: $?"
+data.aws_iam_policy_document.ec2_assume: Reading...
+data.aws_ami.ubuntu: Reading...
+aws_vpc.main: Refreshing state... [id=vpc-034a5edf]
+data.aws_iam_policy_document.ec2_assume: Read complete after 0s [id=2851119427]
+aws_s3_bucket.assets: Refreshing state... [id=ajij-24bcs10103-app-assets]
+aws_iam_role.ec2: Refreshing state... [id=ajij-cloud-tf-ec2-role]
+data.aws_ami.ubuntu: Read complete after 0s [id=ami-1e749f67]
+aws_iam_instance_profile.ec2: Refreshing state... [id=ajij-cloud-tf-ec2-profile]
+aws_internet_gateway.main: Refreshing state... [id=igw-e9c5dbb8]
+aws_subnet.public: Refreshing state... [id=subnet-f3f600a7]
+aws_security_group.web: Refreshing state... [id=sg-c05b4aee6b79b861d]
+aws_route_table.public: Refreshing state... [id=rtb-55ffeb47]
+aws_route_table_association.public: Refreshing state... [id=rtbassoc-3379e358]
+aws_s3_bucket_public_access_block.assets: Refreshing state... [id=ajij-24bcs10103-app-assets]
+aws_s3_bucket_versioning.assets: Refreshing state... [id=ajij-24bcs10103-app-assets]
+aws_s3_object.index: Refreshing state... [id=site/index.html]
+data.aws_iam_policy_document.read_assets: Reading...
+data.aws_iam_policy_document.read_assets: Read complete after 0s [id=2529677692]
+aws_instance.web: Refreshing state... [id=i-60df9e6f7e3f61c6b]
+aws_iam_role_policy.read_assets: Refreshing state... [id=ajij-cloud-tf-ec2-role:read-app-assets]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # aws_subnet.public will be updated in-place
+  ~ resource "aws_subnet" "public" {
+        id                                             = "subnet-f3f600a7"
+      ~ tags                                           = {
+          + "Name" = "ajij-cloud-tf-public-subnet"
+        }
+      ~ tags_all                                       = {
+          + "ManagedBy" = "Terraform"
+          + "Name"      = "ajij-cloud-tf-public-subnet"
+          + "Owner"     = "ajij-uttam"
+          + "Project"   = "ajij-cloud-tf"
+          + "Session"   = "19"
+        }
+        # (19 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+exit code: 2
+
+$ aws ec2 describe-subnets --filters Name=vpc-id,Values=$(terraform output -raw vpc_id) --query 'Subnets[].Tags' --output text
+
+### apply once more: provider uses CreateTags for the update, which LocalStack does honour
+$ terraform apply -no-color -auto-approve | sed "/^Outputs:/,\$d"
+data.aws_ami.ubuntu: Reading...
+data.aws_iam_policy_document.ec2_assume: Reading...
+aws_vpc.main: Refreshing state... [id=vpc-034a5edf]
+data.aws_iam_policy_document.ec2_assume: Read complete after 0s [id=2851119427]
+aws_s3_bucket.assets: Refreshing state... [id=ajij-24bcs10103-app-assets]
+aws_iam_role.ec2: Refreshing state... [id=ajij-cloud-tf-ec2-role]
+data.aws_ami.ubuntu: Read complete after 0s [id=ami-1e749f67]
+aws_iam_instance_profile.ec2: Refreshing state... [id=ajij-cloud-tf-ec2-profile]
+aws_subnet.public: Refreshing state... [id=subnet-f3f600a7]
+aws_internet_gateway.main: Refreshing state... [id=igw-e9c5dbb8]
+aws_security_group.web: Refreshing state... [id=sg-c05b4aee6b79b861d]
+aws_route_table.public: Refreshing state... [id=rtb-55ffeb47]
+aws_route_table_association.public: Refreshing state... [id=rtbassoc-3379e358]
+aws_s3_bucket_versioning.assets: Refreshing state... [id=ajij-24bcs10103-app-assets]
+aws_s3_bucket_public_access_block.assets: Refreshing state... [id=ajij-24bcs10103-app-assets]
+data.aws_iam_policy_document.read_assets: Reading...
+aws_s3_object.index: Refreshing state... [id=site/index.html]
+data.aws_iam_policy_document.read_assets: Read complete after 0s [id=2529677692]
+aws_instance.web: Refreshing state... [id=i-60df9e6f7e3f61c6b]
+aws_iam_role_policy.read_assets: Refreshing state... [id=ajij-cloud-tf-ec2-role:read-app-assets]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # aws_subnet.public will be updated in-place
+  ~ resource "aws_subnet" "public" {
+        id                                             = "subnet-f3f600a7"
+      ~ tags                                           = {
+          + "Name" = "ajij-cloud-tf-public-subnet"
+        }
+      ~ tags_all                                       = {
+          + "ManagedBy" = "Terraform"
+          + "Name"      = "ajij-cloud-tf-public-subnet"
+          + "Owner"     = "ajij-uttam"
+          + "Project"   = "ajij-cloud-tf"
+          + "Session"   = "19"
+        }
+        # (19 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+aws_subnet.public: Modifying... [id=subnet-f3f600a7]
+aws_subnet.public: Modifications complete after 0s [id=subnet-f3f600a7]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+
+$ aws ec2 describe-subnets --filters Name=vpc-id,Values=$(terraform output -raw vpc_id) --query 'Subnets[].Tags' --output text
+Owner	ajij-uttam
+Project	ajij-cloud-tf
+Session	19
+ManagedBy	Terraform
+Name	ajij-cloud-tf-public-subnet
+
+$ terraform plan -no-color -detailed-exitcode | tail -2; echo "exit code: ${PIPESTATUS[0]}"
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+exit code: 0
+

@@ -1,0 +1,520 @@
+$ terraform plan -destroy -no-color -out=destroy.tfplan
+data.aws_ami.ubuntu: Reading...
+data.aws_iam_policy_document.ec2_assume: Reading...
+aws_vpc.main: Refreshing state... [id=vpc-034a5edf]
+aws_s3_bucket.assets: Refreshing state... [id=ajij-24bcs10103-app-assets]
+data.aws_iam_policy_document.ec2_assume: Read complete after 0s [id=2851119427]
+aws_iam_role.ec2: Refreshing state... [id=ajij-cloud-tf-ec2-role]
+data.aws_ami.ubuntu: Read complete after 0s [id=ami-1e749f67]
+aws_iam_instance_profile.ec2: Refreshing state... [id=ajij-cloud-tf-ec2-profile]
+aws_internet_gateway.main: Refreshing state... [id=igw-e9c5dbb8]
+aws_subnet.public: Refreshing state... [id=subnet-f3f600a7]
+aws_security_group.web: Refreshing state... [id=sg-c05b4aee6b79b861d]
+aws_route_table.public: Refreshing state... [id=rtb-55ffeb47]
+aws_route_table_association.public: Refreshing state... [id=rtbassoc-3379e358]
+aws_s3_bucket_public_access_block.assets: Refreshing state... [id=ajij-24bcs10103-app-assets]
+aws_s3_object.index: Refreshing state... [id=site/index.html]
+aws_s3_bucket_versioning.assets: Refreshing state... [id=ajij-24bcs10103-app-assets]
+data.aws_iam_policy_document.read_assets: Reading...
+data.aws_iam_policy_document.read_assets: Read complete after 0s [id=2529677692]
+aws_instance.web: Refreshing state... [id=i-60df9e6f7e3f61c6b]
+aws_iam_role_policy.read_assets: Refreshing state... [id=ajij-cloud-tf-ec2-role:read-app-assets]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # aws_iam_instance_profile.ec2 will be destroyed
+  - resource "aws_iam_instance_profile" "ec2" {
+      - arn         = "arn:aws:iam::000000000000:instance-profile/ajij-cloud-tf-ec2-profile" -> null
+      - create_date = "2026-10-07T16:38:33Z" -> null
+      - id          = "ajij-cloud-tf-ec2-profile" -> null
+      - name        = "ajij-cloud-tf-ec2-profile" -> null
+      - path        = "/" -> null
+      - role        = "ajij-cloud-tf-ec2-role" -> null
+      - tags        = {} -> null
+      - tags_all    = {
+          - "ManagedBy" = "Terraform"
+          - "Owner"     = "ajij-uttam"
+          - "Project"   = "ajij-cloud-tf"
+          - "Session"   = "19"
+        } -> null
+      - unique_id   = "qrhongdywh26m44dtbqk" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+  # aws_iam_role.ec2 will be destroyed
+  - resource "aws_iam_role" "ec2" {
+      - arn                   = "arn:aws:iam::000000000000:role/ajij-cloud-tf-ec2-role" -> null
+      - assume_role_policy    = jsonencode(
+            {
+              - Statement = [
+                  - {
+                      - Action    = "sts:AssumeRole"
+                      - Effect    = "Allow"
+                      - Principal = {
+                          - Service = "ec2.amazonaws.com"
+                        }
+                    },
+                ]
+              - Version   = "2012-10-17"
+            }
+        ) -> null
+      - create_date           = "2026-10-07T16:38:33Z" -> null
+      - force_detach_policies = false -> null
+      - id                    = "ajij-cloud-tf-ec2-role" -> null
+      - managed_policy_arns   = [] -> null
+      - max_session_duration  = 3600 -> null
+      - name                  = "ajij-cloud-tf-ec2-role" -> null
+      - path                  = "/" -> null
+      - tags                  = {} -> null
+      - tags_all              = {
+          - "ManagedBy" = "Terraform"
+          - "Owner"     = "ajij-uttam"
+          - "Project"   = "ajij-cloud-tf"
+          - "Session"   = "19"
+        } -> null
+      - unique_id             = "AROAQAAAAAAAK2L6LIUR3" -> null
+        # (3 unchanged attributes hidden)
+
+      - inline_policy {
+          - name   = "read-app-assets" -> null
+          - policy = jsonencode(
+                {
+                  - Statement = [
+                      - {
+                          - Action   = "s3:ListBucket"
+                          - Effect   = "Allow"
+                          - Resource = "arn:aws:s3:::ajij-24bcs10103-app-assets"
+                        },
+                      - {
+                          - Action   = "s3:GetObject"
+                          - Effect   = "Allow"
+                          - Resource = "arn:aws:s3:::ajij-24bcs10103-app-assets/*"
+                        },
+                    ]
+                  - Version   = "2012-10-17"
+                }
+            ) -> null
+        }
+    }
+
+  # aws_iam_role_policy.read_assets will be destroyed
+  - resource "aws_iam_role_policy" "read_assets" {
+      - id          = "ajij-cloud-tf-ec2-role:read-app-assets" -> null
+      - name        = "read-app-assets" -> null
+      - policy      = jsonencode(
+            {
+              - Statement = [
+                  - {
+                      - Action   = "s3:ListBucket"
+                      - Effect   = "Allow"
+                      - Resource = "arn:aws:s3:::ajij-24bcs10103-app-assets"
+                    },
+                  - {
+                      - Action   = "s3:GetObject"
+                      - Effect   = "Allow"
+                      - Resource = "arn:aws:s3:::ajij-24bcs10103-app-assets/*"
+                    },
+                ]
+              - Version   = "2012-10-17"
+            }
+        ) -> null
+      - role        = "ajij-cloud-tf-ec2-role" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+  # aws_instance.web will be destroyed
+  - resource "aws_instance" "web" {
+      - ami                                  = "ami-1e749f67" -> null
+      - arn                                  = "arn:aws:ec2:ap-south-1::instance/i-60df9e6f7e3f61c6b" -> null
+      - associate_public_ip_address          = true -> null
+      - availability_zone                    = "ap-south-1a" -> null
+      - disable_api_stop                     = false -> null
+      - disable_api_termination              = false -> null
+      - ebs_optimized                        = false -> null
+      - get_password_data                    = false -> null
+      - hibernation                          = false -> null
+      - iam_instance_profile                 = "ajij-cloud-tf-ec2-profile" -> null
+      - id                                   = "i-60df9e6f7e3f61c6b" -> null
+      - instance_initiated_shutdown_behavior = "stop" -> null
+      - instance_state                       = "running" -> null
+      - instance_type                        = "t3.micro" -> null
+      - ipv6_address_count                   = 0 -> null
+      - ipv6_addresses                       = [] -> null
+      - monitoring                           = false -> null
+      - placement_partition_number           = 0 -> null
+      - primary_network_interface_id         = "eni-85d60982" -> null
+      - private_dns                          = "ip-10-10-1-4.ap-south-1.compute.internal" -> null
+      - private_ip                           = "10.10.1.4" -> null
+      - public_dns                           = "ec2-54-214-154-240.ap-south-1.compute.amazonaws.com" -> null
+      - public_ip                            = "54.214.154.240" -> null
+      - secondary_private_ips                = [] -> null
+      - security_groups                      = [] -> null
+      - source_dest_check                    = true -> null
+      - subnet_id                            = "subnet-f3f600a7" -> null
+      - tags                                 = {
+          - "Name" = "ajij-cloud-tf-web"
+        } -> null
+      - tags_all                             = {
+          - "ManagedBy" = "Terraform"
+          - "Name"      = "ajij-cloud-tf-web"
+          - "Owner"     = "ajij-uttam"
+          - "Project"   = "ajij-cloud-tf"
+          - "Session"   = "19"
+        } -> null
+      - tenancy                              = "default" -> null
+      - user_data                            = "0090883ac757a783655b89afde514dfb13d0f03a" -> null
+      - user_data_replace_on_change          = false -> null
+      - vpc_security_group_ids               = [
+          - "sg-c05b4aee6b79b861d",
+        ] -> null
+        # (7 unchanged attributes hidden)
+
+      - root_block_device {
+          - delete_on_termination = true -> null
+          - device_name           = "/dev/sda1" -> null
+          - encrypted             = false -> null
+          - iops                  = 3000 -> null
+          - tags                  = {} -> null
+          - tags_all              = {
+              - "ManagedBy" = "Terraform"
+              - "Owner"     = "ajij-uttam"
+              - "Project"   = "ajij-cloud-tf"
+              - "Session"   = "19"
+            } -> null
+          - throughput            = 0 -> null
+          - volume_id             = "vol-356653ee" -> null
+          - volume_size           = 8 -> null
+          - volume_type           = "gp3" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # aws_internet_gateway.main will be destroyed
+  - resource "aws_internet_gateway" "main" {
+      - arn      = "arn:aws:ec2:ap-south-1:000000000000:internet-gateway/igw-e9c5dbb8" -> null
+      - id       = "igw-e9c5dbb8" -> null
+      - owner_id = "000000000000" -> null
+      - tags     = {
+          - "Name" = "ajij-cloud-tf-igw"
+        } -> null
+      - tags_all = {
+          - "ManagedBy" = "Terraform"
+          - "Name"      = "ajij-cloud-tf-igw"
+          - "Owner"     = "ajij-uttam"
+          - "Project"   = "ajij-cloud-tf"
+          - "Session"   = "19"
+        } -> null
+      - vpc_id   = "vpc-034a5edf" -> null
+    }
+
+  # aws_route_table.public will be destroyed
+  - resource "aws_route_table" "public" {
+      - arn              = "arn:aws:ec2:ap-south-1:000000000000:route-table/rtb-55ffeb47" -> null
+      - id               = "rtb-55ffeb47" -> null
+      - owner_id         = "000000000000" -> null
+      - propagating_vgws = [] -> null
+      - route            = [
+          - {
+              - cidr_block                 = "0.0.0.0/0"
+              - gateway_id                 = "igw-e9c5dbb8"
+                # (11 unchanged attributes hidden)
+            },
+        ] -> null
+      - tags             = {
+          - "Name" = "ajij-cloud-tf-public-rt"
+        } -> null
+      - tags_all         = {
+          - "ManagedBy" = "Terraform"
+          - "Name"      = "ajij-cloud-tf-public-rt"
+          - "Owner"     = "ajij-uttam"
+          - "Project"   = "ajij-cloud-tf"
+          - "Session"   = "19"
+        } -> null
+      - vpc_id           = "vpc-034a5edf" -> null
+    }
+
+  # aws_route_table_association.public will be destroyed
+  - resource "aws_route_table_association" "public" {
+      - id             = "rtbassoc-3379e358" -> null
+      - route_table_id = "rtb-55ffeb47" -> null
+      - subnet_id      = "subnet-f3f600a7" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+  # aws_s3_bucket.assets will be destroyed
+  - resource "aws_s3_bucket" "assets" {
+      - arn                         = "arn:aws:s3:::ajij-24bcs10103-app-assets" -> null
+      - bucket                      = "ajij-24bcs10103-app-assets" -> null
+      - bucket_domain_name          = "ajij-24bcs10103-app-assets.s3.amazonaws.com" -> null
+      - bucket_regional_domain_name = "ajij-24bcs10103-app-assets.s3.ap-south-1.amazonaws.com" -> null
+      - force_destroy               = true -> null
+      - hosted_zone_id              = "Z11RGJOFQNVJUP" -> null
+      - id                          = "ajij-24bcs10103-app-assets" -> null
+      - object_lock_enabled         = false -> null
+      - region                      = "ap-south-1" -> null
+      - request_payer               = "BucketOwner" -> null
+      - tags                        = {
+          - "Name" = "ajij-24bcs10103-app-assets"
+        } -> null
+      - tags_all                    = {
+          - "ManagedBy" = "Terraform"
+          - "Name"      = "ajij-24bcs10103-app-assets"
+          - "Owner"     = "ajij-uttam"
+          - "Project"   = "ajij-cloud-tf"
+          - "Session"   = "19"
+        } -> null
+        # (3 unchanged attributes hidden)
+
+      - grant {
+          - id          = "75aa57f09aa0c8caeab4f8c24e99d10f8e7faeebf76c078efc7c6caea54ba06a" -> null
+          - permissions = [
+              - "FULL_CONTROL",
+            ] -> null
+          - type        = "CanonicalUser" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - server_side_encryption_configuration {
+          - rule {
+              - bucket_key_enabled = false -> null
+
+              - apply_server_side_encryption_by_default {
+                  - sse_algorithm     = "AES256" -> null
+                    # (1 unchanged attribute hidden)
+                }
+            }
+        }
+
+      - versioning {
+          - enabled    = true -> null
+          - mfa_delete = false -> null
+        }
+    }
+
+  # aws_s3_bucket_public_access_block.assets will be destroyed
+  - resource "aws_s3_bucket_public_access_block" "assets" {
+      - block_public_acls       = true -> null
+      - block_public_policy     = true -> null
+      - bucket                  = "ajij-24bcs10103-app-assets" -> null
+      - id                      = "ajij-24bcs10103-app-assets" -> null
+      - ignore_public_acls      = true -> null
+      - restrict_public_buckets = true -> null
+    }
+
+  # aws_s3_bucket_versioning.assets will be destroyed
+  - resource "aws_s3_bucket_versioning" "assets" {
+      - bucket                = "ajij-24bcs10103-app-assets" -> null
+      - id                    = "ajij-24bcs10103-app-assets" -> null
+        # (1 unchanged attribute hidden)
+
+      - versioning_configuration {
+          - status     = "Enabled" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # aws_s3_object.index will be destroyed
+  - resource "aws_s3_object" "index" {
+      - arn                           = "arn:aws:s3:::ajij-24bcs10103-app-assets/site/index.html" -> null
+      - bucket                        = "ajij-24bcs10103-app-assets" -> null
+      - bucket_key_enabled            = false -> null
+      - content                       = <<-EOT
+            <h1>Hello from ajij-cloud-tf</h1><p>Deployed with Terraform by Ajij Uttam (24bcs10103)</p>
+        EOT -> null
+      - content_type                  = "text/html" -> null
+      - etag                          = "3a29c3450c0cd8a499a2e040c7cefae7" -> null
+      - force_destroy                 = false -> null
+      - id                            = "site/index.html" -> null
+      - key                           = "site/index.html" -> null
+      - metadata                      = {} -> null
+      - server_side_encryption        = "AES256" -> null
+      - storage_class                 = "STANDARD" -> null
+      - tags                          = {} -> null
+      - tags_all                      = {
+          - "ManagedBy" = "Terraform"
+          - "Owner"     = "ajij-uttam"
+          - "Project"   = "ajij-cloud-tf"
+          - "Session"   = "19"
+        } -> null
+      - version_id                    = "hlCMsaimfMqFr_2fmh3EjNFHedkD4qFZ" -> null
+        # (13 unchanged attributes hidden)
+    }
+
+  # aws_security_group.web will be destroyed
+  - resource "aws_security_group" "web" {
+      - arn                    = "arn:aws:ec2:ap-south-1:000000000000:security-group/sg-c05b4aee6b79b861d" -> null
+      - description            = "HTTP from anywhere, SSH only from one admin IP" -> null
+      - egress                 = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - description      = "All outbound"
+              - from_port        = 0
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "-1"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 0
+            },
+        ] -> null
+      - id                     = "sg-c05b4aee6b79b861d" -> null
+      - ingress                = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - description      = "HTTP"
+              - from_port        = 80
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "tcp"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 80
+            },
+          - {
+              - cidr_blocks      = [
+                  - "203.0.113.10/32",
+                ]
+              - description      = "SSH from admin IP only"
+              - from_port        = 22
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "tcp"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 22
+            },
+        ] -> null
+      - name                   = "ajij-cloud-tf-web-sg" -> null
+      - owner_id               = "000000000000" -> null
+      - revoke_rules_on_delete = false -> null
+      - tags                   = {
+          - "Name" = "ajij-cloud-tf-web-sg"
+        } -> null
+      - tags_all               = {
+          - "ManagedBy" = "Terraform"
+          - "Name"      = "ajij-cloud-tf-web-sg"
+          - "Owner"     = "ajij-uttam"
+          - "Project"   = "ajij-cloud-tf"
+          - "Session"   = "19"
+        } -> null
+      - vpc_id                 = "vpc-034a5edf" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+  # aws_subnet.public will be destroyed
+  - resource "aws_subnet" "public" {
+      - arn                                            = "arn:aws:ec2:ap-south-1:000000000000:subnet/subnet-f3f600a7" -> null
+      - assign_ipv6_address_on_creation                = false -> null
+      - availability_zone                              = "ap-south-1a" -> null
+      - availability_zone_id                           = "aps1-az1" -> null
+      - cidr_block                                     = "10.10.1.0/24" -> null
+      - enable_dns64                                   = false -> null
+      - enable_lni_at_device_index                     = 0 -> null
+      - enable_resource_name_dns_a_record_on_launch    = false -> null
+      - enable_resource_name_dns_aaaa_record_on_launch = false -> null
+      - id                                             = "subnet-f3f600a7" -> null
+      - ipv6_native                                    = false -> null
+      - map_customer_owned_ip_on_launch                = false -> null
+      - map_public_ip_on_launch                        = true -> null
+      - owner_id                                       = "000000000000" -> null
+      - private_dns_hostname_type_on_launch            = "ip-name" -> null
+      - tags                                           = {
+          - "Name" = "ajij-cloud-tf-public-subnet"
+        } -> null
+      - tags_all                                       = {
+          - "ManagedBy" = "Terraform"
+          - "Name"      = "ajij-cloud-tf-public-subnet"
+          - "Owner"     = "ajij-uttam"
+          - "Project"   = "ajij-cloud-tf"
+          - "Session"   = "19"
+        } -> null
+      - vpc_id                                         = "vpc-034a5edf" -> null
+        # (4 unchanged attributes hidden)
+    }
+
+  # aws_vpc.main will be destroyed
+  - resource "aws_vpc" "main" {
+      - arn                                  = "arn:aws:ec2:ap-south-1:000000000000:vpc/vpc-034a5edf" -> null
+      - assign_generated_ipv6_cidr_block     = false -> null
+      - cidr_block                           = "10.10.0.0/16" -> null
+      - default_network_acl_id               = "acl-91ebb8a1" -> null
+      - default_route_table_id               = "rtb-bb604356" -> null
+      - default_security_group_id            = "sg-0f1b6c608cda4b174" -> null
+      - dhcp_options_id                      = "default" -> null
+      - enable_dns_hostnames                 = true -> null
+      - enable_dns_support                   = true -> null
+      - enable_network_address_usage_metrics = false -> null
+      - id                                   = "vpc-034a5edf" -> null
+      - instance_tenancy                     = "default" -> null
+      - ipv6_netmask_length                  = 0 -> null
+      - main_route_table_id                  = "rtb-bb604356" -> null
+      - owner_id                             = "000000000000" -> null
+      - tags                                 = {
+          - "Name" = "ajij-cloud-tf-vpc"
+        } -> null
+      - tags_all                             = {
+          - "ManagedBy" = "Terraform"
+          - "Name"      = "ajij-cloud-tf-vpc"
+          - "Owner"     = "ajij-uttam"
+          - "Project"   = "ajij-cloud-tf"
+          - "Session"   = "19"
+        } -> null
+        # (4 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 0 to change, 14 to destroy.
+
+Changes to Outputs:
+  - ami_id              = "ami-1e749f67" -> null
+  - ami_name            = "ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727" -> null
+  - bucket_name         = "ajij-24bcs10103-app-assets" -> null
+  - instance_id         = "i-60df9e6f7e3f61c6b" -> null
+  - instance_private_ip = "10.10.1.4" -> null
+  - instance_public_ip  = "54.214.154.240" -> null
+  - instance_role_arn   = "arn:aws:iam::000000000000:role/ajij-cloud-tf-ec2-role" -> null
+  - internet_gateway_id = "igw-e9c5dbb8" -> null
+  - public_subnet_id    = "subnet-f3f600a7" -> null
+  - security_group_id   = "sg-c05b4aee6b79b861d" -> null
+  - vpc_id              = "vpc-034a5edf" -> null
+
+$ terraform apply -no-color destroy.tfplan
+aws_s3_bucket_public_access_block.assets: Destroying... [id=ajij-24bcs10103-app-assets]
+aws_s3_bucket_versioning.assets: Destroying... [id=ajij-24bcs10103-app-assets]
+aws_iam_role_policy.read_assets: Destroying... [id=ajij-cloud-tf-ec2-role:read-app-assets]
+aws_s3_object.index: Destroying... [id=site/index.html]
+aws_instance.web: Destroying... [id=i-60df9e6f7e3f61c6b]
+aws_s3_bucket_versioning.assets: Destruction complete after 0s
+aws_iam_role_policy.read_assets: Destruction complete after 0s
+aws_s3_bucket_public_access_block.assets: Destruction complete after 0s
+aws_s3_object.index: Destruction complete after 0s
+aws_instance.web: Still destroying... [id=i-60df9e6f7e3f61c6b, 00m10s elapsed]
+aws_instance.web: Destruction complete after 10s
+aws_route_table_association.public: Destroying... [id=rtbassoc-3379e358]
+aws_iam_instance_profile.ec2: Destroying... [id=ajij-cloud-tf-ec2-profile]
+aws_security_group.web: Destroying... [id=sg-c05b4aee6b79b861d]
+aws_s3_bucket.assets: Destroying... [id=ajij-24bcs10103-app-assets]
+aws_route_table_association.public: Destruction complete after 0s
+aws_subnet.public: Destroying... [id=subnet-f3f600a7]
+aws_route_table.public: Destroying... [id=rtb-55ffeb47]
+aws_iam_instance_profile.ec2: Destruction complete after 0s
+aws_iam_role.ec2: Destroying... [id=ajij-cloud-tf-ec2-role]
+aws_security_group.web: Destruction complete after 0s
+aws_subnet.public: Destruction complete after 0s
+aws_s3_bucket.assets: Destruction complete after 0s
+aws_iam_role.ec2: Destruction complete after 0s
+aws_route_table.public: Destruction complete after 0s
+aws_internet_gateway.main: Destroying... [id=igw-e9c5dbb8]
+aws_internet_gateway.main: Destruction complete after 0s
+aws_vpc.main: Destroying... [id=vpc-034a5edf]
+aws_vpc.main: Destruction complete after 0s
+
+Apply complete! Resources: 0 added, 0 changed, 14 destroyed.
+

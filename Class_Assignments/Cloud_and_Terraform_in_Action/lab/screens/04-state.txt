@@ -1,0 +1,56 @@
+$ terraform state list
+data.aws_ami.ubuntu
+data.aws_iam_policy_document.ec2_assume
+data.aws_iam_policy_document.read_assets
+aws_iam_instance_profile.ec2
+aws_iam_role.ec2
+aws_iam_role_policy.read_assets
+aws_instance.web
+aws_internet_gateway.main
+aws_route_table.public
+aws_route_table_association.public
+aws_s3_bucket.assets
+aws_s3_bucket_public_access_block.assets
+aws_s3_bucket_versioning.assets
+aws_s3_object.index
+aws_security_group.web
+aws_subnet.public
+aws_vpc.main
+
+$ terraform state show -no-color aws_instance.web
+# aws_instance.web:
+resource "aws_instance" "web" {
+    ami                                  = "ami-1e749f67"
+    arn                                  = "arn:aws:ec2:ap-south-1::instance/i-60df9e6f7e3f61c6b"
+    associate_public_ip_address          = true
+    availability_zone                    = "ap-south-1a"
+    disable_api_stop                     = false
+    disable_api_termination              = false
+    ebs_optimized                        = false
+    get_password_data                    = false
+    hibernation                          = false
+    host_id                              = null
+    iam_instance_profile                 = "ajij-cloud-tf-ec2-profile"
+    id                                   = "i-60df9e6f7e3f61c6b"
+    instance_initiated_shutdown_behavior = "stop"
+    instance_lifecycle                   = null
+    instance_state                       = "running"
+    instance_type                        = "t3.micro"
+    ipv6_address_count                   = 0
+    ipv6_addresses                       = []
+    key_name                             = null
+    monitoring                           = false
+    outpost_arn                          = null
+    password_data                        = null
+    placement_group                      = null
+    placement_partition_number           = 0
+    primary_network_interface_id         = "eni-85d60982"
+    private_dns                          = "ip-10-10-1-4.ap-south-1.compute.internal"
+    private_ip                           = "10.10.1.4"
+    public_dns                           = "ec2-54-214-154-240.ap-south-1.compute.amazonaws.com"
+    public_ip                            = "54.214.154.240"
+    secondary_private_ips                = []
+    security_groups                      = []
+    source_dest_check                    = true
+    spot_instance_request_id             = null
+###   ... 73 lines omitted (full output: lab/04-state.txt)

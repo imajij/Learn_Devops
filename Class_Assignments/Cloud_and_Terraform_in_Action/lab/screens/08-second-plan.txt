@@ -1,0 +1,55 @@
+### a second plan right after apply should be empty. Here it is not (LocalStack quirk, see README):
+$ terraform plan -no-color -detailed-exitcode; echo "exit code: $?"
+###   ... 27 lines omitted (full output: lab/06b-second-plan.txt)
+  # aws_subnet.public will be updated in-place
+  ~ resource "aws_subnet" "public" {
+        id                                             = "subnet-f3f600a7"
+      ~ tags                                           = {
+          + "Name" = "ajij-cloud-tf-public-subnet"
+        }
+      ~ tags_all                                       = {
+          + "ManagedBy" = "Terraform"
+          + "Name"      = "ajij-cloud-tf-public-subnet"
+          + "Owner"     = "ajij-uttam"
+          + "Project"   = "ajij-cloud-tf"
+          + "Session"   = "19"
+###   ... 4 lines omitted (full output: lab/06b-second-plan.txt)
+Plan: 0 to add, 1 to change, 0 to destroy.
+exit code: 2
+
+$ aws ec2 describe-subnets --filters Name=vpc-id,Values=$(terraform output -raw vpc_id) --query 'Subnets[].Tags' --output text
+
+### apply once more: provider uses CreateTags for the update, which LocalStack does honour
+$ terraform apply -no-color -auto-approve | sed "/^Outputs:/,\$d"
+###   ... 27 lines omitted (full output: lab/06b-second-plan.txt)
+  # aws_subnet.public will be updated in-place
+  ~ resource "aws_subnet" "public" {
+        id                                             = "subnet-f3f600a7"
+      ~ tags                                           = {
+          + "Name" = "ajij-cloud-tf-public-subnet"
+        }
+      ~ tags_all                                       = {
+          + "ManagedBy" = "Terraform"
+          + "Name"      = "ajij-cloud-tf-public-subnet"
+          + "Owner"     = "ajij-uttam"
+          + "Project"   = "ajij-cloud-tf"
+          + "Session"   = "19"
+###   ... 4 lines omitted (full output: lab/06b-second-plan.txt)
+Plan: 0 to add, 1 to change, 0 to destroy.
+aws_subnet.public: Modifying... [id=subnet-f3f600a7]
+aws_subnet.public: Modifications complete after 0s [id=subnet-f3f600a7]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+
+$ aws ec2 describe-subnets --filters Name=vpc-id,Values=$(terraform output -raw vpc_id) --query 'Subnets[].Tags' --output text
+Owner	ajij-uttam
+Project	ajij-cloud-tf
+Session	19
+ManagedBy	Terraform
+Name	ajij-cloud-tf-public-subnet
+
+$ terraform plan -no-color -detailed-exitcode | tail -2; echo "exit code: ${PIPESTATUS[0]}"
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+exit code: 0

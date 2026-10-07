@@ -1,0 +1,69 @@
+### verify every resource with the AWS CLI (AWS_ENDPOINT_URL points it at LocalStack)
+$ aws ec2 describe-vpcs --filters Name=tag:Project,Values=ajij-cloud-tf --query 'Vpcs[].[VpcId,CidrBlock,State,Tags[?Key==`Name`]|[0].Value]' --output table
+--------------------------------------------------------------------
+|                           DescribeVpcs                           |
++--------------+---------------+------------+----------------------+
+|  vpc-034a5edf|  10.10.0.0/16 |  available |  ajij-cloud-tf-vpc   |
++--------------+---------------+------------+----------------------+
+
+$ aws ec2 describe-subnets --filters Name=vpc-id,Values=$(terraform output -raw vpc_id) --query 'Subnets[].[SubnetId,CidrBlock,AvailabilityZone,MapPublicIpOnLaunch]' --output table
+------------------------------------------------------------
+|                      DescribeSubnets                     |
++-----------------+----------------+---------------+-------+
+|  subnet-f3f600a7|  10.10.1.0/24  |  ap-south-1a  |  True |
++-----------------+----------------+---------------+-------+
+
+$ aws ec2 describe-internet-gateways --filters Name=tag:Project,Values=ajij-cloud-tf --query 'InternetGateways[].[InternetGatewayId,Attachments[0].VpcId,Attachments[0].State]' --output table
+-----------------------------------------------
+|          DescribeInternetGateways           |
++--------------+----------------+-------------+
+|  igw-e9c5dbb8|  vpc-034a5edf  |  available  |
++--------------+----------------+-------------+
+
+$ aws ec2 describe-route-tables --filters Name=tag:Project,Values=ajij-cloud-tf --query 'RouteTables[].Routes[].[DestinationCidrBlock,GatewayId,State]' --output table
+--------------------------------------------
+|            DescribeRouteTables           |
++---------------+----------------+---------+
+|  10.10.0.0/16 |  local         |  active |
+|  0.0.0.0/0    |  igw-e9c5dbb8  |  active |
++---------------+----------------+---------+
+
+$ aws ec2 describe-security-groups --filters Name=group-name,Values=ajij-cloud-tf-web-sg --query 'SecurityGroups[].IpPermissions[].[FromPort,ToPort,IpProtocol,IpRanges[0].CidrIp]' --output table
+----------------------------------------
+|        DescribeSecurityGroups        |
++----+-----+------+--------------------+
+|  22|  22 |  tcp |  203.0.113.10/32   |
+|  80|  80 |  tcp |  0.0.0.0/0         |
++----+-----+------+--------------------+
+
+$ aws ec2 describe-instances --filters Name=tag:Project,Values=ajij-cloud-tf --query 'Reservations[].Instances[].[InstanceId,InstanceType,State.Name,ImageId,PrivateIpAddress,PublicIpAddress,IamInstanceProfile.Arn]' --output table
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|                                                                            DescribeInstances                                                                           |
++---------------------+-----------+-------------+---------------+------------+-----------------+-------------------------------------------------------------------------+
+|  i-4c15c689200c3a6a7|  t3.micro |  terminated |  ami-1e749f67 |  10.10.1.4 |  None           |  arn:aws:iam::000000000000:instance-profile/ajij-cloud-tf-ec2-profile   |
+|  i-60df9e6f7e3f61c6b|  t3.micro |  running    |  ami-1e749f67 |  10.10.1.4 |  54.214.154.240 |  arn:aws:iam::000000000000:instance-profile/ajij-cloud-tf-ec2-profile   |
++---------------------+-----------+-------------+---------------+------------+-----------------+-------------------------------------------------------------------------+
+
+$ aws s3 ls s3://ajij-24bcs10103-app-assets --recursive
+2026-10-07 22:08:33         91 site/index.html
+
+$ aws s3 cp s3://ajij-24bcs10103-app-assets/site/index.html -
+<h1>Hello from ajij-cloud-tf</h1><p>Deployed with Terraform by Ajij Uttam (24bcs10103)</p>
+
+$ aws iam get-role --role-name ajij-cloud-tf-ec2-role --query 'Role.[RoleName,Arn]' --output text
+ajij-cloud-tf-ec2-role	arn:aws:iam::000000000000:role/ajij-cloud-tf-ec2-role
+
+$ aws iam get-role-policy --role-name ajij-cloud-tf-ec2-role --policy-name read-app-assets --query PolicyDocument.Statement
+[
+    {
+        "Action": "s3:ListBucket",
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::ajij-24bcs10103-app-assets"
+    },
+    {
+        "Action": "s3:GetObject",
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::ajij-24bcs10103-app-assets/*"
+    }
+]
+

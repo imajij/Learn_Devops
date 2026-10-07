@@ -1,0 +1,36 @@
+digraph arch {
+  graph [rankdir=LR, fontname="Helvetica", fontsize=13, nodesep=0.5, ranksep=0.7, bgcolor="white", label="ajij-cloud-tf: architecture built by terraform-infra/ (region ap-south-1)", labelloc=t, fontsize=16];
+  node  [fontname="Helvetica", fontsize=12, shape=box, style="rounded,filled", fillcolor="#ffffff", color="#555555"];
+  edge  [fontname="Helvetica", fontsize=10, color="#555555"];
+
+  user [label="Internet user\n(browser, HTTP :80)", shape=ellipse, fillcolor="#eef2f7"];
+  admin [label="Admin laptop\n203.0.113.10/32 (SSH :22)", shape=ellipse, fillcolor="#eef2f7"];
+  tf [label="Terraform CLI\n(init / plan / apply / destroy)", fillcolor="#ede7fb", color="#7b42bc"];
+  state [label="terraform.tfstate\n(local backend)", shape=note, fillcolor="#fff8e1"];
+
+  subgraph cluster_aws {
+    label="AWS account (LocalStack 4.0 in this lab)"; style="rounded"; color="#ff9900"; fontcolor="#c06800";
+    subgraph cluster_vpc {
+      label="VPC  10.10.0.0/16  (aws_vpc.main)"; style="rounded,filled"; fillcolor="#f1f8e9"; color="#2e7d32"; fontcolor="#2e7d32";
+      igw [label="Internet Gateway\naws_internet_gateway.main", fillcolor="#e3f2fd", color="#1565c0"];
+      rt  [label="Route table\n0.0.0.0/0 -> IGW\n10.10.0.0/16 -> local", fillcolor="#e3f2fd", color="#1565c0"];
+      subgraph cluster_subnet {
+        label="Public subnet 10.10.1.0/24 (ap-south-1a)"; style="rounded,filled"; fillcolor="#e8f5e9"; color="#43a047"; fontcolor="#2e7d32";
+        subgraph cluster_sg {
+          label="Security group web-sg: 80 from 0.0.0.0/0, 22 from admin /32"; style="dashed"; color="#c62828"; fontcolor="#c62828";
+          ec2 [label="EC2 aws_instance.web\nUbuntu AMI, t3.micro, 8 GB gp3\nuser_data: nginx", fillcolor="#fff3e0", color="#ef6c00"];
+        }
+      }
+    }
+    iam [label="IAM role + instance profile\nread-only on the bucket", fillcolor="#fce4ec", color="#ad1457"];
+    s3  [label="S3 bucket\najij-24bcs10103-app-assets\nversioned, public access blocked\nsite/index.html", shape=cylinder, fillcolor="#fff3e0", color="#ef6c00"];
+  }
+
+  user -> igw [label="HTTP"];
+  admin -> igw [label="SSH", style=dashed];
+  igw -> rt -> ec2;
+  ec2 -> iam [label="assumes", style=dashed];
+  ec2 -> s3 [label="s3:GetObject\n(via role)"];
+  tf -> state [label="records", style=dotted];
+  tf -> igw [style=invis];
+}

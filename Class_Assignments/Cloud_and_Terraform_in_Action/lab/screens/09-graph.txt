@@ -1,0 +1,30 @@
+### dependency graph: terraform graph prints DOT, graphviz 'dot' renders it
+$ terraform graph > graph.dot && wc -l graph.dot
+      40 graph.dot
+
+$ grep -- '->' graph.dot | sed 's/"//g' | sort
+  aws_iam_instance_profile.ec2 -> aws_iam_role.ec2;
+  aws_iam_role_policy.read_assets -> aws_iam_role.ec2;
+  aws_iam_role_policy.read_assets -> data.aws_iam_policy_document.read_assets;
+  aws_iam_role.ec2 -> data.aws_iam_policy_document.ec2_assume;
+  aws_instance.web -> aws_iam_instance_profile.ec2;
+  aws_instance.web -> aws_route_table_association.public;
+  aws_instance.web -> aws_s3_bucket.assets;
+  aws_instance.web -> aws_security_group.web;
+  aws_instance.web -> data.aws_ami.ubuntu;
+  aws_internet_gateway.main -> aws_vpc.main;
+  aws_route_table_association.public -> aws_route_table.public;
+  aws_route_table_association.public -> aws_subnet.public;
+  aws_route_table.public -> aws_internet_gateway.main;
+  aws_s3_bucket_public_access_block.assets -> aws_s3_bucket.assets;
+  aws_s3_bucket_versioning.assets -> aws_s3_bucket.assets;
+  aws_s3_object.index -> aws_s3_bucket.assets;
+  aws_security_group.web -> aws_vpc.main;
+  aws_subnet.public -> aws_vpc.main;
+  data.aws_iam_policy_document.read_assets -> aws_s3_bucket.assets;
+
+$ dot -Tpng -Gdpi=110 graph.dot -o ../images/terraform-graph.png && dot -Tsvg graph.dot -o ../images/terraform-graph.svg && ls -l ../images/terraform-graph.*
+-rw-r--r--@ 1 ajijuttam  staff  118459  7 Oct 22:09 ../images/terraform-graph.png
+-rw-r--r--@ 1 ajijuttam  staff   14579  7 Oct 22:09 ../images/terraform-graph.svg
+
+$ rm graph.dot

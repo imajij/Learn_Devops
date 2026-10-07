@@ -1,0 +1,50 @@
+$ terraform plan -no-color -out=tfplan
+data.aws_iam_policy_document.ec2_assume: Reading...
+data.aws_ami.ubuntu: Reading...
+data.aws_iam_policy_document.ec2_assume: Read complete after 0s [id=2851119427]
+data.aws_ami.ubuntu: Read complete after 0s [id=ami-1e749f67]
+
+Terraform used the selected providers to generate the following execution
+###   ... 31 lines omitted (full output: lab/02-plan.txt)
+  # aws_iam_instance_profile.ec2 will be created
+###   ... 17 lines omitted (full output: lab/02-plan.txt)
+  # aws_iam_role.ec2 will be created
+###   ... 35 lines omitted (full output: lab/02-plan.txt)
+  # aws_iam_role_policy.read_assets will be created
+###   ... 8 lines omitted (full output: lab/02-plan.txt)
+  # aws_instance.web will be created
+###   ... 88 lines omitted (full output: lab/02-plan.txt)
+  # aws_internet_gateway.main will be created
+###   ... 17 lines omitted (full output: lab/02-plan.txt)
+  # aws_route_table.public will be created
+###   ... 25 lines omitted (full output: lab/02-plan.txt)
+  # aws_route_table_association.public will be created
+###   ... 6 lines omitted (full output: lab/02-plan.txt)
+  # aws_s3_bucket.assets will be created
+###   ... 47 lines omitted (full output: lab/02-plan.txt)
+  # aws_s3_bucket_public_access_block.assets will be created
+###   ... 9 lines omitted (full output: lab/02-plan.txt)
+  # aws_s3_bucket_versioning.assets will be created
+###   ... 10 lines omitted (full output: lab/02-plan.txt)
+  # aws_s3_object.index will be created
+###   ... 30 lines omitted (full output: lab/02-plan.txt)
+  # aws_security_group.web will be created
+###   ... 64 lines omitted (full output: lab/02-plan.txt)
+  # aws_subnet.public will be created
+###   ... 28 lines omitted (full output: lab/02-plan.txt)
+  # aws_vpc.main will be created
+###   ... 29 lines omitted (full output: lab/02-plan.txt)
+Plan: 14 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + ami_id              = "ami-1e749f67"
+  + ami_name            = "ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727"
+  + bucket_name         = "ajij-24bcs10103-app-assets"
+  + instance_id         = (known after apply)
+  + instance_private_ip = (known after apply)
+  + instance_public_ip  = (known after apply)
+  + instance_role_arn   = (known after apply)
+  + internet_gateway_id = (known after apply)
+  + public_subnet_id    = (known after apply)
+  + security_group_id   = (known after apply)
+  + vpc_id              = (known after apply)

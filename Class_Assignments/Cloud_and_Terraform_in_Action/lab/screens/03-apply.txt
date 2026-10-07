@@ -1,0 +1,50 @@
+$ terraform apply -no-color tfplan
+aws_vpc.main: Creating...
+aws_iam_role.ec2: Creating...
+aws_s3_bucket.assets: Creating...
+aws_iam_role.ec2: Creation complete after 0s [id=ajij-cloud-tf-ec2-role]
+aws_iam_instance_profile.ec2: Creating...
+aws_s3_bucket.assets: Creation complete after 0s [id=ajij-24bcs10103-app-assets]
+data.aws_iam_policy_document.read_assets: Reading...
+aws_s3_bucket_public_access_block.assets: Creating...
+aws_s3_bucket_versioning.assets: Creating...
+data.aws_iam_policy_document.read_assets: Read complete after 0s [id=2529677692]
+aws_s3_object.index: Creating...
+aws_iam_role_policy.read_assets: Creating...
+aws_s3_bucket_public_access_block.assets: Creation complete after 0s [id=ajij-24bcs10103-app-assets]
+aws_iam_role_policy.read_assets: Creation complete after 0s [id=ajij-cloud-tf-ec2-role:read-app-assets]
+aws_s3_object.index: Creation complete after 0s [id=site/index.html]
+aws_s3_bucket_versioning.assets: Creation complete after 1s [id=ajij-24bcs10103-app-assets]
+aws_iam_instance_profile.ec2: Creation complete after 5s [id=ajij-cloud-tf-ec2-profile]
+aws_vpc.main: Still creating... [00m10s elapsed]
+aws_vpc.main: Creation complete after 10s [id=vpc-034a5edf]
+aws_internet_gateway.main: Creating...
+aws_subnet.public: Creating...
+aws_security_group.web: Creating...
+aws_internet_gateway.main: Creation complete after 0s [id=igw-e9c5dbb8]
+aws_route_table.public: Creating...
+aws_route_table.public: Creation complete after 0s [id=rtb-55ffeb47]
+aws_security_group.web: Creation complete after 0s [id=sg-c05b4aee6b79b861d]
+aws_subnet.public: Still creating... [00m10s elapsed]
+aws_subnet.public: Creation complete after 10s [id=subnet-f3f600a7]
+aws_route_table_association.public: Creating...
+aws_route_table_association.public: Creation complete after 0s [id=rtbassoc-3379e358]
+aws_instance.web: Creating...
+aws_instance.web: Still creating... [00m10s elapsed]
+aws_instance.web: Creation complete after 10s [id=i-60df9e6f7e3f61c6b]
+
+Apply complete! Resources: 14 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+ami_id = "ami-1e749f67"
+ami_name = "ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727"
+bucket_name = "ajij-24bcs10103-app-assets"
+instance_id = "i-60df9e6f7e3f61c6b"
+instance_private_ip = "10.10.1.4"
+instance_public_ip = "54.214.154.240"
+instance_role_arn = "arn:aws:iam::000000000000:role/ajij-cloud-tf-ec2-role"
+internet_gateway_id = "igw-e9c5dbb8"
+public_subnet_id = "subnet-f3f600a7"
+security_group_id = "sg-c05b4aee6b79b861d"
+vpc_id = "vpc-034a5edf"

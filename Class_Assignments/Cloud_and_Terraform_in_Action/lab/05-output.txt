@@ -1,0 +1,16 @@
+$ terraform output -no-color
+ami_id = "ami-1e749f67"
+ami_name = "ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727"
+bucket_name = "ajij-24bcs10103-app-assets"
+instance_id = "i-60df9e6f7e3f61c6b"
+instance_private_ip = "10.10.1.4"
+instance_public_ip = "54.214.154.240"
+instance_role_arn = "arn:aws:iam::000000000000:role/ajij-cloud-tf-ec2-role"
+internet_gateway_id = "igw-e9c5dbb8"
+public_subnet_id = "subnet-f3f600a7"
+security_group_id = "sg-c05b4aee6b79b861d"
+vpc_id = "vpc-034a5edf"
+
+$ terraform output -raw instance_public_ip
+54.214.154.240
+

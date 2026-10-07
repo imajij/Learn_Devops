@@ -1,0 +1,56 @@
+$ terraform plan -destroy -no-color -out=destroy.tfplan
+###   ... 471 lines omitted (full output: lab/08-destroy.txt)
+Plan: 0 to add, 0 to change, 14 to destroy.
+###   ... 14 lines omitted (full output: lab/08-destroy.txt)
+$ terraform apply -no-color destroy.tfplan
+aws_s3_bucket_public_access_block.assets: Destroying... [id=ajij-24bcs10103-app-assets]
+aws_s3_bucket_versioning.assets: Destroying... [id=ajij-24bcs10103-app-assets]
+aws_iam_role_policy.read_assets: Destroying... [id=ajij-cloud-tf-ec2-role:read-app-assets]
+aws_s3_object.index: Destroying... [id=site/index.html]
+aws_instance.web: Destroying... [id=i-60df9e6f7e3f61c6b]
+aws_s3_bucket_versioning.assets: Destruction complete after 0s
+aws_iam_role_policy.read_assets: Destruction complete after 0s
+aws_s3_bucket_public_access_block.assets: Destruction complete after 0s
+aws_s3_object.index: Destruction complete after 0s
+aws_instance.web: Still destroying... [id=i-60df9e6f7e3f61c6b, 00m10s elapsed]
+aws_instance.web: Destruction complete after 10s
+aws_route_table_association.public: Destroying... [id=rtbassoc-3379e358]
+aws_iam_instance_profile.ec2: Destroying... [id=ajij-cloud-tf-ec2-profile]
+aws_security_group.web: Destroying... [id=sg-c05b4aee6b79b861d]
+aws_s3_bucket.assets: Destroying... [id=ajij-24bcs10103-app-assets]
+aws_route_table_association.public: Destruction complete after 0s
+aws_subnet.public: Destroying... [id=subnet-f3f600a7]
+aws_route_table.public: Destroying... [id=rtb-55ffeb47]
+aws_iam_instance_profile.ec2: Destruction complete after 0s
+aws_iam_role.ec2: Destroying... [id=ajij-cloud-tf-ec2-role]
+aws_security_group.web: Destruction complete after 0s
+aws_subnet.public: Destruction complete after 0s
+aws_s3_bucket.assets: Destruction complete after 0s
+aws_iam_role.ec2: Destruction complete after 0s
+aws_route_table.public: Destruction complete after 0s
+aws_internet_gateway.main: Destroying... [id=igw-e9c5dbb8]
+aws_internet_gateway.main: Destruction complete after 0s
+aws_vpc.main: Destroying... [id=vpc-034a5edf]
+aws_vpc.main: Destruction complete after 0s
+
+Apply complete! Resources: 0 added, 0 changed, 14 destroyed.
+
+### after destroy: state is empty and the AWS CLI finds nothing left
+$ terraform state list
+
+$ echo "vpcs tagged Project=ajij-cloud-tf: $(aws ec2 describe-vpcs --filters Name=tag:Project,Values=ajij-cloud-tf --query "length(Vpcs)")"
+vpcs tagged Project=ajij-cloud-tf: 0
+
+$ echo "running/pending instances: $(aws ec2 describe-instances --filters Name=tag:Project,Values=ajij-cloud-tf Name=instance-state-name,Values=pending,running --query "length(Reservations)")"
+running/pending instances: 0
+
+$ aws ec2 describe-instances --filters Name=tag:Project,Values=ajij-cloud-tf --query 'Reservations[].Instances[].[InstanceId,State.Name]' --output text
+i-4c15c689200c3a6a7	terminated
+i-60df9e6f7e3f61c6b	terminated
+
+$ aws s3 ls; echo "buckets: $(aws s3 ls | wc -l | tr -d " ")"
+buckets: 0
+
+$ aws iam get-role --role-name ajij-cloud-tf-ec2-role
+
+aws: [ERROR]: An error occurred (NoSuchEntity) when calling the GetRole operation: Role ajij-cloud-tf-ec2-role not found

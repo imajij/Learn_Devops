@@ -1,0 +1,39 @@
+### verify every resource with the AWS CLI (AWS_ENDPOINT_URL points it at LocalStack)
+$ aws ec2 describe-vpcs --filters Name=tag:Project,Values=ajij-cloud-tf --query 'Vpcs[].[VpcId,CidrBlock,State,Tags[?Key==`Name`]|[0].Value]' --output table
+--------------------------------------------------------------------
+|                           DescribeVpcs                           |
++--------------+---------------+------------+----------------------+
+|  vpc-034a5edf|  10.10.0.0/16 |  available |  ajij-cloud-tf-vpc   |
++--------------+---------------+------------+----------------------+
+
+$ aws ec2 describe-subnets --filters Name=vpc-id,Values=$(terraform output -raw vpc_id) --query 'Subnets[].[SubnetId,CidrBlock,AvailabilityZone,MapPublicIpOnLaunch]' --output table
+------------------------------------------------------------
+|                      DescribeSubnets                     |
++-----------------+----------------+---------------+-------+
+|  subnet-f3f600a7|  10.10.1.0/24  |  ap-south-1a  |  True |
++-----------------+----------------+---------------+-------+
+
+$ aws ec2 describe-internet-gateways --filters Name=tag:Project,Values=ajij-cloud-tf --query 'InternetGateways[].[InternetGatewayId,Attachments[0].VpcId,Attachments[0].State]' --output table
+-----------------------------------------------
+|          DescribeInternetGateways           |
++--------------+----------------+-------------+
+|  igw-e9c5dbb8|  vpc-034a5edf  |  available  |
++--------------+----------------+-------------+
+
+$ aws ec2 describe-route-tables --filters Name=tag:Project,Values=ajij-cloud-tf --query 'RouteTables[].Routes[].[DestinationCidrBlock,GatewayId,State]' --output table
+--------------------------------------------
+|            DescribeRouteTables           |
++---------------+----------------+---------+
+|  10.10.0.0/16 |  local         |  active |
+|  0.0.0.0/0    |  igw-e9c5dbb8  |  active |
++---------------+----------------+---------+
+
+$ aws ec2 describe-security-groups --filters Name=group-name,Values=ajij-cloud-tf-web-sg --query 'SecurityGroups[].IpPermissions[].[FromPort,ToPort,IpProtocol,IpRanges[0].CidrIp]' --output table
+----------------------------------------
+|        DescribeSecurityGroups        |
++----+-----+------+--------------------+
+|  22|  22 |  tcp |  203.0.113.10/32   |
+|  80|  80 |  tcp |  0.0.0.0/0         |
++----+-----+------+--------------------+
+
+###   ... 30 lines omitted (full output: lab/06-verify-awscli.txt)
