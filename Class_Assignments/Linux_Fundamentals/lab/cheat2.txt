@@ -1,0 +1,61 @@
+# cd /root/projects/app
+# chmod 750 main.py && ls -l main.py
+-rwxr-x--- 1 root root 0 Oct  7 16:11 main.py
+# chown ajij:ajij README.md && ls -l README.md
+-rw-r--r-- 1 ajij ajij 0 Oct  7 16:11 README.md
+# tar -czf /tmp/app.tar.gz -C /root/projects app && tar -tzf /tmp/app.tar.gz
+app/
+app/README.md
+app/main.py
+app/logs/
+app/logs/app.log
+# uname -a
+Linux ubuntu-lab 6.8.0-117-generic #117-Ubuntu SMP PREEMPT_DYNAMIC Thu May  7 17:26:37 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux
+# cat /etc/os-release | head -4
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.5 LTS (Noble Numbat)"
+# whoami; id
+root
+uid=0(root) gid=0(root) groups=0(root)
+# df -h /
+Filesystem      Size  Used Avail Use% Mounted on
+overlay          40G  272M   37G   1% /
+# du -sh /var/log
+8.4M	/var/log
+# free -h
+               total        used        free      shared  buff/cache   available
+Mem:           5.8Gi       374Mi       4.8Gi       840Ki       745Mi       5.4Gi
+Swap:             0B          0B          0B
+# uptime
+ 16:11:11 up 1 min,  0 user,  load average: 0.16, 0.07, 0.02
+# ps aux --sort=-%mem | head -6
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  1.6  0.1  20840 11576 ?        Ss   16:11   0:00 /sbin/init
+root          29  0.4  0.1  33692 11316 ?        S<s  16:11   0:00 /usr/lib/systemd/systemd-journald
+root          86  0.0  0.1  19484  7732 ?        Ss   16:11   0:00 (agetty)
+root          83  0.0  0.1  17256  7156 ?        Ss   16:11   0:00 /usr/lib/systemd/systemd-logind
+message+      80  0.0  0.0   8392  4004 ?        Ss   16:11   0:00 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+# top -bn1 | head -12
+top - 16:11:11 up 1 min,  0 user,  load average: 0.16, 0.07, 0.02
+Tasks:  14 total,   1 running,  13 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni, 97.6 id,  0.0 wa,  0.0 hi,  2.4 si,  0.0 st 
+MiB Mem :   5910.3 total,   4945.1 free,    376.4 used,    745.6 buff/cache     
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.   5533.9 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+      1 root      20   0   20840  11576   8904 S   0.0   0.2   0:00.04 systemd
+     29 root      19  -1   33692  11316  10348 S   0.0   0.2   0:00.01 systemd+
+     79 root      20   0    4160   2428   2196 S   0.0   0.0   0:00.00 cron
+     80 message+  20   0    8392   4004   3508 S   0.0   0.1   0:00.00 dbus-da+
+     83 root      20   0   17256   7156   6244 S   0.0   0.1   0:00.00 systemd+
+# which nginx bash
+/usr/sbin/nginx
+/usr/bin/bash
+# echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# curl -sI http://localhost | head -3
+HTTP/1.1 200 OK
+Server: nginx/1.24.0 (Ubuntu)
+Date: Wed, 07 Oct 2026 16:11:11 GMT

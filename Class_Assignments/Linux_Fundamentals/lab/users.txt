@@ -1,0 +1,45 @@
+# ls -l $(which useradd adduser)
+-rwxr-xr-x 1 root root  55191 Jul  5  2023 /usr/sbin/adduser
+-rwxr-xr-x 1 root root 142784 May 30  2024 /usr/sbin/useradd
+# head -1 /usr/sbin/adduser
+#! /usr/bin/perl
+### useradd: low-level binary, does only what flags say
+# useradd testuser1
+# grep testuser1 /etc/passwd
+testuser1:x:1001:1001::/home/testuser1:/bin/sh
+# ls -ld /home/testuser1
+ls: cannot access '/home/testuser1': No such file or directory
+# passwd -S testuser1
+testuser1 L 2026-10-07 0 99999 7 -1
+### adduser: interactive Perl wrapper around useradd (recommended on Ubuntu/Debian)
+# adduser --gecos "Ajij Uttam" --disabled-password ajij
+info: Adding user `ajij' ...
+info: Selecting UID/GID from range 1000 to 59999 ...
+info: Adding new group `ajij' (1002) ...
+info: Adding new user `ajij' (1002) with group `ajij (1002)' ...
+info: Creating home directory `/home/ajij' ...
+info: Copying files from `/etc/skel' ...
+info: Adding new user `ajij' to supplemental / extra groups `users' ...
+info: Adding user `ajij' to group `users' ...
+# grep ajij /etc/passwd
+ajij:x:1002:1002:Ajij Uttam,,,:/home/ajij:/bin/bash
+# ls -la /home/ajij
+total 20
+drwxr-x--- 2 ajij ajij 4096 Oct  7 16:11 .
+drwxr-xr-x 1 root root 4096 Oct  7 16:11 ..
+-rw-r--r-- 1 ajij ajij  220 Oct  7 16:11 .bash_logout
+-rw-r--r-- 1 ajij ajij 3771 Oct  7 16:11 .bashrc
+-rw-r--r-- 1 ajij ajij  807 Oct  7 16:11 .profile
+# id ajij
+uid=1002(ajij) gid=1002(ajij) groups=1002(ajij),100(users)
+# usermod -aG sudo ajij && id ajij
+uid=1002(ajij) gid=1002(ajij) groups=1002(ajij),27(sudo),100(users)
+# grep -E "^#?(DSHELL|DHOME|SKEL|USERGROUPS)=" /etc/adduser.conf
+#DSHELL=/bin/bash
+#SKEL=/etc/skel
+#USERGROUPS=yes
+### cleanup: deluser --remove-home needs the full perl package; userdel works without it
+# deluser --remove-home testuser1
+fatal: In order to use the --remove-home, --remove-all-files, and --backup features, you need to install the `perl' package. To accomplish that, run apt-get install perl.
+# userdel testuser1 && grep -c testuser1 /etc/passwd
+0

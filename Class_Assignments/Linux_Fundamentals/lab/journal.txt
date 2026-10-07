@@ -1,0 +1,62 @@
+# systemctl status nginx --no-pager | head -8
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-10-07 16:11:08 UTC; 2s ago
+       Docs: man:nginx(8)
+    Process: 82 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 88 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+   Main PID: 89 (nginx)
+      Tasks: 5 (limit: 7039)
+# journalctl --list-boots --no-pager
+IDX BOOT ID                          FIRST ENTRY                 LAST ENTRY
+  0 a668a8c95146488ba1109edf996f8f5e Wed 2026-10-07 16:11:08 UTC Wed 2026-10-07 16:11:11 UTC
+# journalctl -n 10 --no-pager
+Oct 07 16:11:11 ubuntu-lab chfn[174]: changed user 'ajij' information
+Oct 07 16:11:11 ubuntu-lab adduser[150]: Adding new user `ajij' to supplemental / extra groups `users' ...
+Oct 07 16:11:11 ubuntu-lab adduser[150]: Adding user `ajij' to group `users' ...
+Oct 07 16:11:11 ubuntu-lab gpasswd[182]: members of group users set by root to ajij
+Oct 07 16:11:11 ubuntu-lab usermod[191]: add 'ajij' to group 'sudo'
+Oct 07 16:11:11 ubuntu-lab usermod[191]: add 'ajij' to shadow group 'sudo'
+Oct 07 16:11:11 ubuntu-lab deluser[200]: In order to use the --remove-home, --remove-all-files, and --backup features, you need to install the `perl' package. To accomplish that, run apt-get install perl.
+Oct 07 16:11:11 ubuntu-lab userdel[202]: delete user 'testuser1'
+Oct 07 16:11:11 ubuntu-lab userdel[202]: removed group 'testuser1' owned by 'testuser1'
+Oct 07 16:11:11 ubuntu-lab userdel[202]: removed shadow group 'testuser1' owned by 'testuser1'
+# systemctl restart nginx
+# journalctl -u nginx --no-pager
+Oct 07 16:11:08 ubuntu-lab systemd[1]: Starting nginx.service - A high performance web server and a reverse proxy server...
+Oct 07 16:11:08 ubuntu-lab systemd[1]: Started nginx.service - A high performance web server and a reverse proxy server.
+Oct 07 16:11:11 ubuntu-lab systemd[1]: Stopping nginx.service - A high performance web server and a reverse proxy server...
+Oct 07 16:11:11 ubuntu-lab systemd[1]: nginx.service: Deactivated successfully.
+Oct 07 16:11:11 ubuntu-lab systemd[1]: Stopped nginx.service - A high performance web server and a reverse proxy server.
+Oct 07 16:11:11 ubuntu-lab systemd[1]: Starting nginx.service - A high performance web server and a reverse proxy server...
+Oct 07 16:11:11 ubuntu-lab systemd[1]: Started nginx.service - A high performance web server and a reverse proxy server.
+# logger -t ajij-app "deployment finished for 24bcs10103"
+# journalctl -t ajij-app --no-pager
+Oct 07 16:11:11 ubuntu-lab ajij-app[234]: deployment finished for 24bcs10103
+# logger -p user.err -t ajij-app "simulated error: disk quota exceeded"
+# journalctl -p err --no-pager -n 5
+Oct 07 16:11:11 ubuntu-lab deluser[200]: In order to use the --remove-home, --remove-all-files, and --backup features, you need to install the `perl' package. To accomplish that, run apt-get install perl.
+Oct 07 16:11:11 ubuntu-lab ajij-app[236]: simulated error: disk quota exceeded
+# journalctl -u cron --since "10 min ago" --no-pager -o short-iso
+2026-10-07T16:11:08+00:00 ubuntu-lab systemd[1]: Started cron.service - Regular background program processing daemon.
+2026-10-07T16:11:08+00:00 ubuntu-lab (cron)[79]: cron.service: Referenced but unset environment variable evaluates to an empty string: EXTRA_OPTS
+2026-10-07T16:11:08+00:00 ubuntu-lab cron[79]: (CRON) INFO (pidfile fd = 3)
+2026-10-07T16:11:08+00:00 ubuntu-lab cron[79]: (CRON) INFO (Running @reboot jobs)
+# journalctl -u nginx -o json-pretty -n 1 --no-pager | head -15
+{
+	"_UID" : "0",
+	"__REALTIME_TIMESTAMP" : "1791389471166513",
+	"_MACHINE_ID" : "d640e464991741bcbb5ede4d412bc43d",
+	"TID" : "1",
+	"_HOSTNAME" : "ubuntu-lab",
+	"_PID" : "1",
+	"__CURSOR" : "s=5a40204c57df4b64b723b64302361036;i=4e9;b=a668a8c95146488ba1109edf996f8f5e;m=59efa23;t=65d425d155031;x=1c06f88e83909b88",
+	"CODE_LINE" : "796",
+	"MESSAGE_ID" : "39f53479d3a045ac8e11786248231fbf",
+	"__SEQNUM_ID" : "5a40204c57df4b64b723b64302361036",
+	"UNIT" : "nginx.service",
+	"INVOCATION_ID" : "7c8fe69594724e7ca070bee08937e0b1",
+	"CODE_FILE" : "src/core/job.c",
+	"_SYSTEMD_UNIT" : "init.scope",
+# journalctl --disk-usage
+Archived and active journals take up 8.0M in the file system.

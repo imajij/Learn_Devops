@@ -1,0 +1,45 @@
+# mkdir -p /root/linkdemo && cd /root/linkdemo
+# echo "Hello from Ajij" > original.txt
+# ln -s original.txt soft.txt
+# ln original.txt hard.txt
+# ls -li
+total 8
+1576505 -rw-r--r-- 2 root root 16 Oct  7 16:11 hard.txt
+1576505 -rw-r--r-- 2 root root 16 Oct  7 16:11 original.txt
+1576506 lrwxrwxrwx 1 root root 12 Oct  7 16:11 soft.txt -> original.txt
+# cat soft.txt hard.txt
+Hello from Ajij
+Hello from Ajij
+### inode: hard.txt shares original.txt's inode, link count is 2. soft.txt has its own inode.
+# stat -c "%n inode=%i links=%h type=%F" original.txt hard.txt soft.txt
+original.txt inode=1576505 links=2 type=regular file
+hard.txt inode=1576505 links=2 type=regular file
+soft.txt inode=1576506 links=1 type=symbolic link
+# echo "edited via hard link" >> hard.txt
+# cat original.txt
+Hello from Ajij
+edited via hard link
+### delete the original
+# rm original.txt
+# ls -li
+total 4
+1576505 -rw-r--r-- 1 root root 37 Oct  7 16:11 hard.txt
+1576506 lrwxrwxrwx 1 root root 12 Oct  7 16:11 soft.txt -> original.txt
+# cat hard.txt
+Hello from Ajij
+edited via hard link
+# cat soft.txt
+cat: soft.txt: No such file or directory
+### soft link to a directory works; hard link to a directory is refused
+# mkdir mydir && ln -s mydir mydir-soft && ls -ld mydir-soft
+lrwxrwxrwx 1 root root 5 Oct  7 16:11 mydir-soft -> mydir
+# ln mydir mydir-hard
+ln: mydir: hard link not allowed for directory
+### deleting links
+# unlink soft.txt
+# rm hard.txt mydir-soft
+# ls -la
+total 12
+drwxr-xr-x 3 root root 4096 Oct  7 16:11 .
+drwx------ 1 root root 4096 Oct  7 16:11 ..
+drwxr-xr-x 2 root root 4096 Oct  7 16:11 mydir
