@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-content-demo
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.27
+      volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+  volumes:
+    - name: html
+      configMap:
+        name: web-content     # this ConfigMap has not been created yet

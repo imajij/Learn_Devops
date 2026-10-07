@@ -1,0 +1,23 @@
+$ kubectl --context k8s-b apply -f 02-issues/09-configuration/configmap.yaml -f 02-issues/09-configuration/broken-deployment.yaml
+configmap/app-config created
+deployment.apps/config-app created
+### 1) IDENTIFY
+$ kubectl --context k8s-b get pods -l app=config-app
+NAME                          READY   STATUS                       RESTARTS   AGE
+config-app-577b99b8b8-q9fdx   0/1     CreateContainerConfigError   0          21s
+### 2) INVESTIGATE
+$ kubectl --context k8s-b describe pod -l app=config-app | sed -n '/Environment/,/Mounts/p;/Events/,$p'
+    Environment:
+      DB_HOST:    <set to the key 'DB_HOST' of config map 'app-config'>    Optional: false
+      LOG_LEVEL:  <set to the key 'LOG_LEVEL' of config map 'app-config'>  Optional: false
+    Mounts:
+Events:
+  Type     Reason     Age               From               Message
+  ----     ------     ----              ----               -------
+  Normal   Scheduled  21s               default-scheduler  Successfully assigned default/config-app-577b99b8b8-q9fdx to k8s-b
+  Normal   Pulled     5s (x3 over 20s)  kubelet            spec.containers{app}: Container image "busybox:1.36" already present on machine and can be accessed by the pod
+  Warning  Failed     5s (x3 over 20s)  kubelet            spec.containers{app}: Error: couldn't find key DB_HOST in ConfigMap default/app-config
+$ kubectl --context k8s-b logs deploy/config-app
+Error from server (BadRequest): container "app" in pod "config-app-577b99b8b8-q9fdx" is waiting to start: CreateContainerConfigError
+$ kubectl --context k8s-b get configmap app-config -o jsonpath='{.data}{"\n"}'
+{"DATABASE_HOST":"postgres.default.svc.cluster.local","LOG_LEVEL":"info"}

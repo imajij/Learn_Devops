@@ -1,0 +1,20 @@
+$ kubectl --context k8s-b apply -f 02-issues/05-containercreating/broken-pod.yaml
+pod/web-content-demo created
+### 1) IDENTIFY
+$ kubectl --context k8s-b get pod web-content-demo
+NAME               READY   STATUS              RESTARTS   AGE
+web-content-demo   0/1     ContainerCreating   0          40s
+### 2) INVESTIGATE
+$ kubectl --context k8s-b describe pod web-content-demo | sed -n '/Volumes:/,/Optional/p;/Events/,$p'
+Volumes:
+  html:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      web-content
+    Optional:  false
+Events:
+  Type     Reason       Age               From               Message
+  ----     ------       ----              ----               -------
+  Normal   Scheduled    40s               default-scheduler  Successfully assigned default/web-content-demo to k8s-b
+  Warning  FailedMount  8s (x7 over 40s)  kubelet            MountVolume.SetUp failed for volume "html" : configmap "web-content" not found
+$ kubectl --context k8s-b get configmap web-content
+Error from server (NotFound): configmaps "web-content" not found

@@ -1,0 +1,24 @@
+$ diff -bB 02-issues/08-pod-networking/broken-app.yaml 02-issues/08-pod-networking/fixed-app.yaml
+15,16c15,16
+<           # BUG: binds only to the loopback interface
+<           exec httpd -f -v -p 127.0.0.1:8080 -h /www
+---
+>           # FIX: listen on all interfaces (0.0.0.0), so the pod IP is reachable
+>           exec httpd -f -v -p 0.0.0.0:8080 -h /www
+$ kubectl --context k8s-b delete pod backend --now
+pod "backend" deleted from default namespace
+$ kubectl --context k8s-b apply -f 02-issues/08-pod-networking/fixed-app.yaml
+pod/backend created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/backend --timeout=60s
+pod/backend condition met
+$ kubectl --context k8s-b exec backend -- netstat -tln
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       
+tcp        0      0 0.0.0.0:8080            0.0.0.0:*               LISTEN      
+$ BIP=$(kubectl --context k8s-b get pod backend -o jsonpath='{.status.podIP}'); echo backend IP = $BIP
+backend IP = 10.244.0.93
+$ kubectl --context k8s-b exec client -- wget -qO- -T 3 http://$BIP:8080
+hello from backend pod backend
+$ kubectl --context k8s-b delete -f 02-issues/08-pod-networking/fixed-app.yaml -f 02-issues/08-pod-networking/client.yaml --now
+pod "backend" deleted from default namespace
+pod "client" deleted from default namespace

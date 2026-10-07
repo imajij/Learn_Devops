@@ -1,0 +1,56 @@
+$ kubectl --context k8s-b describe node k8s-b | sed -n '/Conditions:/,/Events:/p' | grep -v '^  kube-\|^  default' | head -60
+Conditions:
+  Type             Status  LastHeartbeatTime                 LastTransitionTime                Reason                       Message
+  ----             ------  -----------------                 ------------------                ------                       -------
+  MemoryPressure   False   Wed, 07 Oct 2026 22:52:29 +0530   Wed, 07 Oct 2026 22:04:55 +0530   KubeletHasSufficientMemory   kubelet has sufficient memory available
+  DiskPressure     False   Wed, 07 Oct 2026 22:52:29 +0530   Wed, 07 Oct 2026 22:04:55 +0530   KubeletHasNoDiskPressure     kubelet has no disk pressure
+  PIDPressure      False   Wed, 07 Oct 2026 22:52:29 +0530   Wed, 07 Oct 2026 22:04:55 +0530   KubeletHasSufficientPID      kubelet has sufficient PID available
+  Ready            True    Wed, 07 Oct 2026 22:52:29 +0530   Wed, 07 Oct 2026 22:05:30 +0530   KubeletReady                 kubelet is posting ready status
+Addresses:
+  InternalIP:  192.168.58.2
+  Hostname:    k8s-b
+Capacity:
+  cpu:                10
+  ephemeral-storage:  84223356928
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  hugepages-32Mi:     0
+  hugepages-64Ki:     0
+  memory:             16340012Ki
+  pods:               110
+Allocatable:
+  cpu:                10
+  ephemeral-storage:  84223356928
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  hugepages-32Mi:     0
+  hugepages-64Ki:     0
+  memory:             16340012Ki
+  pods:               110
+System Info:
+  Machine ID:                 c7552358bf1aab9f1f21b3de6a971616
+  System UUID:                d611848b-91a5-418d-bdd9-5de5caec0dec
+  Boot ID:                    0aa66da3-e17d-41aa-a229-8c27874fb81f
+  Kernel Version:             6.8.0-117-generic
+  OS Image:                   Debian GNU/Linux 12 (bookworm)
+  Operating System:           linux
+  Architecture:               arm64
+  Container Runtime Version:  containerd://2.3.4
+  Kubelet Version:            v1.37.0
+PodCIDR:                      10.244.0.0/24
+PodCIDRs:                     10.244.0.0/24
+Non-terminated Pods:          (11 in total)
+  Namespace                   Name                               CPU Requests  CPU Limits  Memory Requests  Memory Limits  Age
+  ---------                   ----                               ------------  ----------  ---------------  -------------  ---
+Allocated resources:
+  (Total limits may be over 100 percent, i.e., overcommitted.)
+  Resource           Requests    Limits
+  --------           --------    ------
+  cpu                950m (9%)   100m (1%)
+  memory             420Mi (2%)  220Mi (1%)
+  ephemeral-storage  0 (0%)      0 (0%)
+  hugepages-1Gi      0 (0%)      0 (0%)
+  hugepages-2Mi      0 (0%)      0 (0%)
+  hugepages-32Mi     0 (0%)      0 (0%)
+  hugepages-64Ki     0 (0%)      0 (0%)
+Events:

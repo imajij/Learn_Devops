@@ -1,0 +1,24 @@
+$ kubectl --context k8s-b apply -f 02-issues/03-errimagepull/broken-pod.yaml
+pod/errpull-demo created
+### 1) IDENTIFY: poll the STATUS column every 4 s to catch both states
+[22:57:25] errpull-demo   0/1   ContainerCreating   0     0s
+[22:57:29] errpull-demo   0/1   ErrImagePull   0     4s
+[22:57:33] errpull-demo   0/1   ErrImagePull   0     8s
+[22:57:37] errpull-demo   0/1   ErrImagePull   0     12s
+[22:57:41] errpull-demo   0/1   ImagePullBackOff   0     16s
+[22:57:45] errpull-demo   0/1   ImagePullBackOff   0     20s
+[22:57:49] errpull-demo   0/1   ImagePullBackOff   0     24s
+[22:57:53] errpull-demo   0/1   ImagePullBackOff   0     28s
+[22:57:57] errpull-demo   0/1   ErrImagePull   0     32s
+[22:58:01] errpull-demo   0/1   ErrImagePull   0     36s
+### 2) INVESTIGATE
+$ kubectl --context k8s-b describe pod errpull-demo | sed -n '/Events/,$p'
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  40s                default-scheduler  Successfully assigned default/errpull-demo to k8s-b
+  Normal   Pulling    26s (x2 over 40s)  kubelet            spec.containers{app}: Pulling image "docker.io/ajijuttam/notes-api-does-not-exist:v1"
+  Warning  Failed     24s (x2 over 38s)  kubelet            spec.containers{app}: Failed to pull image "docker.io/ajijuttam/notes-api-does-not-exist:v1": failed to pull and unpack image "docker.io/ajijuttam/notes-api-does-not-exist:v1": failed to resolve reference "docker.io/ajijuttam/notes-api-does-not-exist:v1": pull access denied, repository does not exist or may require authorization: server message: insufficient_scope: authorization failed
+  Warning  Failed     24s (x2 over 38s)  kubelet            spec.containers{app}: Error: ErrImagePull
+  Normal   BackOff    10s (x2 over 37s)  kubelet            spec.containers{app}: Back-off pulling image "docker.io/ajijuttam/notes-api-does-not-exist:v1"
+  Warning  Failed     10s (x2 over 37s)  kubelet            spec.containers{app}: Error: ImagePullBackOff

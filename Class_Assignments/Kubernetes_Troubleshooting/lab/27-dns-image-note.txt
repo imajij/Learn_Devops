@@ -1,0 +1,15 @@
+### the course's dns-test-pod.yaml as provided (image dnsutils:1.3)
+$ grep image dns-test-pod-orig.yaml
+      image: registry.k8s.io/e2e-test-images/dnsutils:1.3
+$ kubectl --context k8s-b apply -f dns-test-pod-orig.yaml
+pod/dns-test created
+$ kubectl --context k8s-b get pod dns-test
+NAME       READY   STATUS             RESTARTS   AGE
+dns-test   0/1     ImagePullBackOff   0          20s
+$ kubectl --context k8s-b events --for pod/dns-test | tail -4
+18s                 Warning   Failed      Pod/dns-test   Error: ImagePullBackOff
+4s (x2 over 20s)    Normal    Pulling     Pod/dns-test   Pulling image "registry.k8s.io/e2e-test-images/dnsutils:1.3"
+3s (x2 over 18s)    Warning   Failed      Pod/dns-test   Failed to pull image "registry.k8s.io/e2e-test-images/dnsutils:1.3": rpc error: code = NotFound desc = failed to pull and unpack image "registry.k8s.io/e2e-test-images/dnsutils:1.3": failed to resolve reference "registry.k8s.io/e2e-test-images/dnsutils:1.3": registry.k8s.io/e2e-test-images/dnsutils:1.3: not found
+3s (x2 over 18s)    Warning   Failed      Pod/dns-test   Error: ErrImagePull
+$ kubectl --context k8s-b delete pod dns-test --now
+pod "dns-test" deleted from default namespace

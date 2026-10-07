@@ -1,0 +1,42 @@
+$ kubectl --context k8s-b events | tail -15
+15m                  Normal    Started                        Pod/slow-start                      Container started
+15m                  Normal    Created                        Pod/slow-start                      Container created
+15m                  Normal    Pulled                         Pod/slow-start                      Container image "nginx:1.27" already present on machine and can be accessed by the pod
+15m                  Normal    Scheduled                      Pod/slow-start                      Successfully assigned default/slow-start to k8s-b
+15m (x10 over 15m)   Warning   Unhealthy                      Pod/slow-start                      Startup probe failed: Get "http://10.244.0.30:80/": dial tcp 10.244.0.30:80: connect: connection refused
+14m                  Normal    Killing                        Pod/slow-start                      Stopping container nginx
+12m                  Normal    Killing                        Pod/hpa-demo-5d6676989b-n75zz       Stopping container nginx
+9s                   Normal    Started                        Pod/logs-demo                       Container started
+9s                   Normal    Scheduled                      Pod/logs-demo                       Successfully assigned default/logs-demo to k8s-b
+9s                   Normal    Pulled                         Pod/logs-demo                       Container image "busybox:1.36" already present on machine and can be accessed by the pod
+9s                   Normal    Scheduled                      Pod/get-demo                        Successfully assigned default/get-demo to k8s-b
+9s                   Normal    Pulled                         Pod/get-demo                        Container image "nginx:1.27" already present on machine and can be accessed by the pod
+9s                   Normal    Created                        Pod/get-demo                        Container created
+9s                   Normal    Started                        Pod/get-demo                        Container started
+9s                   Normal    Created                        Pod/logs-demo                       Container created
+$ kubectl --context k8s-b events --for pod/get-demo
+LAST SEEN   TYPE     REASON      OBJECT         MESSAGE
+9s          Normal   Scheduled   Pod/get-demo   Successfully assigned default/get-demo to k8s-b
+9s          Normal   Pulled      Pod/get-demo   Container image "nginx:1.27" already present on machine and can be accessed by the pod
+9s          Normal   Created     Pod/get-demo   Container created
+9s          Normal   Started     Pod/get-demo   Container started
+$ kubectl --context k8s-b get events --sort-by=.lastTimestamp -o custom-columns=LAST:.lastTimestamp,TYPE:.type,REASON:.reason,OBJECT:.involvedObject.name | tail -10
+2026-10-07T17:08:52Z   Normal    Killing                        slow-start
+2026-10-07T17:10:52Z   Normal    Killing                        hpa-demo-5d6676989b-n75zz
+2026-10-07T17:23:34Z   Normal    Started                        logs-demo
+2026-10-07T17:23:34Z   Normal    Scheduled                      logs-demo
+2026-10-07T17:23:34Z   Normal    Pulled                         logs-demo
+2026-10-07T17:23:34Z   Normal    Scheduled                      get-demo
+2026-10-07T17:23:34Z   Normal    Pulled                         get-demo
+2026-10-07T17:23:34Z   Normal    Created                        get-demo
+2026-10-07T17:23:34Z   Normal    Started                        get-demo
+2026-10-07T17:23:34Z   Normal    Created                        logs-demo
+$ kubectl --context k8s-b events -A --types=Warning | tail -8
+default       21m (x2 over 21m)    Warning   BackOff                        Pod/liveness-demo                     Back-off restarting failed container nginx in pod liveness-demo_default(f4e13aa2-a302-4b36-ab9f-6a85c8d8adfb)
+default       21m (x12 over 22m)   Warning   Unhealthy                      Pod/liveness-demo                     Liveness probe failed: HTTP probe failed with statuscode: 404
+default       19m (x9 over 20m)    Warning   Unhealthy                      Pod/readiness-demo                    Readiness probe failed: HTTP probe failed with statuscode: 404
+default       18m (x6 over 19m)    Warning   Unhealthy                      Pod/slow-start                        Startup probe failed: Get "http://10.244.0.25:80/": dial tcp 10.244.0.25:80: connect: connection refused
+default       17m (x10 over 18m)   Warning   Unhealthy                      Pod/slow-start                        Startup probe failed: Get "http://10.244.0.26:80/": dial tcp 10.244.0.26:80: connect: connection refused
+default       16m (x10 over 17m)   Warning   Unhealthy                      Pod/readiness-demo                    Readiness probe failed: HTTP probe failed with statuscode: 404
+default       15m (x6 over 16m)    Warning   Unhealthy                      Pod/slow-start                        Startup probe failed: Get "http://10.244.0.29:80/": dial tcp 10.244.0.29:80: connect: connection refused
+default       15m (x10 over 15m)   Warning   Unhealthy                      Pod/slow-start                        Startup probe failed: Get "http://10.244.0.30:80/": dial tcp 10.244.0.30:80: connect: connection refused

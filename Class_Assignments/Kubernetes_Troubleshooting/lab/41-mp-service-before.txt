@@ -1,0 +1,21 @@
+### 3) CHECK THE SERVICE: users report the app is unreachable
+$ kubectl --context k8s-b run client --image=busybox:1.36 --restart=Never -i --rm -- wget -qO- -T 3 http://troubleshooting-service 2>/dev/null; echo exit=$?
+pod "client" deleted from default namespace
+exit=1
+$ kubectl --context k8s-b describe service troubleshooting-service | grep -E 'Selector|TargetPort|Endpoints'
+Selector:                 app=wrong-app
+TargetPort:               80/TCP
+Endpoints:                
+### 4) CHECK ENDPOINTS
+$ kubectl --context k8s-b get endpoints troubleshooting-service
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME                      ENDPOINTS   AGE
+troubleshooting-service   <none>      4s
+### ROOT CAUSE: compare the Pod labels with the Service selector
+$ kubectl --context k8s-b get pods --show-labels
+NAME                                   READY   STATUS        RESTARTS   AGE   LABELS
+config-app-6947bd6bb5-6txzj            1/1     Terminating   0          24s   app=config-app,pod-template-hash=6947bd6bb5
+troubleshooting-app-59d4957864-ps2gp   1/1     Running       0          4s    app=troubleshooting-app,pod-template-hash=59d4957864
+troubleshooting-app-59d4957864-x6gqs   1/1     Running       0          4s    app=troubleshooting-app,pod-template-hash=59d4957864
+$ kubectl --context k8s-b get service troubleshooting-service -o jsonpath='{.spec.selector}{"\n"}'
+{"app":"wrong-app"}

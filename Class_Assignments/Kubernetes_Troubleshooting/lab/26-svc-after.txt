@@ -1,0 +1,15 @@
+$ diff -bB 02-issues/06-service-connectivity/broken-service.yaml 02-issues/06-service-connectivity/service.yaml
+10c13,14
+<       targetPort: 8080     # BUG: nginx listens on 80, not 8080
+---
+>       targetPort: 80
+> 
+$ kubectl --context k8s-b apply -f 02-issues/06-service-connectivity/service.yaml
+service/web-service configured
+$ kubectl --context k8s-b get endpoints web-service
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME          ENDPOINTS                       AGE
+web-service   10.244.0.76:80,10.244.0.77:80   5s
+$ kubectl --context k8s-b run client --image=busybox:1.36 --restart=Never -i --rm -- wget -qO- -T 3 http://web-service 2>/dev/null | grep title
+<title>Welcome to nginx!</title>
+<title>Welcome to nginx!</title>

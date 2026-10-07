@@ -1,0 +1,15 @@
+$ diff -bB mini-project/broken-pod.yaml mini-project/fixed-pod.yaml
+10c10
+<       image: nginx:this-tag-does-not-exist
+\ No newline at end of file
+---
+>       image: nginx:1.27     # FIX: was nginx:this-tag-does-not-exist
+$ kubectl --context k8s-b delete pod project-broken-pod --now
+pod "project-broken-pod" deleted from default namespace
+$ kubectl --context k8s-b apply -f mini-project/fixed-pod.yaml
+pod/project-broken-pod created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/project-broken-pod --timeout=60s
+pod/project-broken-pod condition met
+$ kubectl --context k8s-b get pod project-broken-pod
+NAME                 READY   STATUS    RESTARTS   AGE
+project-broken-pod   1/1     Running   0          1s

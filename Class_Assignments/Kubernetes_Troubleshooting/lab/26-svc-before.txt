@@ -1,0 +1,42 @@
+$ kubectl --context k8s-b apply -f 02-issues/06-service-connectivity/deployment.yaml -f 02-issues/06-service-connectivity/broken-service.yaml
+deployment.apps/web created
+service/web-service created
+$ kubectl --context k8s-b rollout status deploy/web --timeout=120s
+Waiting for deployment "web" rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment "web" rollout to finish: 1 of 2 updated replicas are available...
+deployment "web" successfully rolled out
+### 1) IDENTIFY: a client pod cannot reach the Service
+$ kubectl --context k8s-b run client --image=busybox:1.36 --restart=Never -i --rm -- wget -qO- -T 3 http://web-service
+wget: can't connect to remote host (10.109.153.208): Connection refused
+All commands and output from this session will be recorded in container logs, including credentials and sensitive information passed through the command prompt.
+If you don't see a command prompt, try pressing enter.
+warning: couldn't attach to pod/client, falling back to streaming logs: unable to upgrade connection: container client not found in pod client_default
+wget: can't connect to remote host (10.109.153.208): Connection refused
+pod "client" deleted from default namespace
+pod default/client terminated (Error)
+### 2) INVESTIGATE: pods fine? service? endpoints?
+$ kubectl --context k8s-b get pods -l app=web -o wide
+NAME                   READY   STATUS    RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES
+web-557577df75-bfn2g   1/1     Running   0          3s    10.244.0.76   k8s-b   <none>           <none>
+web-557577df75-d8kxw   1/1     Running   0          3s    10.244.0.77   k8s-b   <none>           <none>
+$ kubectl --context k8s-b describe svc web-service | grep -E 'Selector|Port|Endpoints'
+Selector:                 app=web
+Port:                     <unset>  80/TCP
+TargetPort:               8080/TCP
+Endpoints:                10.244.0.76:8080,10.244.0.77:8080
+$ kubectl --context k8s-b get endpoints web-service
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME          ENDPOINTS                           AGE
+web-service   10.244.0.76:8080,10.244.0.77:8080   3s
+$ kubectl --context k8s-b run client --image=busybox:1.36 --restart=Never -i --rm -- sh -c "wget -qO- -T 3 http://$(kubectl --context k8s-b get pod -l app=web -o jsonpath='{.items[0].status.podIP}'):80 | grep title; wget -qO- -T 3 http://$(kubectl --context k8s-b get pod -l app=web -o jsonpath='{.items[0].status.podIP}'):8080"
+<title>Welcome to nginx!</title>
+wget: can't connect to remote host (10.244.0.76): Connection refused
+All commands and output from this session will be recorded in container logs, including credentials and sensitive information passed through the command prompt.
+If you don't see a command prompt, try pressing enter.
+warning: couldn't attach to pod/client, falling back to streaming logs: unable to upgrade connection: container client not found in pod client_default
+<title>Welcome to nginx!</title>
+wget: can't connect to remote host (10.244.0.76): Connection refused
+pod "client" deleted from default namespace
+pod default/client terminated (Error)
+$ kubectl --context k8s-b get pod -l app=web -o jsonpath='{.items[0].spec.containers[0].ports}{"\n"}'
+[{"containerPort":80,"protocol":"TCP"}]

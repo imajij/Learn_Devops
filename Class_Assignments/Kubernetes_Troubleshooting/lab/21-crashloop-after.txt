@@ -1,0 +1,25 @@
+### 4) FIX: the command must keep running instead of 'exit 1'
+$ diff 02-issues/01-crashloopbackoff/broken-pod.yaml 02-issues/01-crashloopbackoff/fixed-pod.yaml
+16,17c16,17
+<           echo "Something went wrong!"
+<           exit 1
+\ No newline at end of file
+---
+>           echo "Application is healthy"
+>           sleep 3600
+\ No newline at end of file
+$ kubectl --context k8s-b delete pod crash-demo --now
+pod "crash-demo" deleted from default namespace
+$ kubectl --context k8s-b apply -f 02-issues/01-crashloopbackoff/fixed-pod.yaml
+pod/crash-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/crash-demo --timeout=60s
+pod/crash-demo condition met
+### 5) VERIFY
+$ kubectl --context k8s-b get pod crash-demo
+NAME         READY   STATUS    RESTARTS   AGE
+crash-demo   1/1     Running   0          16s
+$ kubectl --context k8s-b logs crash-demo
+Application starting...
+Application is healthy
+$ kubectl --context k8s-b delete pod crash-demo --now
+pod "crash-demo" deleted from default namespace

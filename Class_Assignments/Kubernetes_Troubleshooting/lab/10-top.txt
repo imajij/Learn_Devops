@@ -1,0 +1,31 @@
+$ kubectl --context k8s-b top nodes
+NAME    CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+k8s-b   228m         2%       1056Mi          6%          
+$ kubectl --context k8s-b top pods
+NAME        CPU(cores)   MEMORY(bytes)   
+get-demo    5m           8Mi             
+logs-demo   1m           0Mi             
+$ kubectl --context k8s-b top pods -A --sort-by=cpu
+NAMESPACE     NAME                              CPU(cores)   MEMORY(bytes)   
+kube-system   kube-apiserver-k8s-b              76m          269Mi           
+kube-system   etcd-k8s-b                        24m          50Mi            
+kube-system   kube-controller-manager-k8s-b     17m          69Mi            
+kube-system   kube-scheduler-k8s-b              10m          25Mi            
+default       get-demo                          5m           8Mi             
+kube-system   metrics-server-768f9f6999-89vrc   5m           22Mi            
+kube-system   coredns-559f6c778d-cvxl2          4m           19Mi            
+kube-system   kindnet-dq6z2                     3m           11Mi            
+kube-system   kube-proxy-78jgp                  3m           15Mi            
+kube-system   storage-provisioner               3m           12Mi            
+default       logs-demo                         1m           0Mi             
+$ kubectl --context k8s-b top pods -n kube-system --containers --sort-by=memory
+POD                               NAME                      CPU(cores)   MEMORY(bytes)   
+kube-apiserver-k8s-b              kube-apiserver            76m          269Mi           
+kube-controller-manager-k8s-b     kube-controller-manager   17m          69Mi            
+etcd-k8s-b                        etcd                      24m          50Mi            
+kube-scheduler-k8s-b              kube-scheduler            10m          25Mi            
+metrics-server-768f9f6999-89vrc   metrics-server            5m           22Mi            
+coredns-559f6c778d-cvxl2          coredns                   4m           19Mi            
+kube-proxy-78jgp                  kube-proxy                3m           15Mi            
+storage-provisioner               storage-provisioner       3m           12Mi            
+kindnet-dq6z2                     kindnet-cni               3m           11Mi            

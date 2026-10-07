@@ -1,0 +1,3 @@
+$ kubectl --context k8s-b delete -f 01-commands/get-pod.yaml -f 01-commands/logs-pod.yaml --now
+pod "get-demo" deleted from default namespace
+pod "logs-demo" deleted from default namespace

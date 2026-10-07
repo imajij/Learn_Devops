@@ -1,0 +1,17 @@
+$ diff 02-issues/03-errimagepull/broken-pod.yaml 02-issues/03-errimagepull/fixed-pod.yaml
+8,9c8
+<       # This repository does not exist on Docker Hub
+<       image: docker.io/ajijuttam/notes-api-does-not-exist:v1
+---
+>       image: nginx:1.27
+$ kubectl --context k8s-b delete pod errpull-demo --now
+pod "errpull-demo" deleted from default namespace
+$ kubectl --context k8s-b apply -f 02-issues/03-errimagepull/fixed-pod.yaml
+pod/errpull-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/errpull-demo --timeout=120s
+pod/errpull-demo condition met
+$ kubectl --context k8s-b get pod errpull-demo
+NAME           READY   STATUS    RESTARTS   AGE
+errpull-demo   1/1     Running   0          0s
+$ kubectl --context k8s-b delete pod errpull-demo --now
+pod "errpull-demo" deleted from default namespace

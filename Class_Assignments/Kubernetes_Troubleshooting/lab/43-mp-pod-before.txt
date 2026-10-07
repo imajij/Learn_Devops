@@ -1,0 +1,27 @@
+### 5) CREATE THE BROKEN POD
+$ kubectl --context k8s-b apply -f mini-project/broken-pod.yaml
+pod/project-broken-pod created
+### 6) TROUBLESHOOT IT (no YAML changes yet)
+$ kubectl --context k8s-b get pod project-broken-pod
+NAME                 READY   STATUS             RESTARTS   AGE
+project-broken-pod   0/1     ImagePullBackOff   0          25s
+$ kubectl --context k8s-b describe pod project-broken-pod | sed -n '/Containers:/,/Ready:/p;/Events/,$p'
+Containers:
+  app:
+    Container ID:   
+    Image:          nginx:this-tag-does-not-exist
+    Image ID:       
+    Port:           <none>
+    Host Port:      <none>
+    State:          Waiting
+      Reason:       ImagePullBackOff
+    Ready:          False
+Events:
+  Type     Reason     Age               From               Message
+  ----     ------     ----              ----               -------
+  Normal   Scheduled  25s               default-scheduler  Successfully assigned default/project-broken-pod to k8s-b
+  Normal   BackOff    21s               kubelet            spec.containers{app}: Back-off pulling image "nginx:this-tag-does-not-exist"
+  Warning  Failed     21s               kubelet            spec.containers{app}: Error: ImagePullBackOff
+  Normal   Pulling    5s (x2 over 25s)  kubelet            spec.containers{app}: Pulling image "nginx:this-tag-does-not-exist"
+  Warning  Failed     4s (x2 over 21s)  kubelet            spec.containers{app}: Failed to pull image "nginx:this-tag-does-not-exist": failed to pull and unpack image "docker.io/library/nginx:this-tag-does-not-exist": failed to resolve reference "docker.io/library/nginx:this-tag-does-not-exist": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/nginx/manifests/this-tag-does-not-exist: 429 Too Many Requests
+  Warning  Failed     4s (x2 over 21s)  kubelet            spec.containers{app}: Error: ErrImagePull

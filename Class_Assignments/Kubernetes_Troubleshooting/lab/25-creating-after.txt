@@ -1,0 +1,20 @@
+### 4) FIX: create the missing ConfigMap (no need to touch the Pod)
+$ kubectl --context k8s-b apply -f 02-issues/05-containercreating/configmap.yaml
+configmap/web-content created
+### the kubelet retries the mount with a back-off, so give it up to 3 minutes
+$ kubectl --context k8s-b wait --for=condition=Ready pod/web-content-demo --timeout=180s
+pod/web-content-demo condition met
+$ kubectl --context k8s-b get pod web-content-demo
+NAME               READY   STATUS    RESTARTS   AGE
+web-content-demo   1/1     Running   0          64s
+$ kubectl --context k8s-b describe pod web-content-demo | sed -n '/Events/,$p' | tail -5
+  Normal   Scheduled    64s                default-scheduler  Successfully assigned default/web-content-demo to k8s-b
+  Warning  FailedMount  32s (x7 over 64s)  kubelet            MountVolume.SetUp failed for volume "html" : configmap "web-content" not found
+  Normal   Pulled       0s                 kubelet            spec.containers{nginx}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal   Created      0s                 kubelet            spec.containers{nginx}: Container created
+  Normal   Started      0s                 kubelet            spec.containers{nginx}: Container started
+$ kubectl --context k8s-b exec web-content-demo -- curl -s localhost
+<h1>Served from the web-content ConfigMap</h1>
+$ kubectl --context k8s-b delete -f 02-issues/05-containercreating/broken-pod.yaml -f 02-issues/05-containercreating/configmap.yaml --now
+pod "web-content-demo" deleted from default namespace
+configmap "web-content" deleted from default namespace

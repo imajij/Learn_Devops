@@ -1,0 +1,6 @@
+$ kubectl --context k8s-b apply -f 01-commands/get-pod.yaml -f 01-commands/logs-pod.yaml
+pod/get-demo created
+pod/logs-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/get-demo pod/logs-demo --timeout=180s
+pod/get-demo condition met
+pod/logs-demo condition met

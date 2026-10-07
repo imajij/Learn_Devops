@@ -1,0 +1,12 @@
+$ kubectl --context k8s-b get pods -o wide
+NAME        READY   STATUS    RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES
+get-demo    1/1     Running   0          1s    10.244.0.50   k8s-b   <none>           <none>
+logs-demo   1/1     Running   0          1s    10.244.0.49   k8s-b   <none>           <none>
+$ kubectl --context k8s-b get nodes -o wide
+NAME    STATUS   ROLES           AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION              CONTAINER-RUNTIME
+k8s-b   Ready    control-plane   48m   v1.37.0   192.168.58.2   <none>        Debian GNU/Linux 12 (bookworm)   6.8.0-117-generic (arm64)   containerd://2.3.4
+$ kubectl --context k8s-b get svc -A -o wide
+NAMESPACE     NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                  AGE   SELECTOR
+default       kubernetes       ClusterIP   10.96.0.1       <none>        443/TCP                  48m   <none>
+kube-system   kube-dns         ClusterIP   10.96.0.10      <none>        53/UDP,53/TCP,9153/TCP   48m   k8s-app=kube-dns
+kube-system   metrics-server   ClusterIP   10.111.11.175   <none>        443/TCP                  48m   k8s-app=metrics-server

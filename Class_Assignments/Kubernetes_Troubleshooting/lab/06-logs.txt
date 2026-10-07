@@ -1,0 +1,20 @@
+$ kubectl --context k8s-b logs logs-demo --tail=8
+Application started
+Connecting to database...
+Database connection successful
+Application is running
+Application is healthy
+$ kubectl --context k8s-b logs logs-demo --since=12s --timestamps
+2026-10-07T17:23:34.979816009Z Application started
+2026-10-07T17:23:34.979862378Z Connecting to database...
+2026-10-07T17:23:34.979867253Z Database connection successful
+2026-10-07T17:23:34.979868628Z Application is running
+2026-10-07T17:23:34.979869169Z Application is healthy
+$ kubectl --context k8s-b logs -l app=get-demo --tail=3
+2026/10/07 17:23:35 [notice] 1#1: start worker process 36
+2026/10/07 17:23:35 [notice] 1#1: start worker process 37
+2026/10/07 17:23:35 [notice] 1#1: start worker process 38
+$ timeout 7 kubectl --context k8s-b logs -f logs-demo --tail=1; echo '(stopped follow after 7s)'
+Application is healthy
+Application is healthy
+(stopped follow after 7s)

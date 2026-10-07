@@ -1,0 +1,20 @@
+$ diff 02-issues/02-imagepullbackoff/broken-pod.yaml 02-issues/02-imagepullbackoff/fixed-pod.yaml
+10c10
+<       image: nginx:this-image-does-not-exist
+\ No newline at end of file
+---
+>       image: nginx:1.27
+\ No newline at end of file
+$ kubectl --context k8s-b delete pod image-demo --now
+pod "image-demo" deleted from default namespace
+$ kubectl --context k8s-b apply -f 02-issues/02-imagepullbackoff/fixed-pod.yaml
+pod/image-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/image-demo --timeout=120s
+pod/image-demo condition met
+$ kubectl --context k8s-b get pod image-demo
+NAME         READY   STATUS    RESTARTS   AGE
+image-demo   1/1     Running   0          1s
+$ kubectl --context k8s-b exec image-demo -- curl -s localhost | grep title
+<title>Welcome to nginx!</title>
+$ kubectl --context k8s-b delete pod image-demo --now
+pod "image-demo" deleted from default namespace

@@ -1,0 +1,26 @@
+$ diff 02-issues/04-pending/broken-pod.yaml 02-issues/04-pending/fixed-pod.yaml
+8,10d7
+<   nodeSelector:
+<     kubernetes.io/hostname: node-that-does-not-exist
+< 
+$ diff 02-issues/04-pending/broken-pod-cpu.yaml 02-issues/04-pending/fixed-pod-cpu.yaml
+11c11
+<           cpu: "16"       # more than the node can offer
+---
+>           cpu: 100m
+$ kubectl --context k8s-b delete pod pending-demo pending-cpu-demo --now
+pod "pending-demo" deleted from default namespace
+pod "pending-cpu-demo" deleted from default namespace
+$ kubectl --context k8s-b apply -f 02-issues/04-pending/fixed-pod.yaml -f 02-issues/04-pending/fixed-pod-cpu.yaml
+pod/pending-demo created
+pod/pending-cpu-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/pending-demo pod/pending-cpu-demo --timeout=120s
+pod/pending-demo condition met
+pod/pending-cpu-demo condition met
+$ kubectl --context k8s-b get pods pending-demo pending-cpu-demo -o wide
+NAME               READY   STATUS    RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES
+pending-demo       1/1     Running   0          1s    10.244.0.66   k8s-b   <none>           <none>
+pending-cpu-demo   1/1     Running   0          1s    10.244.0.65   k8s-b   <none>           <none>
+$ kubectl --context k8s-b delete pod pending-demo pending-cpu-demo --now
+pod "pending-demo" deleted from default namespace
+pod "pending-cpu-demo" deleted from default namespace

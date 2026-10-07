@@ -1,0 +1,19 @@
+$ kubectl --context k8s-b exec get-demo -- hostname
+get-demo
+$ kubectl --context k8s-b exec get-demo -- nginx -v
+nginx version: nginx/1.27.5
+$ kubectl --context k8s-b exec get-demo -- env | grep -E 'HOSTNAME|KUBERNETES_SERVICE_HOST|NGINX_VERSION'
+HOSTNAME=get-demo
+NGINX_VERSION=1.27.5
+KUBERNETES_SERVICE_HOST=10.96.0.1
+$ kubectl --context k8s-b exec get-demo -- cat /etc/resolv.conf
+search default.svc.cluster.local svc.cluster.local cluster.local
+nameserver 10.96.0.10
+options ndots:5
+$ kubectl --context k8s-b exec get-demo -- curl -s -o /dev/null -w 'localhost -> HTTP %{http_code}\n' http://localhost
+localhost -> HTTP 200
+$ kubectl --context k8s-b exec get-demo -- sh -c 'tr "\\0" " " < /proc/1/cmdline; echo'
+nginx: master process nginx -g daemon off; 
+$ echo 'ls /usr/share/nginx/html; exit' | kubectl --context k8s-b exec -i get-demo -- sh
+50x.html
+index.html

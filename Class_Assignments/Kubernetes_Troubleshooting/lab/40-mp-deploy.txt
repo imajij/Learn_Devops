@@ -1,0 +1,42 @@
+### 1) DEPLOY the application exactly as provided
+$ kubectl --context k8s-b apply -f mini-project/deployment.yaml -f mini-project/service.yaml
+deployment.apps/troubleshooting-app created
+service/troubleshooting-service created
+$ kubectl --context k8s-b rollout status deploy/troubleshooting-app --timeout=120s
+Waiting for deployment "troubleshooting-app" rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment "troubleshooting-app" rollout to finish: 1 of 2 updated replicas are available...
+deployment "troubleshooting-app" successfully rolled out
+$ kubectl --context k8s-b get pods
+NAME                                   READY   STATUS        RESTARTS   AGE
+config-app-6947bd6bb5-6txzj            1/1     Terminating   0          21s
+troubleshooting-app-59d4957864-ps2gp   1/1     Running       0          1s
+troubleshooting-app-59d4957864-x6gqs   1/1     Running       0          1s
+$ kubectl --context k8s-b get service
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+kubernetes                ClusterIP   10.96.0.1       <none>        443/TCP   62m
+troubleshooting-service   ClusterIP   10.99.124.236   <none>        80/TCP    1s
+### 2) CHECK THE APPLICATION (pods)
+$ kubectl --context k8s-b get pods -o wide -l app=troubleshooting-app
+NAME                                   READY   STATUS    RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES
+troubleshooting-app-59d4957864-ps2gp   1/1     Running   0          1s    10.244.0.97   k8s-b   <none>           <none>
+troubleshooting-app-59d4957864-x6gqs   1/1     Running   0          1s    10.244.0.96   k8s-b   <none>           <none>
+$ P=$(kubectl --context k8s-b get pods -l app=troubleshooting-app -o jsonpath='{.items[0].metadata.name}'); echo $P
+troubleshooting-app-59d4957864-ps2gp
+$ kubectl --context k8s-b describe pod $P | sed -n '/^Status:/p;/^IP:/p;/Image:/p;/Ready:/p;/Events/,$p'
+Status:           Running
+IP:               10.244.0.97
+    Image:          nginx:1.27
+    Ready:          True
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  1s    default-scheduler  Successfully assigned default/troubleshooting-app-59d4957864-ps2gp to k8s-b
+  Normal  Pulled     1s    kubelet            spec.containers{app}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal  Created    1s    kubelet            spec.containers{app}: Container created
+  Normal  Started    1s    kubelet            spec.containers{app}: Container started
+$ kubectl --context k8s-b logs $P --tail=3
+2026/10/07 17:37:21 [notice] 1#1: start worker process 36
+2026/10/07 17:37:21 [notice] 1#1: start worker process 37
+2026/10/07 17:37:21 [notice] 1#1: start worker process 38
+$ kubectl --context k8s-b exec $P -- curl -s localhost | grep -i title
+<title>Welcome to nginx!</title>

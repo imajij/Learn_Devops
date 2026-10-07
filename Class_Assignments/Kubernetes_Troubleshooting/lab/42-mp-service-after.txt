@@ -1,0 +1,17 @@
+$ diff -bB mini-project/service.yaml mini-project/service-fixed.yaml
+9c9
+<     app: wrong-app
+---
+>     app: troubleshooting-app     # FIX: was "wrong-app", must match the Pod label
+$ kubectl --context k8s-b apply -f mini-project/service-fixed.yaml
+service/troubleshooting-service configured
+$ kubectl --context k8s-b get endpoints troubleshooting-service
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME                      ENDPOINTS                       AGE
+troubleshooting-service   10.244.0.96:80,10.244.0.97:80   4s
+$ kubectl --context k8s-b describe service troubleshooting-service | grep -E 'Selector|TargetPort|Endpoints'
+Selector:                 app=troubleshooting-app
+TargetPort:               80/TCP
+Endpoints:                10.244.0.97:80,10.244.0.96:80
+$ kubectl --context k8s-b run client --image=busybox:1.36 --restart=Never -i --rm -- wget -qO- -T 3 http://troubleshooting-service 2>/dev/null | grep title
+<title>Welcome to nginx!</title>

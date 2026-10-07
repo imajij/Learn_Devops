@@ -1,0 +1,32 @@
+$ kubectl --context k8s-b apply -f 02-issues/08-pod-networking/broken-app.yaml -f 02-issues/08-pod-networking/client.yaml
+pod/backend created
+pod/client created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/backend pod/client --timeout=120s
+pod/backend condition met
+pod/client condition met
+$ kubectl --context k8s-b get pods backend client -o wide
+NAME      READY   STATUS    RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES
+backend   1/1     Running   0          0s    10.244.0.91   k8s-b   <none>           <none>
+client    1/1     Running   0          0s    10.244.0.92   k8s-b   <none>           <none>
+### 1) IDENTIFY: pod-to-pod request fails
+$ BIP=$(kubectl --context k8s-b get pod backend -o jsonpath='{.status.podIP}'); echo backend IP = $BIP
+backend IP = 10.244.0.91
+$ kubectl --context k8s-b exec client -- wget -qO- -T 3 http://$BIP:8080
+wget: can't connect to remote host (10.244.0.91): Connection refused
+command terminated with exit code 1
+### 2) INVESTIGATE: is the network itself fine? (ping works) is the app up? (logs, local request)
+$ kubectl --context k8s-b exec client -- ping -c 2 $BIP
+PING 10.244.0.91 (10.244.0.91): 56 data bytes
+64 bytes from 10.244.0.91: seq=0 ttl=63 time=0.333 ms
+64 bytes from 10.244.0.91: seq=1 ttl=63 time=0.113 ms
+
+--- 10.244.0.91 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 0.113/0.223/0.333 ms
+$ kubectl --context k8s-b logs backend
+$ kubectl --context k8s-b exec backend -- wget -qO- -T 3 http://127.0.0.1:8080
+hello from backend pod backend
+$ kubectl --context k8s-b exec backend -- netstat -tln
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       
+tcp        0      0 127.0.0.1:8080          0.0.0.0:*               LISTEN      

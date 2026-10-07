@@ -1,0 +1,44 @@
+$ kubectl --context k8s-b apply -f 02-issues/07-dns/broken-dns-pod.yaml
+pod/dns-test created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/dns-test --timeout=180s
+pod/dns-test condition met
+### 1) IDENTIFY: the Service works by IP, but not by name
+$ kubectl --context k8s-b get svc web-service
+NAME          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+web-service   ClusterIP   10.100.65.236   <none>        80/TCP    1s
+$ kubectl --context k8s-b run client --image=busybox:1.36 --restart=Never -i --rm -- wget -qO- -T 3 http://$(kubectl --context k8s-b get svc web-service -o jsonpath='{.spec.clusterIP}') 2>/dev/null | grep title
+<title>Welcome to nginx!</title>
+<title>Welcome to nginx!</title>
+$ kubectl --context k8s-b exec dns-test -- nslookup -timeout=3 -retry=1 web-service
+Server:		10.96.0.99
+Address:	10.96.0.99#53
+
+** server can't find web-service: NXDOMAIN
+
+command terminated with exit code 1
+$ kubectl --context k8s-b exec dns-test -- nslookup -timeout=3 google.com | head -6
+Server:		10.96.0.99
+Address:	10.96.0.99#53
+
+Non-authoritative answer:
+Name:	google.com
+Address: 142.250.146.139
+### 2) INVESTIGATE: is CoreDNS healthy? what resolver does the pod use?
+$ kubectl --context k8s-b get pods -n kube-system -l k8s-app=kube-dns -o wide
+NAME                       READY   STATUS    RESTARTS   AGE   IP           NODE    NOMINATED NODE   READINESS GATES
+coredns-559f6c778d-cvxl2   1/1     Running   0          61m   10.244.0.2   k8s-b   <none>           <none>
+$ kubectl --context k8s-b get svc -n kube-system kube-dns
+NAME       TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE
+kube-dns   ClusterIP   10.96.0.10   <none>        53/UDP,53/TCP,9153/TCP   61m
+$ kubectl --context k8s-b exec dns-test -- cat /etc/resolv.conf
+search default.svc.cluster.local svc.cluster.local cluster.local
+nameserver 10.96.0.99
+$ kubectl --context k8s-b get pod dns-test -o jsonpath='dnsPolicy={.spec.dnsPolicy} dnsConfig={.spec.dnsConfig.nameservers}{"\n"}'
+dnsPolicy=None dnsConfig=["10.96.0.99"]
+$ kubectl --context k8s-b exec dns-test -- nslookup -timeout=3 web-service 10.96.0.10
+Server:		10.96.0.10
+Address:	10.96.0.10#53
+
+Name:	web-service.default.svc.cluster.local
+Address: 10.100.65.236
+

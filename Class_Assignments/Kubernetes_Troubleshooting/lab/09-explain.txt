@@ -1,0 +1,95 @@
+$ kubectl --context k8s-b explain pod.spec.containers.livenessProbe | head -30
+KIND:       Pod
+VERSION:    v1
+
+FIELD: livenessProbe <Probe>
+
+
+DESCRIPTION:
+    Periodic probe of container liveness. Container will be restarted if the
+    probe fails. Cannot be updated. More info:
+    https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
+    Probe describes a health check to be performed against a container to
+    determine whether it is alive or ready to receive traffic.
+    
+FIELDS:
+  exec	<ExecAction>
+    Exec specifies a command to execute in the container.
+
+  failureThreshold	<integer>
+    Minimum consecutive failures for the probe to be considered failed after
+    having succeeded. Defaults to 3. Minimum value is 1.
+
+  grpc	<GRPCAction>
+    GRPC specifies a GRPC HealthCheckRequest.
+
+  httpGet	<HTTPGetAction>
+    HTTPGet specifies an HTTP GET request to perform.
+
+  initialDelaySeconds	<integer>
+    Number of seconds after the container has started before liveness probes are
+    initiated. More info:
+$ kubectl --context k8s-b explain deployment.spec.strategy
+GROUP:      apps
+KIND:       Deployment
+VERSION:    v1
+
+FIELD: strategy <DeploymentStrategy>
+
+
+DESCRIPTION:
+    The deployment strategy to use to replace existing pods with new ones.
+    DeploymentStrategy describes how to replace existing pods with new ones.
+    
+FIELDS:
+  rollingUpdate	<RollingUpdateDeployment>
+    Rolling update config params. Present only if DeploymentStrategyType =
+    RollingUpdate.
+
+  type	<string>
+  enum: Recreate, RollingUpdate
+    Type of deployment. Can be "Recreate" or "RollingUpdate". Default is
+    RollingUpdate.
+    
+    Possible enum values:
+     - `"Recreate"` Kill all existing pods before creating new ones.
+     - `"RollingUpdate"` Replace the old ReplicaSets by new one using rolling
+    update i.e gradually scale down the old ReplicaSets and scale up the new
+    one.
+
+
+$ kubectl --context k8s-b explain service.spec.selector | head -15
+KIND:       Service
+VERSION:    v1
+
+FIELD: selector <map[string]string>
+
+
+DESCRIPTION:
+    Route service traffic to pods with label keys and values matching this
+    selector. If empty or not present, the service is assumed to have an
+    external process managing its endpoints, which Kubernetes will not modify.
+    Only applies to types ClusterIP, NodePort, and LoadBalancer. Ignored if type
+    is ExternalName. More info:
+    https://kubernetes.io/docs/concepts/services-networking/service/
+    
+
+$ kubectl --context k8s-b explain pod.spec.containers.resources --recursive | head -20
+KIND:       Pod
+VERSION:    v1
+
+FIELD: resources <ResourceRequirements>
+
+
+DESCRIPTION:
+    Compute Resources required by this container. Cannot be updated. More info:
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+    ResourceRequirements describes the compute resource requirements.
+    
+FIELDS:
+  claims	<[]ResourceClaim>
+    name	<string> -required-
+    request	<string>
+  limits	<map[string]Quantity>
+  requests	<map[string]Quantity>
+

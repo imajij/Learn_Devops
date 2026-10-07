@@ -1,0 +1,22 @@
+$ diff -bB 02-issues/09-configuration/broken-deployment.yaml 02-issues/09-configuration/fixed-deployment.yaml
+24c24
+<                   key: DB_HOST          # BUG: the key in the ConfigMap is DATABASE_HOST
+---
+>                   key: DATABASE_HOST    # FIX: matches the ConfigMap key
+$ kubectl --context k8s-b apply -f 02-issues/09-configuration/fixed-deployment.yaml
+deployment.apps/config-app configured
+$ kubectl --context k8s-b rollout status deploy/config-app --timeout=60s
+Waiting for deployment "config-app" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "config-app" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "config-app" rollout to finish: 1 old replicas are pending termination...
+deployment "config-app" successfully rolled out
+$ kubectl --context k8s-b get pods -l app=config-app
+NAME                          READY   STATUS        RESTARTS   AGE
+config-app-577b99b8b8-q9fdx   0/1     Terminating   0          21s
+config-app-6947bd6bb5-6txzj   1/1     Running       0          0s
+$ kubectl --context k8s-b logs deploy/config-app
+Found 2 pods, using pod/config-app-6947bd6bb5-6txzj
+DB=postgres.default.svc.cluster.local LOG=info
+$ kubectl --context k8s-b delete -f 02-issues/09-configuration/fixed-deployment.yaml -f 02-issues/09-configuration/configmap.yaml
+deployment.apps "config-app" deleted from default namespace
+configmap "app-config" deleted from default namespace

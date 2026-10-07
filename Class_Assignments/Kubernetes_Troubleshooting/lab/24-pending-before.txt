@@ -1,0 +1,35 @@
+$ kubectl --context k8s-b apply -f 02-issues/04-pending/broken-pod.yaml -f 02-issues/04-pending/broken-pod-cpu.yaml
+pod/pending-demo created
+pod/pending-cpu-demo created
+### 1) IDENTIFY
+$ kubectl --context k8s-b get pods pending-demo pending-cpu-demo -o wide
+NAME               READY   STATUS    RESTARTS   AGE   IP       NODE     NOMINATED NODE   READINESS GATES
+pending-demo       0/1     Pending   0          8s    <none>   <none>   <none>           <none>
+pending-cpu-demo   0/1     Pending   0          8s    <none>   <none>   <none>           <none>
+### 2) INVESTIGATE: the scheduler explains itself in the Events
+$ kubectl --context k8s-b describe pod pending-demo | sed -n '/Node-Selectors/p;/Events/,$p'
+Node-Selectors:              kubernetes.io/hostname=node-that-does-not-exist
+Events:
+  Type     Reason            Age   From               Message
+  ----     ------            ----  ----               -------
+  Warning  FailedScheduling  8s    default-scheduler  0/1 nodes are available: 1 node(s) didn't match Pod's node affinity/selector. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
+$ kubectl --context k8s-b describe pod pending-cpu-demo | sed -n '/Requests/,/memory/p;/Events/,$p'
+    Requests:
+      cpu:        16
+      memory:     64Mi
+Events:
+  Type     Reason            Age   From               Message
+  ----     ------            ----  ----               -------
+  Warning  FailedScheduling  8s    default-scheduler  0/1 nodes are available: 1 Insufficient cpu. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
+$ kubectl --context k8s-b get nodes --show-labels | tr ',' '\n' | grep hostname
+kubernetes.io/hostname=k8s-b
+$ kubectl --context k8s-b describe node k8s-b | grep -A3 -E '^Allocatable|Allocated resources' 
+Allocatable:
+  cpu:                10
+  ephemeral-storage:  84223356928
+  hugepages-1Gi:      0
+--
+Allocated resources:
+  (Total limits may be over 100 percent, i.e., overcommitted.)
+  Resource           Requests    Limits
+  --------           --------    ------

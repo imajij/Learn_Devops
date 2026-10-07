@@ -1,0 +1,82 @@
+$ kubectl --context k8s-b get nodes
+NAME    STATUS   ROLES           AGE   VERSION
+k8s-b   Ready    control-plane   48m   v1.37.0
+$ kubectl --context k8s-b get pods
+NAME        READY   STATUS    RESTARTS   AGE
+get-demo    1/1     Running   0          1s
+logs-demo   1/1     Running   0          1s
+$ kubectl --context k8s-b get pods -A
+NAMESPACE     NAME                              READY   STATUS    RESTARTS   AGE
+default       get-demo                          1/1     Running   0          1s
+default       logs-demo                         1/1     Running   0          1s
+kube-system   coredns-559f6c778d-cvxl2          1/1     Running   0          48m
+kube-system   etcd-k8s-b                        1/1     Running   0          48m
+kube-system   kindnet-dq6z2                     1/1     Running   0          48m
+kube-system   kube-apiserver-k8s-b              1/1     Running   0          48m
+kube-system   kube-controller-manager-k8s-b     1/1     Running   0          48m
+kube-system   kube-proxy-78jgp                  1/1     Running   0          48m
+kube-system   kube-scheduler-k8s-b              1/1     Running   0          48m
+kube-system   metrics-server-768f9f6999-89vrc   1/1     Running   0          48m
+kube-system   storage-provisioner               1/1     Running   0          48m
+$ kubectl --context k8s-b get pods --show-labels
+NAME        READY   STATUS    RESTARTS   AGE   LABELS
+get-demo    1/1     Running   0          1s    app=get-demo
+logs-demo   1/1     Running   0          1s    <none>
+$ kubectl --context k8s-b get pods -l app=get-demo
+NAME       READY   STATUS    RESTARTS   AGE
+get-demo   1/1     Running   0          1s
+$ kubectl --context k8s-b get pod get-demo -o jsonpath='{.status.phase} {.status.podIP} {.spec.containers[0].image}{"\n"}'
+Running 10.244.0.50 nginx:1.27
+$ kubectl --context k8s-b get pod get-demo -o yaml | sed -n '/^status:/,/hostIP/p'
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-10-07T17:23:34Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-10-07T17:23:34Z"
+    observedGeneration: 1
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-10-07T17:23:34Z"
+    observedGeneration: 1
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-10-07T17:23:34Z"
+    observedGeneration: 1
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-10-07T17:23:34Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://652dd3ceb32acb9c03ffc0a20b159b551e35782aacf54bea218689de41419e0f
+    image: docker.io/library/nginx:1.27
+    imageID: docker.io/library/nginx@sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d
+    lastState: {}
+    name: nginx
+    ready: true
+    resources: {}
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-10-07T17:23:34Z"
+    user:
+      linux:
+        gid: 0
+        supplementalGroups:
+        - 0
+        uid: 0
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-8bkbd
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 192.168.58.2

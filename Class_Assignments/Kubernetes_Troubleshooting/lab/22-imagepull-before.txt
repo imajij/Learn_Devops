@@ -1,0 +1,33 @@
+$ kubectl --context k8s-b apply -f 02-issues/02-imagepullbackoff/broken-pod.yaml
+pod/image-demo created
+### 1) IDENTIFY (each failed pull shows ErrImagePull, then the kubelet backs off -> ImagePullBackOff)
+[22:59:45] image-demo   0/1   ErrImagePull   0     6s
+[22:59:51] image-demo   0/1   ErrImagePull   0     12s
+[22:59:57] image-demo   0/1   ImagePullBackOff   0     18s
+[23:00:03] image-demo   0/1   ImagePullBackOff   0     24s
+[23:00:09] image-demo   0/1   ErrImagePull   0     30s
+[23:00:15] image-demo   0/1   ErrImagePull   0     36s
+### 2) INVESTIGATE
+$ kubectl --context k8s-b describe pod image-demo | grep -E 'Image:|Reason|Message'
+    Image:          nginx:this-image-does-not-exist
+      Reason:       ErrImagePull
+  Type     Reason     Age                From               Message
+$ kubectl --context k8s-b events --for pod/image-demo
+LAST SEEN               TYPE      REASON      OBJECT           MESSAGE
+3m27s                   Normal    Scheduled   Pod/image-demo   Successfully assigned default/image-demo to k8s-b
+3m10s (x2 over 3m27s)   Normal    Pulling     Pod/image-demo   Pulling image "nginx:this-image-does-not-exist"
+3m8s (x2 over 3m24s)    Warning   Failed      Pod/image-demo   Failed to pull image "nginx:this-image-does-not-exist": rpc error: code = NotFound desc = failed to pull and unpack image "docker.io/library/nginx:this-image-does-not-exist": failed to resolve reference "docker.io/library/nginx:this-image-does-not-exist": docker.io/library/nginx:this-image-does-not-exist: not found
+3m8s (x2 over 3m24s)    Warning   Failed      Pod/image-demo   Error: ErrImagePull
+2m54s (x2 over 3m23s)   Normal    BackOff     Pod/image-demo   Back-off pulling image "nginx:this-image-does-not-exist"
+2m54s (x2 over 3m23s)   Warning   Failed      Pod/image-demo   Error: ImagePullBackOff
+2m52s                   Normal    Scheduled   Pod/image-demo   Successfully assigned default/image-demo to k8s-b
+2m52s                   Normal    Pulled      Pod/image-demo   Container image "nginx:1.27" already present on machine and can be accessed by the pod
+2m52s                   Normal    Created     Pod/image-demo   Container created
+2m52s                   Normal    Started     Pod/image-demo   Container started
+2m51s                   Normal    Killing     Pod/image-demo   Stopping container app
+36s                     Normal    Scheduled   Pod/image-demo   Successfully assigned default/image-demo to k8s-b
+22s (x2 over 36s)       Normal    Pulling     Pod/image-demo   Pulling image "nginx:this-image-does-not-exist"
+21s (x2 over 34s)       Warning   Failed      Pod/image-demo   Failed to pull image "nginx:this-image-does-not-exist": rpc error: code = NotFound desc = failed to pull and unpack image "docker.io/library/nginx:this-image-does-not-exist": failed to resolve reference "docker.io/library/nginx:this-image-does-not-exist": docker.io/library/nginx:this-image-does-not-exist: not found
+21s (x2 over 34s)       Warning   Failed      Pod/image-demo   Error: ErrImagePull
+9s (x2 over 34s)        Normal    BackOff     Pod/image-demo   Back-off pulling image "nginx:this-image-does-not-exist"
+9s (x2 over 34s)        Warning   Failed      Pod/image-demo   Error: ImagePullBackOff

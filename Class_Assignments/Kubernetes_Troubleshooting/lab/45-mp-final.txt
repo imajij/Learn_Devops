@@ -1,0 +1,23 @@
+### final state: Service -> 2 Pods (the fixed standalone pod has no app label, so it is not an endpoint)
+$ kubectl --context k8s-b get pods -o wide --show-labels
+NAME                                   READY   STATUS    RESTARTS   AGE   IP             NODE    NOMINATED NODE   READINESS GATES   LABELS
+project-broken-pod                     1/1     Running   0          1s    10.244.0.101   k8s-b   <none>           <none>            <none>
+troubleshooting-app-59d4957864-ps2gp   1/1     Running   0          32s   10.244.0.97    k8s-b   <none>           <none>            app=troubleshooting-app,pod-template-hash=59d4957864
+troubleshooting-app-59d4957864-x6gqs   1/1     Running   0          32s   10.244.0.96    k8s-b   <none>           <none>            app=troubleshooting-app,pod-template-hash=59d4957864
+$ kubectl --context k8s-b get service,endpoints troubleshooting-service
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME                              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+service/troubleshooting-service   ClusterIP   10.99.124.236   <none>        80/TCP    32s
+
+NAME                                ENDPOINTS                       AGE
+endpoints/troubleshooting-service   10.244.0.96:80,10.244.0.97:80   32s
+$ kubectl --context k8s-b events --types=Warning | tail -5
+3m15s (x7 over 3m47s)   Warning   FailedMount                    Pod/web-content-demo               MountVolume.SetUp failed for volume "html" : configmap "web-content" not found
+57s (x3 over 72s)       Warning   Failed                         Pod/config-app-577b99b8b8-q9fdx    Error: couldn't find key DB_HOST in ConfigMap default/app-config
+22s                     Warning   Failed                         Pod/project-broken-pod             Error: ImagePullBackOff
+5s (x2 over 22s)        Warning   Failed                         Pod/project-broken-pod             Error: ErrImagePull
+5s (x2 over 22s)        Warning   Failed                         Pod/project-broken-pod             Failed to pull image "nginx:this-tag-does-not-exist": failed to pull and unpack image "docker.io/library/nginx:this-tag-does-not-exist": failed to resolve reference "docker.io/library/nginx:this-tag-does-not-exist": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/nginx/manifests/this-tag-does-not-exist: 429 Too Many Requests
+$ kubectl --context k8s-b delete -f mini-project/fixed-pod.yaml -f mini-project/service-fixed.yaml -f mini-project/deployment.yaml --now
+pod "project-broken-pod" deleted from default namespace
+service "troubleshooting-service" deleted from default namespace
+deployment.apps "troubleshooting-app" deleted from default namespace
