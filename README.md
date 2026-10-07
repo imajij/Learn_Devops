@@ -27,7 +27,7 @@ All the homework assignments. Each one has its own `README.md` with the commands
 | 17 | Terraform & Infrastructure as Code | [`Class_Assignments/Terraform/README.md`](Class_Assignments/Terraform/README.md) |
 | 18 | Cloud & Terraform in Action | [`Class_Assignments/Cloud_and_Terraform_in_Action/README.md`](Class_Assignments/Cloud_and_Terraform_in_Action/README.md) |
 | 19 | Monitoring, Observability & GitOps | [`Class_Assignments/Monitoring_Observability_GitOps/README.md`](Class_Assignments/Monitoring_Observability_GitOps/README.md) |
-| 20 | Final DevOps Project & Troubleshooting | _in progress_ |
+| 20 | Final DevOps Project & Troubleshooting | [`Class_Assignments/Devops_Project_And_Troubleshooting/README.md`](Class_Assignments/Devops_Project_And_Troubleshooting/README.md) |
 
 ## What each assignment covers
 
@@ -68,6 +68,8 @@ All the homework assignments. Each one has its own `README.md` with the commands
 **18. Cloud & Terraform in Action** — VPC, subnet, internet gateway, route table, security group, EC2 with an IAM role, and S3 from one project: **14** resources, the dependency graph, state, plan/apply/destroy, and an architecture diagram.
 
 **19. Monitoring, Observability & GitOps** — Prometheus, Grafana and **4** alert rules firing during a simulated incident. Metrics, JSON logs and Jaeger traces linked by `trace_id`. Argo CD syncing from Git, undoing a manual change in about **3 s**, pruning, and rolling back with `git revert`.
+
+**20. Final DevOps Project & Troubleshooting** — *CampusDesk*, a campus IT helpdesk (React + FastAPI + PostgreSQL, **12** tests at **98%** coverage), taken through Docker, a **9**-job CI/CD + DevSecOps pipeline, Helm on Kubernetes (ConfigMap, Secret, Ingress, HPA **2 → 5**, probes, PVC), **32** Terraform resources, Prometheus + Grafana, and Argo CD syncing a Git commit. The final challenge has **6** deliberate faults, each diagnosed and fixed with before/after output.
 
 ## Evidence
 
