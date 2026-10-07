@@ -1,0 +1,12 @@
+# Trivy configuration - used for the container image scan: trivy image --config trivy.yaml ...
+# Trivy only REPORTS here (exit-code 0); the blocking decision is made by security/gate.py.
+severity:
+  - CRITICAL
+  - HIGH
+scan:
+  scanners:
+    - vuln
+vulnerability:
+  # keep unfixed CVEs in the report so they are visible; the gate only blocks fixable ones
+  ignore-unfixed: false
+exit-code: 0

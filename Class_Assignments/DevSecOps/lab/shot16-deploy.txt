@@ -1,0 +1,34 @@
+$ lab/act-run.sh push lab/events/push-main.json   ### v2 run, push + deploy jobs (filtered)
+[9 Push image            ]   ✅  Success - Main Download the scanned image (exactly what passed the gate) [891.649708ms]
+[9 Push image            ]   ✅  Success - Main Log in to registry [136.271625ms]
+[9 Push image            ]   | Loaded image: secure-notes:ci
+[9 Push image            ]   | The push refers to repository [localhost:5050/ajij/secure-notes]
+[9 Push image            ]   | 0c16aa7: digest: sha256:0dec2a7be8e59a7035c5db3fe79ff9902b41fefb4aac720ecd4aba460fc3da7f size: 856
+[9 Push image            ]   ✅  Success - Main Tag and push [489.429ms]
+[9 Push image            ] 🏁  Job succeeded
+[10 Deploy to Kubernetes ]   ✅  Success - Main Checkout [11.501ms]
+[10 Deploy to Kubernetes ]   ✅  Success - Main Install kubectl [23.862579542s]
+[10 Deploy to Kubernetes ]   | ajij-cicd-control-plane   Ready    control-plane   17m   v1.37.0
+[10 Deploy to Kubernetes ]   ✅  Success - Main Configure cluster access from the KUBE_CONFIG secret [145.047916ms]
+[10 Deploy to Kubernetes ]   | namespace/secure-notes created
+[10 Deploy to Kubernetes ]   | secret/regcred created
+[10 Deploy to Kubernetes ]   | secret/secure-notes-api created
+[10 Deploy to Kubernetes ]   ✅  Success - Main Create namespace and secrets [257.590458ms]
+[10 Deploy to Kubernetes ]   | 23:          image: localhost:5050/ajij/secure-notes:0c16aa7                    # replaced by the pipeline with registry/name:<git-sha>
+[10 Deploy to Kubernetes ]   | deployment.apps/secure-notes created
+[10 Deploy to Kubernetes ]   | service/secure-notes created
+[10 Deploy to Kubernetes ]   | Waiting for deployment "secure-notes" rollout to finish: 0 of 2 updated replicas are available...
+[10 Deploy to Kubernetes ]   | Waiting for deployment "secure-notes" rollout to finish: 1 of 2 updated replicas are available...
+[10 Deploy to Kubernetes ]   | deployment "secure-notes" successfully rolled out
+[10 Deploy to Kubernetes ]   ✅  Success - Main Deploy [7.91761225s]
+[10 Deploy to Kubernetes ]   | {"status":"ok"}
+[10 Deploy to Kubernetes ]   | {"build":"0c16aa7","pod":"secure-notes-6c8dcd78fd-wq9tz","service":"secure-notes","version":"1.0.0"}
+[10 Deploy to Kubernetes ]   | write without token -> 401
+[10 Deploy to Kubernetes ]   | {"body":"","id":1,"tags":["devsecops"],"title":"deployed by the pipeline"}
+[10 Deploy to Kubernetes ]   | deployment.apps/secure-notes   2/2     2            2           12s   app          localhost:5050/ajij/secure-notes:0c16aa7   app=secure-notes
+[10 Deploy to Kubernetes ]   | pod/secure-notes-6c8dcd78fd-hqlzg   1/1     Running   0          12s   10.244.0.7   ajij-cicd-control-plane   <none>           <none>
+[10 Deploy to Kubernetes ]   | pod/secure-notes-6c8dcd78fd-wq9tz   1/1     Running   0          12s   10.244.0.6   ajij-cicd-control-plane   <none>           <none>
+[10 Deploy to Kubernetes ]   | service/secure-notes   ClusterIP   10.96.29.143   <none>        80/TCP    12s   app=secure-notes
+[10 Deploy to Kubernetes ]   ✅  Success - Main Smoke test [3.474803916s]
+[10 Deploy to Kubernetes ] 🏁  Job succeeded
+### exit code: 0

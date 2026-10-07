@@ -1,0 +1,22 @@
+### v1 of the code + a temporary file app/settings_local.py holding a random, fake "ghp_..." token
+$ lab/act-run.sh push lab/events/push-main.json
+### scanner output only (filtered from the full log)
+[3 SAST (Bandit)]   | Bandit findings:
+[3 SAST (Bandit)]   |   B404 severity=LOW confidence=HIGH app/main.py:4  Consider possible security implications associated with the subprocess module.
+[3 SAST (Bandit)]   |   B602 severity=HIGH confidence=HIGH app/main.py:49  subprocess call with shell=True identified, security issue.
+[3 SAST (Bandit)]   |   B201 severity=HIGH confidence=MEDIUM app/main.py:58  A Flask app appears to be run with debug=True, which exposes the Werkzeug debugger and allows the execution of arbitrary code.
+[3 SAST (Bandit)]   |   B104 severity=MEDIUM confidence=MEDIUM app/main.py:58  Possible binding to all interfaces.
+[3 SAST (Bandit)]   |   B105 severity=LOW confidence=MEDIUM app/settings_local.py:3  Possible hardcoded password: <redacted>
+[3 SAST (Bandit)]   |   totals: HIGH=2 MEDIUM=1 LOW=2
+[4 SCA (pip-audit)]   | Vulnerable dependencies:
+[4 SCA (pip-audit)]   |   flask==2.2.2: 2 advisories -> fix in 2.2.5, 2.3.2, 3.1.3
+[4 SCA (pip-audit)]   |   werkzeug==2.2.2: 10 advisories -> fix in 2.2.3, 2.3.8, 3.0.1, 3.0.3, 3.0.6, 3.1.4, 3.1.5, 3.1.6, 3.1.9
+[4 SCA (pip-audit)]   |   total advisories: 12
+[5 Secret scan (Gitleaks)]   | Finding:     GITHUB_TOKEN = "REDACTED
+[5 Secret scan (Gitleaks)]   | RuleID:      github-pat
+[5 Secret scan (Gitleaks)]   | File:        app/settings_local.py
+[5 Secret scan (Gitleaks)]   | 4:54PM WRN leaks found: 1
+[7 Image scan (Trivy)    ]   |   target: image.tar (debian 13.7) (debian) -> 44 HIGH/CRITICAL
+[7 Image scan (Trivy)    ]   |   target: Python (python-pkg) -> 3 HIGH/CRITICAL
+[7 Image scan (Trivy)    ]   |   by severity:
+[7 Image scan (Trivy)    ]   |   HIGH: 47 (3 with a fix)

@@ -1,0 +1,10 @@
+# Gitleaks (secret scanning) configuration
+# Start from the ~200 built-in rules (AWS keys, GitHub tokens, Stripe keys, private keys, ...)
+title = "secure-notes gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "scanner output folders are never committed and only contain redacted data"
+paths = ['''^reports/''']

@@ -1,0 +1,37 @@
+$ lab/act-run.sh push lab/events/push-main.json   ### v1 run, job results + gate (filtered)
+[1 Build] 🏁  Job succeeded
+[2 Unit tests] 🏁  Job succeeded
+[3 SAST (Bandit)] 🏁  Job succeeded
+[4 SCA (pip-audit)] 🏁  Job succeeded
+[5 Secret scan (Gitleaks)] 🏁  Job succeeded
+[6 Docker build          ] 🏁  Job succeeded
+[7 Image scan (Trivy)    ] 🏁  Job succeeded
+[8 Security gate         ] 🏁  Job failed
+[FAIL] SAST        (bandit): 3 blocking, 2 below threshold
+         - B602 HIGH app/main.py:49 subprocess call with shell=True identified, security issue.
+         - B201 HIGH app/main.py:58 A Flask app appears to be run with debug=True, which exposes the Werkz
+         - B104 MEDIUM app/main.py:58 Possible binding to all interfaces.
+[FAIL] SCA         (pip-audit): 12 blocking, 0 below threshold
+         - flask==2.2.2 PYSEC-2023-62 (fixed in 2.2.5,2.3.2)
+         - flask==2.2.2 PYSEC-2026-2151 (fixed in 3.1.3)
+         - werkzeug==2.2.2 PYSEC-2023-58 (fixed in 2.2.3)
+         - werkzeug==2.2.2 PYSEC-2023-57 (fixed in 2.2.3)
+         - werkzeug==2.2.2 PYSEC-2023-221 (fixed in 2.3.8,3.0.1)
+         - werkzeug==2.2.2 PYSEC-2026-2046 (fixed in 3.1.4)
+         - werkzeug==2.2.2 PYSEC-2026-2045 (fixed in 3.0.6)
+         - werkzeug==2.2.2 PYSEC-2026-2044 (fixed in 3.1.5)
+         - werkzeug==2.2.2 PYSEC-2026-2043 (fixed in 3.0.3)
+         - werkzeug==2.2.2 PYSEC-2026-2320 (fixed in 3.1.6)
+         - werkzeug==2.2.2 PYSEC-2026-3417 (fixed in 3.0.6)
+         - werkzeug==2.2.2 GHSA-g6x2-hccm-hh4m (fixed in 3.1.9)
+[FAIL] Secret scan (gitleaks): 1 blocking, 0 below threshold
+         - github-pat in app/settings_local.py:3 (value redacted)
+[FAIL] Image scan  (trivy): 3 blocking, 44 below threshold
+         - CVE-2023-30861 HIGH Flask 2.2.2 -> 2.3.2, 2.2.5
+         - CVE-2023-25577 HIGH Werkzeug 2.2.2 -> 2.2.3
+         - CVE-2024-34069 HIGH Werkzeug 2.2.2 -> 3.0.3
+SECURITY GATE: FAIL - pipeline stopped, image will NOT be pushed or deployed
+[8 Security gate         ]   ❌  Failure - Main Apply security policy (security/gate-policy.json) [143.565791ms]
+Error: Job '8 Security gate' failed
+### exit code: 1
+### jobs 9 (push) and 10 (deploy) never started

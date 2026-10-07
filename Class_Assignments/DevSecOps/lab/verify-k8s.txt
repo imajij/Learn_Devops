@@ -1,0 +1,38 @@
+### what the deploy job left in the kind cluster ajij-cicd
+$ kubectl --context kind-ajij-cicd -n secure-notes get deploy,rs,pods,svc,secrets
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/secure-notes   2/2     2            2           27s
+
+NAME                                      DESIRED   CURRENT   READY   AGE
+replicaset.apps/secure-notes-6c8dcd78fd   2         2         2       27s
+
+NAME                                READY   STATUS    RESTARTS   AGE
+pod/secure-notes-6c8dcd78fd-hqlzg   1/1     Running   0          27s
+pod/secure-notes-6c8dcd78fd-wq9tz   1/1     Running   0          27s
+
+NAME                   TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+service/secure-notes   ClusterIP   10.96.29.143   <none>        80/TCP    27s
+
+NAME                      TYPE                             DATA   AGE
+secret/regcred            kubernetes.io/dockerconfigjson   1      27s
+secret/secure-notes-api   Opaque                           1      27s
+$ kubectl --context kind-ajij-cicd -n secure-notes get pods -o jsonpath='{range .items[*]}{.metadata.name}{"  image="}{.spec.containers[0].image}{"  runAsUser="}{.spec.securityContext.runAsUser}{"  readOnlyRootFS="}{.spec.containers[0].securityContext.readOnlyRootFilesystem}{"\n"}{end}'
+secure-notes-6c8dcd78fd-hqlzg  image=localhost:5050/ajij/secure-notes:0c16aa7  runAsUser=10001  readOnlyRootFS=true
+secure-notes-6c8dcd78fd-wq9tz  image=localhost:5050/ajij/secure-notes:0c16aa7  runAsUser=10001  readOnlyRootFS=true
+$ kubectl --context kind-ajij-cicd get ns secure-notes --show-labels
+NAME           STATUS   AGE   LABELS
+secure-notes   Active   28s   kubernetes.io/metadata.name=secure-notes,pod-security.kubernetes.io/enforce=restricted
+### image in the local registry (stand-in for GHCR / Docker Hub)
+$ curl -s -u "$REG_USER:$REG_PASS" http://localhost:5050/v2/ajij/secure-notes/tags/list
+{"name":"ajij/secure-notes","tags":["0c16aa7"]}
+$ docker image ls secure-notes:ci --format "{{.Repository}}:{{.Tag}}  {{.Size}}"
+secure-notes:ci  111MB
+### talk to the app through a port-forward
+$ curl -s localhost:18432/
+{"build":"0c16aa7","pod":"secure-notes-6c8dcd78fd-wq9tz","service":"secure-notes","version":"1.0.0"}
+$ curl -s "localhost:18432/api/admin/resolve?host=kubernetes.default.svc.cluster.local"
+{"addresses":["10.96.0.1"],"host":"kubernetes.default.svc.cluster.local","ok":true}
+$ curl -s -o /dev/null -w '%{http_code}\n' 'localhost:18432/api/admin/resolve?host=x;id'
+400
+$ curl -s localhost:18432/api/notes
+[]

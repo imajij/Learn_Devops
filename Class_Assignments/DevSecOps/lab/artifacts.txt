@@ -1,0 +1,13 @@
+### artifacts of the passing run (act --artifact-server-path ~/devops-lab/cicd/artifacts16), run from ~/devops-lab/cicd/artifacts16/1
+$ find . -type f -exec ls -lh {} \; | awk "{print \$5, \$9}"
+16K ./report-image/report-image.zip
+511B ./test-report/test-report.zip
+307B ./report-sca/report-sca.zip
+5.2K ./app-build/app-build.zip
+380B ./report-sast/report-sast.zip
+26M ./image/image.zip
+145B ./report-secrets/report-secrets.zip
+$ unzip -p report-image/report-image.zip trivy-image.json | jq -c "[.Metadata.OS, .Metadata.ImageConfig.config.User]"
+[{"Family":"alpine","Name":"3.24.2"},"10001"]
+$ unzip -p test-report/test-report.zip junit.xml | grep -o "<testsuite [^>]*>" | cut -c1-90
+<testsuite name="pytest" errors="0" failures="0" skipped="0" tests="13" time="0.366" times

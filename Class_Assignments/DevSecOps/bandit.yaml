@@ -1,0 +1,8 @@
+# Bandit (SAST) configuration - used as: bandit -c bandit.yaml -r app
+# Only application code is scanned; tests use assert on purpose (B101).
+exclude_dirs:
+  - tests
+  - lab
+# no rules are skipped: every finding goes to the security gate,
+# and security/gate-policy.json decides which severities block.
+skips: []

@@ -1,0 +1,6 @@
+{
+  "sast":    {"tool": "bandit",    "block_severities": ["HIGH", "MEDIUM"], "min_confidence": "MEDIUM"},
+  "sca":     {"tool": "pip-audit", "block_only_if_fix_available": false},
+  "secrets": {"tool": "gitleaks",  "max_findings": 0},
+  "image":   {"tool": "trivy",     "block_severities": ["CRITICAL", "HIGH"], "block_only_if_fix_available": true}
+}

@@ -1,0 +1,13 @@
+$ act -l -W .github/workflows/devsecops.yml
+
+Stage  Job ID         Job name                  Workflow name       Workflow file  Events                             
+0      build          1 Build                   DevSecOps Pipeline  devsecops.yml  pull_request,workflow_dispatch,push
+1      unit-test      2 Unit tests              DevSecOps Pipeline  devsecops.yml  pull_request,workflow_dispatch,push
+2      sast           3 SAST (Bandit)           DevSecOps Pipeline  devsecops.yml  push,pull_request,workflow_dispatch
+3      sca            4 SCA (pip-audit)         DevSecOps Pipeline  devsecops.yml  push,pull_request,workflow_dispatch
+4      secret-scan    5 Secret scan (Gitleaks)  DevSecOps Pipeline  devsecops.yml  push,pull_request,workflow_dispatch
+5      docker-build   6 Docker build            DevSecOps Pipeline  devsecops.yml  push,pull_request,workflow_dispatch
+6      image-scan     7 Image scan (Trivy)      DevSecOps Pipeline  devsecops.yml  push,pull_request,workflow_dispatch
+7      security-gate  8 Security gate           DevSecOps Pipeline  devsecops.yml  push,pull_request,workflow_dispatch
+8      push-image     9 Push image              DevSecOps Pipeline  devsecops.yml  pull_request,workflow_dispatch,push
+9      deploy         10 Deploy to Kubernetes   DevSecOps Pipeline  devsecops.yml  pull_request,workflow_dispatch,push

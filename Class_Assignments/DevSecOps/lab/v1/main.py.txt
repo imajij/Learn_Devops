@@ -1,0 +1,58 @@
+"""HTTP layer of the Secure Notes API."""
+import hmac
+import os
+import subprocess
+
+from flask import Flask, jsonify, request
+
+from app import __version__
+from app.notes import NoteStore
+
+
+def create_app(api_token=None):
+    app = Flask(__name__)
+    store = NoteStore()
+    token = api_token if api_token is not None else os.getenv("API_TOKEN", "")
+
+    def authorized():
+        sent = request.headers.get("X-API-Token", "")
+        return bool(token) and hmac.compare_digest(sent, token)
+
+    @app.get("/")
+    def index():
+        return jsonify(service="secure-notes", version=__version__,
+                       build=os.getenv("BUILD_SHA", "local"), pod=os.getenv("HOSTNAME", "?"))
+
+    @app.get("/health")
+    def health():
+        return jsonify(status="ok")
+
+    @app.get("/api/notes")
+    def list_notes():
+        return jsonify(store.search(request.args.get("tag")))
+
+    @app.post("/api/notes")
+    def add_note():
+        if not authorized():
+            return jsonify(error="missing or wrong X-API-Token"), 401
+        data = request.get_json(silent=True) or {}
+        try:
+            note = store.add(data.get("title"), data.get("body", ""), data.get("tags"))
+        except ValueError as err:
+            return jsonify(error=str(err)), 400
+        return jsonify(note), 201
+
+    @app.get("/api/admin/ping")
+    def ping():
+        # network check for operators: /api/admin/ping?host=example.com
+        host = request.args.get("host", "localhost")
+        out = subprocess.run(f"ping -c 1 {host}", shell=True, capture_output=True, text=True)
+        return jsonify(host=host, ok=out.returncode == 0)
+
+    return app
+
+
+app = create_app()
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)

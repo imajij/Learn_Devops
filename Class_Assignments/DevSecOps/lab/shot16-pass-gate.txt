@@ -1,0 +1,23 @@
+### v2: fixes applied (see README), temporary secret file deleted
+$ lab/act-run.sh push lab/events/push-main.json
+### job results + scanner summaries + gate (filtered)
+[3 SAST (Bandit)]   |   totals: HIGH=0 MEDIUM=0 LOW=0
+[4 SCA (pip-audit)]   |   total advisories: 0
+[5 Secret scan (Gitleaks)]   | 4:56PM INF no leaks found
+[7 Image scan (Trivy)    ]   |   target: image.tar (alpine 3.24.2) (alpine) -> 0 HIGH/CRITICAL
+[7 Image scan (Trivy)    ]   |   target: Python (python-pkg) -> 0 HIGH/CRITICAL
+[1 Build] 🏁  Job succeeded
+[2 Unit tests] 🏁  Job succeeded
+[3 SAST (Bandit)] 🏁  Job succeeded
+[4 SCA (pip-audit)] 🏁  Job succeeded
+[5 Secret scan (Gitleaks)] 🏁  Job succeeded
+[6 Docker build          ] 🏁  Job succeeded
+[7 Image scan (Trivy)    ] 🏁  Job succeeded
+[8 Security gate         ] 🏁  Job succeeded
+[9 Push image            ] 🏁  Job succeeded
+[10 Deploy to Kubernetes ] 🏁  Job succeeded
+[PASS] SAST        (bandit): 0 blocking, 0 below threshold
+[PASS] SCA         (pip-audit): 0 blocking, 0 below threshold
+[PASS] Secret scan (gitleaks): 0 blocking, 0 below threshold
+[PASS] Image scan  (trivy): 0 blocking, 0 below threshold
+SECURITY GATE: PASS - image may be pushed and deployed

@@ -1,0 +1,11 @@
+# kind cluster used as the "production" Kubernetes target for the local runs.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: ajij-cicd
+containerdConfigPatches:
+  # let containerd read per-registry mirror files from /etc/containerd/certs.d
+  - |-
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = "/etc/containerd/certs.d"
+nodes:
+  - role: control-plane

@@ -1,0 +1,826 @@
+### v2: fixes applied (see README), temporary secret file deleted
+$ lab/act-run.sh push lab/events/push-main.json
+time="2026-10-07T22:25:42+05:30" level=info msg="Using docker host 'unix:///Users/ajijuttam/.colima/docker.sock', and daemon socket '/var/run/docker.sock'"
+level=warning msg= ⚠ You are using Apple M-series chip and you have not specified container architecture, you might encounter issues while running act. If so, try running it with '--container-architecture linux/amd64'. ⚠ 
+
+time="2026-10-07T22:25:42+05:30" level=info msg="Start server on http://100.128.164.188:34567"
+[DevSecOps Pipeline/1 Build] ⭐ Run Set up job
+[DevSecOps Pipeline/1 Build] 🚀  Start image=catthehacker/ubuntu:act-latest
+[DevSecOps Pipeline/1 Build]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[DevSecOps Pipeline/1 Build]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/1 Build]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/1 Build]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[DevSecOps Pipeline/1 Build]   ✅  Success - Set up job
+[DevSecOps Pipeline/1 Build]   ☁  git clone 'https://github.com/actions/setup-python' # ref=v5
+[DevSecOps Pipeline/1 Build]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[DevSecOps Pipeline/1 Build] ⭐ Run Main Checkout
+[DevSecOps Pipeline/1 Build]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/1 Build]   ✅  Success - Main Checkout [23.525333ms]
+[DevSecOps Pipeline/1 Build] ⭐ Run Main Set up Python
+[DevSecOps Pipeline/1 Build]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-python@v5/ dst=/var/run/act/actions/actions-setup-python@v5/
+[DevSecOps Pipeline/1 Build]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/setup/index.js] user= workdir=
+[DevSecOps Pipeline/1 Build]   ❓  ::group::Installed versions
+[DevSecOps Pipeline/1 Build]   | (node:31) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/1 Build]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/1 Build]   | Successfully set up CPython (3.12.15)
+[DevSecOps Pipeline/1 Build]   ❓  ::endgroup::
+[DevSecOps Pipeline/1 Build]   ❓ add-matcher /run/act/actions/actions-setup-python@v5/.github/python.json
+[DevSecOps Pipeline/1 Build]   ✅  Success - Main Set up Python [1.037755125s]
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-env:: pythonLocation=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-env:: PKG_CONFIG_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib/pkgconfig
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-env:: Python_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-env:: Python2_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-env:: Python3_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-env:: LD_LIBRARY_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-output:: python-version=3.12.15
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-output:: python-path=/opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[DevSecOps Pipeline/1 Build]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/1 Build]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64/bin
+[DevSecOps Pipeline/1 Build] ⭐ Run Main Install runtime dependencies
+[DevSecOps Pipeline/1 Build]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[DevSecOps Pipeline/1 Build]   | Collecting Flask==3.1.3 (from -r requirements.txt (line 1))
+[DevSecOps Pipeline/1 Build]   |   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+[DevSecOps Pipeline/1 Build]   | Collecting Werkzeug==3.1.9 (from -r requirements.txt (line 2))
+[DevSecOps Pipeline/1 Build]   |   Downloading werkzeug-3.1.9-py3-none-any.whl.metadata (4.1 kB)
+[DevSecOps Pipeline/1 Build]   | Requirement already satisfied: gunicorn==23.0.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r requirements.txt (line 3)) (23.0.0)
+[DevSecOps Pipeline/1 Build]   | Requirement already satisfied: blinker>=1.9.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r requirements.txt (line 1)) (1.9.0)
+[DevSecOps Pipeline/1 Build]   | Requirement already satisfied: click>=8.1.3 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r requirements.txt (line 1)) (8.5.0)
+[DevSecOps Pipeline/1 Build]   | Requirement already satisfied: itsdangerous>=2.2.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r requirements.txt (line 1)) (2.2.0)
+[DevSecOps Pipeline/1 Build]   | Requirement already satisfied: jinja2>=3.1.2 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r requirements.txt (line 1)) (3.1.6)
+[DevSecOps Pipeline/1 Build]   | Requirement already satisfied: markupsafe>=2.1.1 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r requirements.txt (line 1)) (3.0.4)
+[DevSecOps Pipeline/1 Build]   | Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from gunicorn==23.0.0->-r requirements.txt (line 3)) (26.3)
+[DevSecOps Pipeline/1 Build]   | Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+[DevSecOps Pipeline/1 Build]   | Downloading werkzeug-3.1.9-py3-none-any.whl (228 kB)
+[DevSecOps Pipeline/1 Build]   | Installing collected packages: Werkzeug, Flask
+[DevSecOps Pipeline/1 Build]   |   Attempting uninstall: Werkzeug
+[DevSecOps Pipeline/1 Build]   |     Found existing installation: Werkzeug 2.2.2
+[DevSecOps Pipeline/1 Build]   |     Uninstalling Werkzeug-2.2.2:
+[DevSecOps Pipeline/1 Build]   |       Successfully uninstalled Werkzeug-2.2.2
+[DevSecOps Pipeline/1 Build]   |   Attempting uninstall: Flask
+[DevSecOps Pipeline/1 Build]   |     Found existing installation: Flask 2.2.2
+[DevSecOps Pipeline/1 Build]   |     Uninstalling Flask-2.2.2:
+[DevSecOps Pipeline/1 Build]   |       Successfully uninstalled Flask-2.2.2
+[DevSecOps Pipeline/1 Build]   | 
+[DevSecOps Pipeline/1 Build]   | Successfully installed Flask-3.1.3 Werkzeug-3.1.9
+[DevSecOps Pipeline/1 Build]   | WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+[DevSecOps Pipeline/1 Build]   ✅  Success - Main Install runtime dependencies [2.263182583s]
+[DevSecOps Pipeline/1 Build] ⭐ Run Main Compile and import check
+[DevSecOps Pipeline/1 Build]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[DevSecOps Pipeline/1 Build]   | app import OK, routes: ['/', '/api/admin/resolve', '/api/notes', '/api/notes', '/health', '/static/<path:filename>']
+[DevSecOps Pipeline/1 Build]   ✅  Success - Main Compile and import check [346.319917ms]
+[DevSecOps Pipeline/1 Build] ⭐ Run Main Package
+[DevSecOps Pipeline/1 Build]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/4] user= workdir=
+[DevSecOps Pipeline/1 Build]   | total 8
+[DevSecOps Pipeline/1 Build]   | -rw-r--r-- 1 root root 5150 Oct  7 16:55 secure-notes-0c16aa7.tar.gz
+[DevSecOps Pipeline/1 Build]   ✅  Success - Main Package [137.593791ms]
+[DevSecOps Pipeline/1 Build] ⭐ Run Main Upload build artifact
+[DevSecOps Pipeline/1 Build]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[DevSecOps Pipeline/1 Build]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[DevSecOps Pipeline/1 Build]   | (node:86) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/1 Build]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/1 Build]   | With the provided path, there will be 1 file uploaded
+[DevSecOps Pipeline/1 Build]   | Artifact name is valid!
+[DevSecOps Pipeline/1 Build]   | Root directory input is valid!
+[DevSecOps Pipeline/1 Build]   | Beginning upload of artifact content to blob storage
+[DevSecOps Pipeline/1 Build]   | (node:86) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+[DevSecOps Pipeline/1 Build]   | Uploaded bytes 5323
+[DevSecOps Pipeline/1 Build]   | Finished uploading artifact content to blob storage!
+[DevSecOps Pipeline/1 Build]   | SHA256 digest of uploaded artifact zip is 04b32042c50adcc47ad5792559a4ea56266465523928ede759942347393654f1
+[DevSecOps Pipeline/1 Build]   | Finalizing artifact upload
+[DevSecOps Pipeline/1 Build]   | Artifact app-build.zip successfully finalized. Artifact ID 2591024921
+[DevSecOps Pipeline/1 Build]   | Artifact app-build has been successfully uploaded! Final size is 5323 bytes. Artifact ID is 2591024921
+[DevSecOps Pipeline/1 Build]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/2591024921
+[DevSecOps Pipeline/1 Build]   ✅  Success - Main Upload build artifact [947.953458ms]
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/2591024921
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-output:: artifact-id=2591024921
+[DevSecOps Pipeline/1 Build]   ⚙  ::set-output:: artifact-digest=04b32042c50adcc47ad5792559a4ea56266465523928ede759942347393654f1
+[DevSecOps Pipeline/1 Build] ⭐ Run Post Set up Python
+[DevSecOps Pipeline/1 Build]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/cache-save/index.js] user= workdir=
+[DevSecOps Pipeline/1 Build]   | (node:103) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/1 Build]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/1 Build]   ✅  Success - Post Set up Python [193.537375ms]
+[DevSecOps Pipeline/1 Build] ⭐ Run Complete job
+[DevSecOps Pipeline/1 Build] Cleaning up container for job 1 Build
+[DevSecOps Pipeline/1 Build]   ✅  Success - Complete job
+[DevSecOps Pipeline/1 Build] 🏁  Job succeeded
+[DevSecOps Pipeline/2 Unit tests] ⭐ Run Set up job
+[DevSecOps Pipeline/2 Unit tests] 🚀  Start image=catthehacker/ubuntu:act-latest
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[DevSecOps Pipeline/2 Unit tests]   ✅  Success - Set up job
+[DevSecOps Pipeline/2 Unit tests]   ☁  git clone 'https://github.com/actions/setup-python' # ref=v5
+[DevSecOps Pipeline/2 Unit tests]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[DevSecOps Pipeline/2 Unit tests] ⭐ Run Main Checkout
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/2 Unit tests]   ✅  Success - Main Checkout [31.111209ms]
+[DevSecOps Pipeline/2 Unit tests] ⭐ Run Main Set up Python
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-python@v5/ dst=/var/run/act/actions/actions-setup-python@v5/
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/setup/index.js] user= workdir=
+[DevSecOps Pipeline/2 Unit tests]   ❓  ::group::Installed versions
+[DevSecOps Pipeline/2 Unit tests]   | (node:30) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/2 Unit tests]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/2 Unit tests]   | Successfully set up CPython (3.12.15)
+[DevSecOps Pipeline/2 Unit tests]   ❓  ::endgroup::
+[DevSecOps Pipeline/2 Unit tests]   ❓ add-matcher /run/act/actions/actions-setup-python@v5/.github/python.json
+[DevSecOps Pipeline/2 Unit tests]   ✅  Success - Main Set up Python [1.429243708s]
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-env:: Python3_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-env:: LD_LIBRARY_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-env:: pythonLocation=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-env:: PKG_CONFIG_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib/pkgconfig
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-env:: Python_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-env:: Python2_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-output:: python-version=3.12.15
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-output:: python-path=/opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64/bin
+[DevSecOps Pipeline/2 Unit tests] ⭐ Run Main Install dev dependencies
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: Flask==3.1.3 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/requirements.txt (line 1)) (3.1.3)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: Werkzeug==3.1.9 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/requirements.txt (line 2)) (3.1.9)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: gunicorn==23.0.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/requirements.txt (line 3)) (23.0.0)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: pytest==8.4.2 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r requirements-dev.txt (line 2)) (8.4.2)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: pytest-cov==7.1.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from -r requirements-dev.txt (line 3)) (7.1.0)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: blinker>=1.9.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/requirements.txt (line 1)) (1.9.0)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: click>=8.1.3 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/requirements.txt (line 1)) (8.5.0)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: itsdangerous>=2.2.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/requirements.txt (line 1)) (2.2.0)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: jinja2>=3.1.2 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/requirements.txt (line 1)) (3.1.6)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: markupsafe>=2.1.1 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from Flask==3.1.3->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/requirements.txt (line 1)) (3.0.4)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from gunicorn==23.0.0->-r /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/requirements.txt (line 3)) (26.3)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: iniconfig>=1 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pytest==8.4.2->-r requirements-dev.txt (line 2)) (2.3.1)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: pluggy<2,>=1.5 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pytest==8.4.2->-r requirements-dev.txt (line 2)) (1.6.0)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: pygments>=2.7.2 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pytest==8.4.2->-r requirements-dev.txt (line 2)) (2.21.0)
+[DevSecOps Pipeline/2 Unit tests]   | Requirement already satisfied: coverage>=7.10.6 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from coverage[toml]>=7.10.6->pytest-cov==7.1.0->-r requirements-dev.txt (line 3)) (7.16.2)
+[DevSecOps Pipeline/2 Unit tests]   | WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+[DevSecOps Pipeline/2 Unit tests]   ✅  Success - Main Install dev dependencies [828.706625ms]
+[DevSecOps Pipeline/2 Unit tests] ⭐ Run Main Run pytest
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[DevSecOps Pipeline/2 Unit tests]   | ============================= test session starts ==============================
+[DevSecOps Pipeline/2 Unit tests]   | platform linux -- Python 3.12.15, pytest-8.4.2, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[DevSecOps Pipeline/2 Unit tests]   | cachedir: .pytest_cache
+[DevSecOps Pipeline/2 Unit tests]   | rootdir: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/2 Unit tests]   | configfile: pytest.ini
+[DevSecOps Pipeline/2 Unit tests]   | testpaths: tests
+[DevSecOps Pipeline/2 Unit tests]   | plugins: cov-7.1.0, platformdirs-4.12.3
+[DevSecOps Pipeline/2 Unit tests]   | collecting ... collected 13 items
+[DevSecOps Pipeline/2 Unit tests]   | 
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_api.py::test_health PASSED                                    [  7%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_api.py::test_write_requires_token PASSED                      [ 15%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_api.py::test_create_and_list PASSED                           [ 23%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_api.py::test_validation_error PASSED                          [ 30%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_api.py::test_no_token_configured_means_no_writes PASSED       [ 38%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_api.py::test_resolve_rejects_shell_injection PASSED           [ 46%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_api.py::test_resolve_localhost PASSED                         [ 53%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_notes.py::test_add_and_search_by_tag PASSED                   [ 61%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_notes.py::test_tags_are_deduplicated_and_sorted PASSED        [ 69%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_notes.py::test_bad_titles_rejected[] PASSED                   [ 76%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_notes.py::test_bad_titles_rejected[   ] PASSED                [ 84%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_notes.py::test_bad_titles_rejected[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] PASSED [ 92%]
+[DevSecOps Pipeline/2 Unit tests]   | tests/test_notes.py::test_bad_tag_rejected PASSED                        [100%]
+[DevSecOps Pipeline/2 Unit tests]   | 
+[DevSecOps Pipeline/2 Unit tests]   | - generated xml file: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/reports/junit.xml -
+[DevSecOps Pipeline/2 Unit tests]   | ================================ tests coverage ================================
+[DevSecOps Pipeline/2 Unit tests]   | _______________ coverage: platform linux, python 3.12.15-final-0 _______________
+[DevSecOps Pipeline/2 Unit tests]   | 
+[DevSecOps Pipeline/2 Unit tests]   | Name              Stmts   Miss  Cover   Missing
+[DevSecOps Pipeline/2 Unit tests]   | -----------------------------------------------
+[DevSecOps Pipeline/2 Unit tests]   | app/__init__.py       1      0   100%
+[DevSecOps Pipeline/2 Unit tests]   | app/main.py          48      4    92%   26, 57-58, 68
+[DevSecOps Pipeline/2 Unit tests]   | app/notes.py         24      1    96%   19
+[DevSecOps Pipeline/2 Unit tests]   | -----------------------------------------------
+[DevSecOps Pipeline/2 Unit tests]   | TOTAL                73      5    93%
+[DevSecOps Pipeline/2 Unit tests]   | ============================== 13 passed in 0.36s ==============================
+[DevSecOps Pipeline/2 Unit tests]   ✅  Success - Main Run pytest [964.310333ms]
+[DevSecOps Pipeline/2 Unit tests] ⭐ Run Main Upload test report
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[DevSecOps Pipeline/2 Unit tests]   | (node:73) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/2 Unit tests]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/2 Unit tests]   | With the provided path, there will be 1 file uploaded
+[DevSecOps Pipeline/2 Unit tests]   | Artifact name is valid!
+[DevSecOps Pipeline/2 Unit tests]   | Root directory input is valid!
+[DevSecOps Pipeline/2 Unit tests]   | Beginning upload of artifact content to blob storage
+[DevSecOps Pipeline/2 Unit tests]   | (node:73) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+[DevSecOps Pipeline/2 Unit tests]   | Uploaded bytes 511
+[DevSecOps Pipeline/2 Unit tests]   | Finished uploading artifact content to blob storage!
+[DevSecOps Pipeline/2 Unit tests]   | SHA256 digest of uploaded artifact zip is db6777be437329a788f56d9858c9b973319d5d10c38a93e03426e371dc6dbc7e
+[DevSecOps Pipeline/2 Unit tests]   | Finalizing artifact upload
+[DevSecOps Pipeline/2 Unit tests]   | Artifact test-report.zip successfully finalized. Artifact ID 3137584898
+[DevSecOps Pipeline/2 Unit tests]   | Artifact test-report has been successfully uploaded! Final size is 511 bytes. Artifact ID is 3137584898
+[DevSecOps Pipeline/2 Unit tests]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/3137584898
+[DevSecOps Pipeline/2 Unit tests]   ✅  Success - Main Upload test report [803.44575ms]
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-output:: artifact-id=3137584898
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-output:: artifact-digest=db6777be437329a788f56d9858c9b973319d5d10c38a93e03426e371dc6dbc7e
+[DevSecOps Pipeline/2 Unit tests]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/3137584898
+[DevSecOps Pipeline/2 Unit tests] ⭐ Run Post Set up Python
+[DevSecOps Pipeline/2 Unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/cache-save/index.js] user= workdir=
+[DevSecOps Pipeline/2 Unit tests]   | (node:90) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/2 Unit tests]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/2 Unit tests]   ✅  Success - Post Set up Python [165.811625ms]
+[DevSecOps Pipeline/2 Unit tests] ⭐ Run Complete job
+[DevSecOps Pipeline/2 Unit tests] Cleaning up container for job 2 Unit tests
+[DevSecOps Pipeline/2 Unit tests]   ✅  Success - Complete job
+[DevSecOps Pipeline/2 Unit tests] 🏁  Job succeeded
+[DevSecOps Pipeline/3 SAST (Bandit)] ⭐ Run Set up job
+[DevSecOps Pipeline/3 SAST (Bandit)] 🚀  Start image=catthehacker/ubuntu:act-latest
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[DevSecOps Pipeline/3 SAST (Bandit)]   ✅  Success - Set up job
+[DevSecOps Pipeline/3 SAST (Bandit)]   ☁  git clone 'https://github.com/actions/setup-python' # ref=v5
+[DevSecOps Pipeline/3 SAST (Bandit)]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[DevSecOps Pipeline/3 SAST (Bandit)] ⭐ Run Main Checkout
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/3 SAST (Bandit)]   ✅  Success - Main Checkout [27.372417ms]
+[DevSecOps Pipeline/3 SAST (Bandit)] ⭐ Run Main Set up Python
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-python@v5/ dst=/var/run/act/actions/actions-setup-python@v5/
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/setup/index.js] user= workdir=
+[DevSecOps Pipeline/3 SAST (Bandit)]   ❓  ::group::Installed versions
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Successfully set up CPython (3.12.15)
+[DevSecOps Pipeline/3 SAST (Bandit)]   ❓  ::endgroup::
+[DevSecOps Pipeline/3 SAST (Bandit)]   ❓ add-matcher /run/act/actions/actions-setup-python@v5/.github/python.json
+[DevSecOps Pipeline/3 SAST (Bandit)]   | (node:30) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/3 SAST (Bandit)]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/3 SAST (Bandit)]   ✅  Success - Main Set up Python [886.381833ms]
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-env:: Python3_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-env:: LD_LIBRARY_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-env:: pythonLocation=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-env:: PKG_CONFIG_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib/pkgconfig
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-env:: Python_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-env:: Python2_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-output:: python-version=3.12.15
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-output:: python-path=/opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64/bin
+[DevSecOps Pipeline/3 SAST (Bandit)] ⭐ Run Main Install Bandit
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Requirement already satisfied: bandit==1.8.6 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (1.8.6)
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Requirement already satisfied: PyYAML>=5.3.1 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from bandit==1.8.6) (6.0.3)
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Requirement already satisfied: stevedore>=1.20.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from bandit==1.8.6) (5.9.1)
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Requirement already satisfied: rich in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from bandit==1.8.6) (15.0.0)
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from rich->bandit==1.8.6) (4.2.0)
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from rich->bandit==1.8.6) (2.21.0)
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Requirement already satisfied: mdurl~=0.1 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from markdown-it-py>=2.2.0->rich->bandit==1.8.6) (0.1.2)
+[DevSecOps Pipeline/3 SAST (Bandit)]   | WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+[DevSecOps Pipeline/3 SAST (Bandit)]   ✅  Success - Main Install Bandit [873.714625ms]
+[DevSecOps Pipeline/3 SAST (Bandit)] ⭐ Run Main Run Bandit
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Bandit findings:
+[DevSecOps Pipeline/3 SAST (Bandit)]   |   totals: HIGH=0 MEDIUM=0 LOW=0
+[DevSecOps Pipeline/3 SAST (Bandit)]   ✅  Success - Main Run Bandit [292.989625ms]
+[DevSecOps Pipeline/3 SAST (Bandit)] ⭐ Run Main Upload SAST report
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[DevSecOps Pipeline/3 SAST (Bandit)]   | (node:77) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/3 SAST (Bandit)]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/3 SAST (Bandit)]   | With the provided path, there will be 1 file uploaded
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Artifact name is valid!
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Root directory input is valid!
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Beginning upload of artifact content to blob storage
+[DevSecOps Pipeline/3 SAST (Bandit)]   | (node:77) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Uploaded bytes 380
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Finished uploading artifact content to blob storage!
+[DevSecOps Pipeline/3 SAST (Bandit)]   | SHA256 digest of uploaded artifact zip is d8655d3837bd1f7776838f5dc5b74bcd66a920e4ea281067e0ef7c4a7a083eeb
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Finalizing artifact upload
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Artifact report-sast.zip successfully finalized. Artifact ID 862344689
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Artifact report-sast has been successfully uploaded! Final size is 380 bytes. Artifact ID is 862344689
+[DevSecOps Pipeline/3 SAST (Bandit)]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/862344689
+[DevSecOps Pipeline/3 SAST (Bandit)]   ✅  Success - Main Upload SAST report [605.02925ms]
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-output:: artifact-id=862344689
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-output:: artifact-digest=d8655d3837bd1f7776838f5dc5b74bcd66a920e4ea281067e0ef7c4a7a083eeb
+[DevSecOps Pipeline/3 SAST (Bandit)]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/862344689
+[DevSecOps Pipeline/3 SAST (Bandit)] ⭐ Run Post Set up Python
+[DevSecOps Pipeline/3 SAST (Bandit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/cache-save/index.js] user= workdir=
+[DevSecOps Pipeline/3 SAST (Bandit)]   | (node:94) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/3 SAST (Bandit)]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/3 SAST (Bandit)]   ✅  Success - Post Set up Python [223.963333ms]
+[DevSecOps Pipeline/3 SAST (Bandit)] ⭐ Run Complete job
+[DevSecOps Pipeline/3 SAST (Bandit)] Cleaning up container for job 3 SAST (Bandit)
+[DevSecOps Pipeline/3 SAST (Bandit)]   ✅  Success - Complete job
+[DevSecOps Pipeline/3 SAST (Bandit)] 🏁  Job succeeded
+[DevSecOps Pipeline/4 SCA (pip-audit)] ⭐ Run Set up job
+[DevSecOps Pipeline/4 SCA (pip-audit)] 🚀  Start image=catthehacker/ubuntu:act-latest
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ✅  Success - Set up job
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ☁  git clone 'https://github.com/actions/setup-python' # ref=v5
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[DevSecOps Pipeline/4 SCA (pip-audit)] ⭐ Run Main Checkout
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ✅  Success - Main Checkout [20.381833ms]
+[DevSecOps Pipeline/4 SCA (pip-audit)] ⭐ Run Main Set up Python
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-python@v5/ dst=/var/run/act/actions/actions-setup-python@v5/
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/setup/index.js] user= workdir=
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ❓  ::group::Installed versions
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | (node:32) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Successfully set up CPython (3.12.15)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ❓  ::endgroup::
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ❓ add-matcher /run/act/actions/actions-setup-python@v5/.github/python.json
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ✅  Success - Main Set up Python [707.980709ms]
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-env:: Python3_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-env:: LD_LIBRARY_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-env:: pythonLocation=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-env:: PKG_CONFIG_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib/pkgconfig
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-env:: Python_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-env:: Python2_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-output:: python-version=3.12.15
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-output:: python-path=/opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64/bin
+[DevSecOps Pipeline/4 SCA (pip-audit)] ⭐ Run Main Install pip-audit
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: pip-audit==2.9.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (2.9.0)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: CacheControl>=0.13.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from CacheControl[filecache]>=0.13.0->pip-audit==2.9.0) (0.14.4)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: cyclonedx-python-lib<10,>=5 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pip-audit==2.9.0) (9.1.0)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: packaging>=23.0.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pip-audit==2.9.0) (26.3)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: pip-api>=0.0.28 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pip-audit==2.9.0) (0.0.35)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: pip-requirements-parser>=32.0.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pip-audit==2.9.0) (32.0.1)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: requests>=2.31.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pip-audit==2.9.0) (2.34.2)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: rich>=12.4 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pip-audit==2.9.0) (15.0.0)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: toml>=0.10 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pip-audit==2.9.0) (0.10.2)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: platformdirs>=4.2.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pip-audit==2.9.0) (4.12.3)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: license-expression<31,>=30 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from cyclonedx-python-lib<10,>=5->pip-audit==2.9.0) (30.4.4)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: packageurl-python<2,>=0.11 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from cyclonedx-python-lib<10,>=5->pip-audit==2.9.0) (0.17.6)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: py-serializable<3.0.0,>=2.0.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from cyclonedx-python-lib<10,>=5->pip-audit==2.9.0) (2.1.0)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: sortedcontainers<3.0.0,>=2.4.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from cyclonedx-python-lib<10,>=5->pip-audit==2.9.0) (2.4.0)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: boolean.py>=4.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from license-expression<31,>=30->cyclonedx-python-lib<10,>=5->pip-audit==2.9.0) (5.0)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: defusedxml<0.8.0,>=0.7.1 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from py-serializable<3.0.0,>=2.0.0->cyclonedx-python-lib<10,>=5->pip-audit==2.9.0) (0.7.1)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: msgpack<2.0.0,>=0.5.2 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from CacheControl>=0.13.0->CacheControl[filecache]>=0.13.0->pip-audit==2.9.0) (1.2.3)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: filelock>=3.8.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from CacheControl[filecache]>=0.13.0->pip-audit==2.9.0) (4.0.12)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pip-api>=0.0.28->pip-audit==2.9.0) (26.2.1)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: pyparsing in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from pip-requirements-parser>=32.0.0->pip-audit==2.9.0) (3.3.3)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: charset_normalizer<4,>=2 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from requests>=2.31.0->pip-audit==2.9.0) (3.5.2)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: idna<4,>=2.5 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from requests>=2.31.0->pip-audit==2.9.0) (3.20)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: urllib3<3,>=1.26 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from requests>=2.31.0->pip-audit==2.9.0) (2.8.0)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: certifi>=2023.5.7 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from requests>=2.31.0->pip-audit==2.9.0) (2026.7.22)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from rich>=12.4->pip-audit==2.9.0) (4.2.0)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from rich>=12.4->pip-audit==2.9.0) (2.21.0)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Requirement already satisfied: mdurl~=0.1 in /opt/hostedtoolcache/Python/3.12.15/arm64/lib/python3.12/site-packages (from markdown-it-py>=2.2.0->rich>=12.4->pip-audit==2.9.0) (0.1.2)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ✅  Success - Main Install pip-audit [845.476375ms]
+[DevSecOps Pipeline/4 SCA (pip-audit)] ⭐ Run Main Audit requirements.txt against the PyPI advisory database
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | No known vulnerabilities found
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Vulnerable dependencies:
+[DevSecOps Pipeline/4 SCA (pip-audit)]   |   total advisories: 0
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ✅  Success - Main Audit requirements.txt against the PyPI advisory database [10.817880208s]
+[DevSecOps Pipeline/4 SCA (pip-audit)] ⭐ Run Main Upload SCA report
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | (node:132) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | With the provided path, there will be 1 file uploaded
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Artifact name is valid!
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Root directory input is valid!
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Beginning upload of artifact content to blob storage
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | (node:132) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Uploaded bytes 307
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Finished uploading artifact content to blob storage!
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | SHA256 digest of uploaded artifact zip is 4727e00d55ab5bb4b7f324da8b772ac2d94242ebfdc55fbdb80f409c2a7c3daf
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Finalizing artifact upload
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Artifact report-sca.zip successfully finalized. Artifact ID 2543950051
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Artifact report-sca has been successfully uploaded! Final size is 307 bytes. Artifact ID is 2543950051
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/2543950051
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ✅  Success - Main Upload SCA report [719.241625ms]
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-output:: artifact-id=2543950051
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-output:: artifact-digest=4727e00d55ab5bb4b7f324da8b772ac2d94242ebfdc55fbdb80f409c2a7c3daf
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/2543950051
+[DevSecOps Pipeline/4 SCA (pip-audit)] ⭐ Run Post Set up Python
+[DevSecOps Pipeline/4 SCA (pip-audit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/cache-save/index.js] user= workdir=
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | (node:149) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/4 SCA (pip-audit)]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ✅  Success - Post Set up Python [171.568208ms]
+[DevSecOps Pipeline/4 SCA (pip-audit)] ⭐ Run Complete job
+[DevSecOps Pipeline/4 SCA (pip-audit)] Cleaning up container for job 4 SCA (pip-audit)
+[DevSecOps Pipeline/4 SCA (pip-audit)]   ✅  Success - Complete job
+[DevSecOps Pipeline/4 SCA (pip-audit)] 🏁  Job succeeded
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)] ⭐ Run Set up job
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)] 🚀  Start image=catthehacker/ubuntu:act-latest
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ✅  Success - Set up job
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)] ⭐ Run Main Checkout
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ✅  Success - Main Checkout [21.642792ms]
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)] ⭐ Run Main Install Gitleaks
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/1] user= workdir=
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | 8.30.1
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ✅  Success - Main Install Gitleaks [1.853308958s]
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ⚙  ::add-path:: /root/.local/bin
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)] ⭐ Run Main Scan the source tree for secrets
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | 4:56PM INF scanned ~168901 bytes (168.90 KB) in 24.4ms
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | 4:56PM INF no leaks found
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ✅  Success - Main Scan the source tree for secrets [500.095291ms]
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)] ⭐ Run Main Upload secret-scan report
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | (node:77) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | With the provided path, there will be 1 file uploaded
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | Artifact name is valid!
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | Root directory input is valid!
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | Beginning upload of artifact content to blob storage
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | (node:77) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | Uploaded bytes 145
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | Finished uploading artifact content to blob storage!
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | SHA256 digest of uploaded artifact zip is c9524696a98455420d47507aafffa426b271ed996108a7bfa81d7e589be9f203
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | Finalizing artifact upload
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | Artifact report-secrets.zip successfully finalized. Artifact ID 3564946595
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | Artifact report-secrets has been successfully uploaded! Final size is 145 bytes. Artifact ID is 3564946595
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/3564946595
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ✅  Success - Main Upload secret-scan report [759.12725ms]
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ⚙  ::set-output:: artifact-id=3564946595
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ⚙  ::set-output:: artifact-digest=c9524696a98455420d47507aafffa426b271ed996108a7bfa81d7e589be9f203
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/3564946595
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)] ⭐ Run Complete job
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)] Cleaning up container for job 5 Secret scan (Gitleaks)
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)]   ✅  Success - Complete job
+[DevSecOps Pipeline/5 Secret scan (Gitleaks)] 🏁  Job succeeded
+[DevSecOps Pipeline/6 Docker build          ] ⭐ Run Set up job
+[DevSecOps Pipeline/6 Docker build          ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[DevSecOps Pipeline/6 Docker build          ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[DevSecOps Pipeline/6 Docker build          ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/6 Docker build          ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/6 Docker build          ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[DevSecOps Pipeline/6 Docker build          ]   ✅  Success - Set up job
+[DevSecOps Pipeline/6 Docker build          ]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[DevSecOps Pipeline/6 Docker build          ] ⭐ Run Main Checkout
+[DevSecOps Pipeline/6 Docker build          ]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/6 Docker build          ]   ✅  Success - Main Checkout [14.979208ms]
+[DevSecOps Pipeline/6 Docker build          ] ⭐ Run Main Build image
+[DevSecOps Pipeline/6 Docker build          ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/1] user= workdir=
+[DevSecOps Pipeline/6 Docker build          ]   | #0 building with "default" instance using docker driver
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #1 [internal] load build definition from Dockerfile
+[DevSecOps Pipeline/6 Docker build          ]   | #1 transferring dockerfile: 472B done
+[DevSecOps Pipeline/6 Docker build          ]   | #1 DONE 0.0s
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #2 [internal] load metadata for docker.io/library/python:3.12-alpine
+[DevSecOps Pipeline/6 Docker build          ]   | #2 DONE 0.0s
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #3 [internal] load .dockerignore
+[DevSecOps Pipeline/6 Docker build          ]   | #3 transferring context: 122B done
+[DevSecOps Pipeline/6 Docker build          ]   | #3 DONE 0.0s
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #4 [internal] load build context
+[DevSecOps Pipeline/6 Docker build          ]   | #4 transferring context: 3.51kB done
+[DevSecOps Pipeline/6 Docker build          ]   | #4 DONE 0.0s
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #5 [1/6] FROM docker.io/library/python:3.12-alpine@sha256:1b668429b3511ab407d8e00648891631b0b1a4d7e15e3ca70f38ab5b91ad4ab4
+[DevSecOps Pipeline/6 Docker build          ]   | #5 resolve docker.io/library/python:3.12-alpine@sha256:1b668429b3511ab407d8e00648891631b0b1a4d7e15e3ca70f38ab5b91ad4ab4 0.0s done
+[DevSecOps Pipeline/6 Docker build          ]   | #5 DONE 0.1s
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #6 [2/6] WORKDIR /srv
+[DevSecOps Pipeline/6 Docker build          ]   | #6 DONE 0.0s
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #7 [3/6] COPY requirements.txt .
+[DevSecOps Pipeline/6 Docker build          ]   | #7 DONE 0.0s
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #8 [4/6] RUN pip install --no-cache-dir -r requirements.txt
+[DevSecOps Pipeline/6 Docker build          ]   | #8 2.627 Collecting Flask==3.1.3 (from -r requirements.txt (line 1))
+[DevSecOps Pipeline/6 Docker build          ]   | #8 2.747   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 2.834 Collecting Werkzeug==3.1.9 (from -r requirements.txt (line 2))
+[DevSecOps Pipeline/6 Docker build          ]   | #8 2.863   Downloading werkzeug-3.1.9-py3-none-any.whl.metadata (4.1 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 2.930 Collecting gunicorn==23.0.0 (from -r requirements.txt (line 3))
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.026   Downloading gunicorn-23.0.0-py3-none-any.whl.metadata (4.4 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.132 Collecting blinker>=1.9.0 (from Flask==3.1.3->-r requirements.txt (line 1))
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.154   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.236 Collecting click>=8.1.3 (from Flask==3.1.3->-r requirements.txt (line 1))
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.256   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.349 Collecting itsdangerous>=2.2.0 (from Flask==3.1.3->-r requirements.txt (line 1))
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.370   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.445 Collecting jinja2>=3.1.2 (from Flask==3.1.3->-r requirements.txt (line 1))
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.470   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.670 Collecting markupsafe>=2.1.1 (from Flask==3.1.3->-r requirements.txt (line 1))
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.744   Downloading markupsafe-3.0.4-cp312-cp312-musllinux_1_2_aarch64.whl.metadata (2.7 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.777 Collecting packaging (from gunicorn==23.0.0->-r requirements.txt (line 3))
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.847   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.875 Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 3.972 Downloading werkzeug-3.1.9-py3-none-any.whl (228 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 4.072 Downloading gunicorn-23.0.0-py3-none-any.whl (85 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 4.163 Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 4.191 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 4.253 Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 4.276 Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 4.356 Downloading markupsafe-3.0.4-cp312-cp312-musllinux_1_2_aarch64.whl (23 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 4.384 Downloading packaging-26.3-py3-none-any.whl (129 kB)
+[DevSecOps Pipeline/6 Docker build          ]   | #8 4.431 Installing collected packages: packaging, markupsafe, itsdangerous, click, blinker, Werkzeug, jinja2, gunicorn, Flask
+[DevSecOps Pipeline/6 Docker build          ]   | #8 5.609 Successfully installed Flask-3.1.3 Werkzeug-3.1.9 blinker-1.9.0 click-8.5.0 gunicorn-23.0.0 itsdangerous-2.2.0 jinja2-3.1.6 markupsafe-3.0.4 packaging-26.3
+[DevSecOps Pipeline/6 Docker build          ]   | #8 5.610 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+[DevSecOps Pipeline/6 Docker build          ]   | #8 5.943 
+[DevSecOps Pipeline/6 Docker build          ]   | #8 5.943 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[DevSecOps Pipeline/6 Docker build          ]   | #8 5.943 [notice] To update, run: pip install --upgrade pip
+[DevSecOps Pipeline/6 Docker build          ]   | #8 DONE 6.3s
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #9 [5/6] COPY app ./app
+[DevSecOps Pipeline/6 Docker build          ]   | #9 DONE 0.1s
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #10 [6/6] RUN adduser -D -u 10001 appuser
+[DevSecOps Pipeline/6 Docker build          ]   | #10 DONE 0.4s
+[DevSecOps Pipeline/6 Docker build          ]   | 
+[DevSecOps Pipeline/6 Docker build          ]   | #11 exporting to image
+[DevSecOps Pipeline/6 Docker build          ]   | #11 exporting layers
+[DevSecOps Pipeline/6 Docker build          ]   | #11 exporting layers 1.4s done
+[DevSecOps Pipeline/6 Docker build          ]   | #11 exporting manifest sha256:36d6c7390f88529ac642690431bb0defad9117fc23941ee3829385d4434d5ade 0.0s done
+[DevSecOps Pipeline/6 Docker build          ]   | #11 exporting config sha256:18dd614d9e71eb2d6afa0ff8f1028fb6557c8f6609051c54f839d0c15292b4d3 0.0s done
+[DevSecOps Pipeline/6 Docker build          ]   | #11 exporting attestation manifest sha256:456819375449b6b7ce0715f0924f55aad0dc9db25957a6e25f446be27f8de7cf 0.0s done
+[DevSecOps Pipeline/6 Docker build          ]   | #11 exporting manifest list sha256:0dec2a7be8e59a7035c5db3fe79ff9902b41fefb4aac720ecd4aba460fc3da7f 0.0s done
+[DevSecOps Pipeline/6 Docker build          ]   | #11 naming to docker.io/library/secure-notes:ci done
+[DevSecOps Pipeline/6 Docker build          ]   | #11 unpacking to docker.io/library/secure-notes:ci
+[DevSecOps Pipeline/6 Docker build          ]   | #11 unpacking to docker.io/library/secure-notes:ci 0.9s done
+[DevSecOps Pipeline/6 Docker build          ]   | #11 DONE 2.4s
+[DevSecOps Pipeline/6 Docker build          ]   | IMAGE             ID             DISK USAGE   CONTENT SIZE   EXTRA
+[DevSecOps Pipeline/6 Docker build          ]   | secure-notes:ci   0dec2a7be8e5        111MB           27MB        
+[DevSecOps Pipeline/6 Docker build          ]   ✅  Success - Main Build image [10.33137025s]
+[DevSecOps Pipeline/6 Docker build          ] ⭐ Run Main Save image for the next jobs
+[DevSecOps Pipeline/6 Docker build          ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[DevSecOps Pipeline/6 Docker build          ]   ✅  Success - Main Save image for the next jobs [1.626692958s]
+[DevSecOps Pipeline/6 Docker build          ] ⭐ Run Main Upload image artifact
+[DevSecOps Pipeline/6 Docker build          ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[DevSecOps Pipeline/6 Docker build          ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[DevSecOps Pipeline/6 Docker build          ]   | (node:108) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/6 Docker build          ]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/6 Docker build          ]   | With the provided path, there will be 1 file uploaded
+[DevSecOps Pipeline/6 Docker build          ]   | Artifact name is valid!
+[DevSecOps Pipeline/6 Docker build          ]   | Root directory input is valid!
+[DevSecOps Pipeline/6 Docker build          ]   | Beginning upload of artifact content to blob storage
+[DevSecOps Pipeline/6 Docker build          ]   | (node:108) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+[DevSecOps Pipeline/6 Docker build          ]   | Uploaded bytes 8388608
+[DevSecOps Pipeline/6 Docker build          ]   | Uploaded bytes 16777216
+[DevSecOps Pipeline/6 Docker build          ]   | Uploaded bytes 25165824
+[DevSecOps Pipeline/6 Docker build          ]   | Uploaded bytes 26851487
+[DevSecOps Pipeline/6 Docker build          ]   | Finished uploading artifact content to blob storage!
+[DevSecOps Pipeline/6 Docker build          ]   | SHA256 digest of uploaded artifact zip is 6a9e406be17c3e599376fbfc4c4e4ef43eb74869c904b94c6b8c183395abf403
+[DevSecOps Pipeline/6 Docker build          ]   | Finalizing artifact upload
+[DevSecOps Pipeline/6 Docker build          ]   | Artifact image.zip successfully finalized. Artifact ID 3008443898
+[DevSecOps Pipeline/6 Docker build          ]   | Artifact image has been successfully uploaded! Final size is 26851487 bytes. Artifact ID is 3008443898
+[DevSecOps Pipeline/6 Docker build          ]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/3008443898
+[DevSecOps Pipeline/6 Docker build          ]   ✅  Success - Main Upload image artifact [3.064126s]
+[DevSecOps Pipeline/6 Docker build          ]   ⚙  ::set-output:: artifact-id=3008443898
+[DevSecOps Pipeline/6 Docker build          ]   ⚙  ::set-output:: artifact-digest=6a9e406be17c3e599376fbfc4c4e4ef43eb74869c904b94c6b8c183395abf403
+[DevSecOps Pipeline/6 Docker build          ]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/3008443898
+[DevSecOps Pipeline/6 Docker build          ] ⭐ Run Complete job
+[DevSecOps Pipeline/6 Docker build          ] Cleaning up container for job 6 Docker build
+[DevSecOps Pipeline/6 Docker build          ]   ✅  Success - Complete job
+[DevSecOps Pipeline/6 Docker build          ] 🏁  Job succeeded
+[DevSecOps Pipeline/7 Image scan (Trivy)    ] ⭐ Run Set up job
+[DevSecOps Pipeline/7 Image scan (Trivy)    ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ✅  Success - Set up job
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ☁  git clone 'https://github.com/actions/download-artifact' # ref=v4
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[DevSecOps Pipeline/7 Image scan (Trivy)    ] ⭐ Run Main Checkout
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ✅  Success - Main Checkout [42.462584ms]
+[DevSecOps Pipeline/7 Image scan (Trivy)    ] ⭐ Run Main Download image artifact
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-download-artifact@v4/ dst=/var/run/act/actions/actions-download-artifact@v4/
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-download-artifact@v4/dist/index.js] user= workdir=
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Downloading single artifact
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | (node:31) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Preparing to download the following artifacts:
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | - image (ID: 3008443898, Size: 96, Expected Digest: undefined)
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Starting download of artifact to: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | (node:31) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | SHA256 digest of downloaded artifact is 6a9e406be17c3e599376fbfc4c4e4ef43eb74869c904b94c6b8c183395abf403
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Artifact download completed successfully.
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Total of 1 artifact(s) downloaded
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Download artifact has finished successfully
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ✅  Success - Main Download image artifact [2.114003958s]
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ⚙  ::set-output:: download-path=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/7 Image scan (Trivy)    ] ⭐ Run Main Install Trivy
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | 2026-10-07T16:57:00Z	INFO	Loaded	file_path="trivy.yaml"
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Version: 0.75.0
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ✅  Success - Main Install Trivy [22.388637s]
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ⚙  ::add-path:: /root/.local/bin
+[DevSecOps Pipeline/7 Image scan (Trivy)    ] ⭐ Run Main Scan image (OS packages + Python packages)
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   |   target: image.tar (alpine 3.24.2) (alpine) -> 0 HIGH/CRITICAL
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   |   target: Python (python-pkg) -> 0 HIGH/CRITICAL
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   |   by severity:
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ✅  Success - Main Scan image (OS packages + Python packages) [59.902772417s]
+[DevSecOps Pipeline/7 Image scan (Trivy)    ] ⭐ Run Main Upload image-scan report
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | (node:99) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | With the provided path, there will be 1 file uploaded
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Artifact name is valid!
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Root directory input is valid!
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Beginning upload of artifact content to blob storage
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | (node:99) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Uploaded bytes 15962
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Finished uploading artifact content to blob storage!
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | SHA256 digest of uploaded artifact zip is 992e9d86d1bd74946acbdbd6f1c3a879eb003f0c8fd29a07c36e00f79025cb76
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Finalizing artifact upload
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Artifact report-image.zip successfully finalized. Artifact ID 1329040791
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Artifact report-image has been successfully uploaded! Final size is 15962 bytes. Artifact ID is 1329040791
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/1329040791
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ✅  Success - Main Upload image-scan report [846.272209ms]
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ⚙  ::set-output:: artifact-id=1329040791
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ⚙  ::set-output:: artifact-digest=992e9d86d1bd74946acbdbd6f1c3a879eb003f0c8fd29a07c36e00f79025cb76
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/1329040791
+[DevSecOps Pipeline/7 Image scan (Trivy)    ] ⭐ Run Complete job
+[DevSecOps Pipeline/7 Image scan (Trivy)    ] Cleaning up container for job 7 Image scan (Trivy)
+[DevSecOps Pipeline/7 Image scan (Trivy)    ]   ✅  Success - Complete job
+[DevSecOps Pipeline/7 Image scan (Trivy)    ] 🏁  Job succeeded
+[DevSecOps Pipeline/8 Security gate         ] ⭐ Run Set up job
+[DevSecOps Pipeline/8 Security gate         ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[DevSecOps Pipeline/8 Security gate         ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[DevSecOps Pipeline/8 Security gate         ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/8 Security gate         ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/8 Security gate         ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[DevSecOps Pipeline/8 Security gate         ]   ✅  Success - Set up job
+[DevSecOps Pipeline/8 Security gate         ]   ☁  git clone 'https://github.com/actions/download-artifact' # ref=v4
+[DevSecOps Pipeline/8 Security gate         ] ⭐ Run Main Checkout
+[DevSecOps Pipeline/8 Security gate         ]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/8 Security gate         ]   ✅  Success - Main Checkout [22.683791ms]
+[DevSecOps Pipeline/8 Security gate         ] ⭐ Run Main Collect all scanner reports
+[DevSecOps Pipeline/8 Security gate         ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-download-artifact@v4/ dst=/var/run/act/actions/actions-download-artifact@v4/
+[DevSecOps Pipeline/8 Security gate         ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-download-artifact@v4/dist/index.js] user= workdir=
+[DevSecOps Pipeline/8 Security gate         ]   | (node:31) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/8 Security gate         ]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/8 Security gate         ]   | Found 7 artifact(s)
+[DevSecOps Pipeline/8 Security gate         ]   | Filtering artifacts by pattern 'report-*'
+[DevSecOps Pipeline/8 Security gate         ]   | Preparing to download the following artifacts:
+[DevSecOps Pipeline/8 Security gate         ]   | - report-secrets (ID: 3564946595, Size: 96, Expected Digest: undefined)
+[DevSecOps Pipeline/8 Security gate         ]   | - report-sca (ID: 2543950051, Size: 96, Expected Digest: undefined)
+[DevSecOps Pipeline/8 Security gate         ]   | - report-image (ID: 1329040791, Size: 96, Expected Digest: undefined)
+[DevSecOps Pipeline/8 Security gate         ]   | - report-sast (ID: 862344689, Size: 96, Expected Digest: undefined)
+[DevSecOps Pipeline/8 Security gate         ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[DevSecOps Pipeline/8 Security gate         ]   | Starting download of artifact to: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/reports
+[DevSecOps Pipeline/8 Security gate         ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[DevSecOps Pipeline/8 Security gate         ]   | Starting download of artifact to: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/reports
+[DevSecOps Pipeline/8 Security gate         ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[DevSecOps Pipeline/8 Security gate         ]   | Starting download of artifact to: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/reports
+[DevSecOps Pipeline/8 Security gate         ]   | (node:31) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+[DevSecOps Pipeline/8 Security gate         ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[DevSecOps Pipeline/8 Security gate         ]   | Starting download of artifact to: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/reports
+[DevSecOps Pipeline/8 Security gate         ]   | SHA256 digest of downloaded artifact is c9524696a98455420d47507aafffa426b271ed996108a7bfa81d7e589be9f203
+[DevSecOps Pipeline/8 Security gate         ]   | Artifact download completed successfully.
+[DevSecOps Pipeline/8 Security gate         ]   | SHA256 digest of downloaded artifact is 4727e00d55ab5bb4b7f324da8b772ac2d94242ebfdc55fbdb80f409c2a7c3daf
+[DevSecOps Pipeline/8 Security gate         ]   | Artifact download completed successfully.
+[DevSecOps Pipeline/8 Security gate         ]   | SHA256 digest of downloaded artifact is d8655d3837bd1f7776838f5dc5b74bcd66a920e4ea281067e0ef7c4a7a083eeb
+[DevSecOps Pipeline/8 Security gate         ]   | Artifact download completed successfully.
+[DevSecOps Pipeline/8 Security gate         ]   | SHA256 digest of downloaded artifact is 992e9d86d1bd74946acbdbd6f1c3a879eb003f0c8fd29a07c36e00f79025cb76
+[DevSecOps Pipeline/8 Security gate         ]   | Artifact download completed successfully.
+[DevSecOps Pipeline/8 Security gate         ]   | Total of 4 artifact(s) downloaded
+[DevSecOps Pipeline/8 Security gate         ]   | Download artifact has finished successfully
+[DevSecOps Pipeline/8 Security gate         ]   ✅  Success - Main Collect all scanner reports [646.462875ms]
+[DevSecOps Pipeline/8 Security gate         ]   ⚙  ::set-output:: download-path=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/reports
+[DevSecOps Pipeline/8 Security gate         ] ⭐ Run Main Apply security policy (security/gate-policy.json)
+[DevSecOps Pipeline/8 Security gate         ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[DevSecOps Pipeline/8 Security gate         ]   | bandit.json
+[DevSecOps Pipeline/8 Security gate         ]   | gitleaks.json
+[DevSecOps Pipeline/8 Security gate         ]   | pip-audit.json
+[DevSecOps Pipeline/8 Security gate         ]   | trivy-image.json
+[DevSecOps Pipeline/8 Security gate         ]   | [PASS] SAST        (bandit): 0 blocking, 0 below threshold
+[DevSecOps Pipeline/8 Security gate         ]   | [PASS] SCA         (pip-audit): 0 blocking, 0 below threshold
+[DevSecOps Pipeline/8 Security gate         ]   | [PASS] Secret scan (gitleaks): 0 blocking, 0 below threshold
+[DevSecOps Pipeline/8 Security gate         ]   | [PASS] Image scan  (trivy): 0 blocking, 0 below threshold
+[DevSecOps Pipeline/8 Security gate         ]   | 
+[DevSecOps Pipeline/8 Security gate         ]   | SECURITY GATE: PASS - image may be pushed and deployed
+[DevSecOps Pipeline/8 Security gate         ]   ✅  Success - Main Apply security policy (security/gate-policy.json) [207.467292ms]
+[DevSecOps Pipeline/8 Security gate         ]   ⚙  Summary - ## Security gate
+
+| Check | Tool | Result | Blocking | Below threshold |
+|---|---|---|---|---|
+| SAST | bandit | PASS | 0 | 0 |
+| SCA | pip-audit | PASS | 0 | 0 |
+| Secret scan | gitleaks | PASS | 0 | 0 |
+| Image scan | trivy | PASS | 0 | 0 |
+
+**PASS - image may be pushed and deployed**
+[DevSecOps Pipeline/8 Security gate         ] ⭐ Run Complete job
+[DevSecOps Pipeline/8 Security gate         ] Cleaning up container for job 8 Security gate
+[DevSecOps Pipeline/8 Security gate         ]   ✅  Success - Complete job
+[DevSecOps Pipeline/8 Security gate         ] 🏁  Job succeeded
+[DevSecOps Pipeline/9 Push image            ] ⭐ Run Set up job
+[DevSecOps Pipeline/9 Push image            ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[DevSecOps Pipeline/9 Push image            ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[DevSecOps Pipeline/9 Push image            ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/9 Push image            ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/9 Push image            ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[DevSecOps Pipeline/9 Push image            ]   ✅  Success - Set up job
+[DevSecOps Pipeline/9 Push image            ]   ☁  git clone 'https://github.com/actions/download-artifact' # ref=v4
+[DevSecOps Pipeline/9 Push image            ] ⭐ Run Main Download the scanned image (exactly what passed the gate)
+[DevSecOps Pipeline/9 Push image            ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-download-artifact@v4/ dst=/var/run/act/actions/actions-download-artifact@v4/
+[DevSecOps Pipeline/9 Push image            ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-download-artifact@v4/dist/index.js] user= workdir=
+[DevSecOps Pipeline/9 Push image            ]   | Downloading single artifact
+[DevSecOps Pipeline/9 Push image            ]   | (node:30) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[DevSecOps Pipeline/9 Push image            ]   | (Use `node --trace-deprecation ...` to show where the warning was created)
+[DevSecOps Pipeline/9 Push image            ]   | Preparing to download the following artifacts:
+[DevSecOps Pipeline/9 Push image            ]   | - image (ID: 3008443898, Size: 96, Expected Digest: undefined)
+[DevSecOps Pipeline/9 Push image            ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[DevSecOps Pipeline/9 Push image            ]   | Starting download of artifact to: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/9 Push image            ]   | (node:30) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+[DevSecOps Pipeline/9 Push image            ]   | SHA256 digest of downloaded artifact is 6a9e406be17c3e599376fbfc4c4e4ef43eb74869c904b94c6b8c183395abf403
+[DevSecOps Pipeline/9 Push image            ]   | Artifact download completed successfully.
+[DevSecOps Pipeline/9 Push image            ]   | Total of 1 artifact(s) downloaded
+[DevSecOps Pipeline/9 Push image            ]   | Download artifact has finished successfully
+[DevSecOps Pipeline/9 Push image            ]   ✅  Success - Main Download the scanned image (exactly what passed the gate) [891.649708ms]
+[DevSecOps Pipeline/9 Push image            ]   ⚙  ::set-output:: download-path=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/9 Push image            ] ⭐ Run Main Log in to registry
+[DevSecOps Pipeline/9 Push image            ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/1] user= workdir=
+[DevSecOps Pipeline/9 Push image            ]   | Login Succeeded
+[DevSecOps Pipeline/9 Push image            ]   | 
+[DevSecOps Pipeline/9 Push image            ]   | WARNING! Your credentials are stored unencrypted in '/root/.docker/config.json'.
+[DevSecOps Pipeline/9 Push image            ]   | Configure a credential helper to remove this warning. See
+[DevSecOps Pipeline/9 Push image            ]   | https://docs.docker.com/go/credential-store/
+[DevSecOps Pipeline/9 Push image            ]   | 
+[DevSecOps Pipeline/9 Push image            ]   ✅  Success - Main Log in to registry [136.271625ms]
+[DevSecOps Pipeline/9 Push image            ] ⭐ Run Main Tag and push
+[DevSecOps Pipeline/9 Push image            ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/push] user= workdir=
+[DevSecOps Pipeline/9 Push image            ]   | Loaded image: secure-notes:ci
+[DevSecOps Pipeline/9 Push image            ]   | The push refers to repository [localhost:5050/ajij/secure-notes]
+[DevSecOps Pipeline/9 Push image            ]   | c11749585dbd: Pushed
+[DevSecOps Pipeline/9 Push image            ]   | 32bef0b52008: Pushed
+[DevSecOps Pipeline/9 Push image            ]   | 4f4fb700ef54: Mounted from ajij/task-tracker
+[DevSecOps Pipeline/9 Push image            ]   | 3a3c95b3d08b: Pushed
+[DevSecOps Pipeline/9 Push image            ]   | cacd4c342fb7: Pushed
+[DevSecOps Pipeline/9 Push image            ]   | 93a691735fbc: Pushed
+[DevSecOps Pipeline/9 Push image            ]   | a9986cd6f37d: Pushed
+[DevSecOps Pipeline/9 Push image            ]   | 08693f0e5690: Pushed
+[DevSecOps Pipeline/9 Push image            ]   | 3cfca739ef45: Pushed
+[DevSecOps Pipeline/9 Push image            ]   | 776bdb191e7f: Pushed
+[DevSecOps Pipeline/9 Push image            ]   | 0c16aa7: digest: sha256:0dec2a7be8e59a7035c5db3fe79ff9902b41fefb4aac720ecd4aba460fc3da7f size: 856
+[DevSecOps Pipeline/9 Push image            ]   ✅  Success - Main Tag and push [489.429ms]
+[DevSecOps Pipeline/9 Push image            ]   ⚙  ::set-output:: image=localhost:5050/ajij/secure-notes:0c16aa7
+[DevSecOps Pipeline/9 Push image            ] ⭐ Run Complete job
+[DevSecOps Pipeline/9 Push image            ] Cleaning up container for job 9 Push image
+[DevSecOps Pipeline/9 Push image            ]   ✅  Success - Complete job
+[DevSecOps Pipeline/9 Push image            ] 🏁  Job succeeded
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] ⭐ Run Set up job
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   ✅  Success - Set up job
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] ⭐ Run Main Checkout
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   🐳  docker cp src=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps/. dst=/Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/DevSecOps
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   ✅  Success - Main Checkout [11.501ms]
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] ⭐ Run Main Install kubectl
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/1] user= workdir=
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | Client Version: v1.37.0
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | Kustomize Version: v5.8.1
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   ✅  Success - Main Install kubectl [23.862579542s]
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   ⚙  ::add-path:: /root/.local/bin
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] ⭐ Run Main Configure cluster access from the KUBE_CONFIG secret
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | NAME                      STATUS   ROLES           AGE   VERSION
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | ajij-cicd-control-plane   Ready    control-plane   17m   v1.37.0
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   ✅  Success - Main Configure cluster access from the KUBE_CONFIG secret [145.047916ms]
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] ⭐ Run Main Create namespace and secrets
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | namespace/secure-notes created
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | secret/regcred created
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | secret/secure-notes-api created
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   ✅  Success - Main Create namespace and secrets [257.590458ms]
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] ⭐ Run Main Deploy
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/4] user= workdir=
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | 23:          image: localhost:5050/ajij/secure-notes:0c16aa7                    # replaced by the pipeline with registry/name:<git-sha>
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | deployment.apps/secure-notes created
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | service/secure-notes created
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | Waiting for deployment "secure-notes" rollout to finish: 0 of 2 updated replicas are available...
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | Waiting for deployment "secure-notes" rollout to finish: 1 of 2 updated replicas are available...
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | deployment "secure-notes" successfully rolled out
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   ✅  Success - Main Deploy [7.91761225s]
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] ⭐ Run Main Smoke test
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/5] user= workdir=
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | {"status":"ok"}
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | 
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | {"build":"0c16aa7","pod":"secure-notes-6c8dcd78fd-wq9tz","service":"secure-notes","version":"1.0.0"}
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | 
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | write without token -> 401
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | {"body":"","id":1,"tags":["devsecops"],"title":"deployed by the pipeline"}
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | 
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | NAME                           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                                     SELECTOR
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | deployment.apps/secure-notes   2/2     2            2           12s   app          localhost:5050/ajij/secure-notes:0c16aa7   app=secure-notes
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | 
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | NAME                                READY   STATUS    RESTARTS   AGE   IP           NODE                      NOMINATED NODE   READINESS GATES
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | pod/secure-notes-6c8dcd78fd-hqlzg   1/1     Running   0          12s   10.244.0.7   ajij-cicd-control-plane   <none>           <none>
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | pod/secure-notes-6c8dcd78fd-wq9tz   1/1     Running   0          12s   10.244.0.6   ajij-cicd-control-plane   <none>           <none>
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | 
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | NAME                   TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE   SELECTOR
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   | service/secure-notes   ClusterIP   10.96.29.143   <none>        80/TCP    12s   app=secure-notes
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   ✅  Success - Main Smoke test [3.474803916s]
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] ⭐ Run Complete job
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] Cleaning up container for job 10 Deploy to Kubernetes
+[DevSecOps Pipeline/10 Deploy to Kubernetes ]   ✅  Success - Complete job
+[DevSecOps Pipeline/10 Deploy to Kubernetes ] 🏁  Job succeeded
+### exit code: 0

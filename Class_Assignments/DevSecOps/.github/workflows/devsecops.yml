@@ -1,0 +1,299 @@
+# DevSecOps pipeline for the Secure Notes API
+#
+#   build -> unit-test -> sast -> sca -> secret-scan -> docker-build -> image-scan
+#         -> security-gate -> push-image -> deploy (Kubernetes)
+#
+# The scanners only REPORT (JSON reports uploaded as artifacts).
+# The security-gate job reads every report, applies security/gate-policy.json
+# and is the single place that can stop the pipeline. push + deploy need the gate.
+name: DevSecOps Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write            # GHCR push on real GitHub
+
+env:
+  PYTHON_VERSION: "3.12"
+  GITLEAKS_VERSION: "8.30.1"
+  TRIVY_VERSION: "0.75.0"
+  KUBECTL_VERSION: "v1.37.0"
+  # Real GitHub: ghcr.io/<owner>/secure-notes.  Local act run: --var REGISTRY=localhost:5050
+  REGISTRY: ${{ vars.REGISTRY || 'ghcr.io' }}
+  IMAGE_NAME: ${{ vars.IMAGE_NAMESPACE || github.repository_owner }}/secure-notes
+  LOCAL_TAG: secure-notes:ci
+
+jobs:
+  # 1 ---------------------------------------------------------------- BUILD
+  build:
+    name: "1 Build"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with: {python-version: "${{ env.PYTHON_VERSION }}"}
+      - name: Install runtime dependencies
+        run: pip install -r requirements.txt
+      - name: Compile and import check
+        run: |
+          python -m compileall -q app
+          python -c "from app.main import app; print('app import OK, routes:', sorted(r.rule for r in app.url_map.iter_rules()))"
+      - name: Package
+        run: |
+          mkdir -p dist
+          tar -czf dist/secure-notes-${GITHUB_SHA::7}.tar.gz app requirements.txt
+          ls -l dist
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with: {name: app-build, path: dist/, retention-days: 7}
+
+  # 2 ------------------------------------------------------------ UNIT TEST
+  unit-test:
+    name: "2 Unit tests"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with: {python-version: "${{ env.PYTHON_VERSION }}"}
+      - name: Install dev dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Run pytest
+        run: pytest --cov=app --cov-report=term-missing --junitxml=reports/junit.xml
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: test-report, path: reports/junit.xml, retention-days: 7}
+
+  # 3 ----------------------------------------------------------------- SAST
+  sast:
+    name: "3 SAST (Bandit)"
+    needs: unit-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with: {python-version: "${{ env.PYTHON_VERSION }}"}
+      - name: Install Bandit
+        run: pip install bandit==1.8.6
+      - name: Run Bandit
+        run: |
+          mkdir -p reports
+          bandit -c bandit.yaml -r app -f json -o reports/bandit.json --exit-zero -q
+          echo "Bandit findings:"
+          jq -r -f security/bandit-summary.jq reports/bandit.json
+          jq -r '"  totals: " + (.metrics._totals | "HIGH=\(."SEVERITY.HIGH") MEDIUM=\(."SEVERITY.MEDIUM") LOW=\(."SEVERITY.LOW")")' reports/bandit.json
+      - name: Upload SAST report
+        uses: actions/upload-artifact@v4
+        with: {name: report-sast, path: reports/bandit.json}
+
+  # 4 ------------------------------------------------------------------ SCA
+  sca:
+    name: "4 SCA (pip-audit)"
+    needs: sast
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with: {python-version: "${{ env.PYTHON_VERSION }}"}
+      - name: Install pip-audit
+        run: pip install pip-audit==2.9.0
+      - name: Audit requirements.txt against the PyPI advisory database
+        run: |
+          mkdir -p reports
+          pip-audit -r requirements.txt -f json -o reports/pip-audit.json --progress-spinner off || true
+          echo "Vulnerable dependencies:"
+          jq -r '.dependencies[] | select(.vulns | length > 0) | "  \(.name)==\(.version): \(.vulns | length) advisories -> fix in \([.vulns[].fix_versions[]] | unique | join(", "))"' reports/pip-audit.json
+          jq -r '"  total advisories: \([.dependencies[].vulns[]] | length)"' reports/pip-audit.json
+      - name: Upload SCA report
+        uses: actions/upload-artifact@v4
+        with: {name: report-sca, path: reports/pip-audit.json}
+
+  # 5 ---------------------------------------------------------- SECRET SCAN
+  secret-scan:
+    name: "5 Secret scan (Gitleaks)"
+    needs: sca
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Install Gitleaks
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          ARCH=$(uname -m); [ "$ARCH" = "x86_64" ] && ARCH=x64; [ "$ARCH" = "aarch64" ] && ARCH=arm64
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_${ARCH}.tar.gz" \
+            | tar -xz -C "$HOME/.local/bin" gitleaks
+          "$HOME/.local/bin/gitleaks" version
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Scan the source tree for secrets
+        run: |
+          mkdir -p reports
+          gitleaks dir . --config .gitleaks.toml --redact --no-banner -v \
+            --report-format json --report-path reports/gitleaks.json --exit-code 0
+      - name: Upload secret-scan report
+        uses: actions/upload-artifact@v4
+        with: {name: report-secrets, path: reports/gitleaks.json}
+
+  # 6 --------------------------------------------------------- DOCKER BUILD
+  docker-build:
+    name: "6 Docker build"
+    needs: secret-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build image
+        run: |
+          docker build --build-arg BUILD_SHA=${GITHUB_SHA::7} -t "$LOCAL_TAG" .
+          docker image ls "$LOCAL_TAG"
+      - name: Save image for the next jobs
+        run: docker save "$LOCAL_TAG" -o image.tar
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with: {name: image, path: image.tar, retention-days: 1}
+
+  # 7 ----------------------------------------------------------- IMAGE SCAN
+  image-scan:
+    name: "7 Image scan (Trivy)"
+    needs: docker-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with: {name: image}
+      - name: Install Trivy
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          ARCH=$(uname -m); [ "$ARCH" = "x86_64" ] && ARCH=64bit; [ "$ARCH" = "aarch64" ] && ARCH=ARM64
+          curl -sSL "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-${ARCH}.tar.gz" \
+            | tar -xz -C "$HOME/.local/bin" trivy
+          "$HOME/.local/bin/trivy" --version | head -1
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Scan image (OS packages + Python packages)
+        run: |
+          mkdir -p reports
+          trivy image --config trivy.yaml --input image.tar --format json --output reports/trivy-image.json --quiet
+          jq -r '.Results[] | "  target: \(.Target) (\(.Type)) -> \(.Vulnerabilities // [] | length) HIGH/CRITICAL"' reports/trivy-image.json
+          echo "  by severity:"
+          jq -r '[.Results[].Vulnerabilities[]?] | group_by(.Severity)[] | "  \(.[0].Severity): \(length) (\([.[] | select(.FixedVersion != null and .FixedVersion != "")] | length) with a fix)"' reports/trivy-image.json
+      - name: Upload image-scan report
+        uses: actions/upload-artifact@v4
+        with: {name: report-image, path: reports/trivy-image.json}
+
+  # 8 -------------------------------------------------------- SECURITY GATE
+  security-gate:
+    name: "8 Security gate"
+    needs: [unit-test, sast, sca, secret-scan, image-scan]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Collect all scanner reports
+        uses: actions/download-artifact@v4
+        with: {pattern: "report-*", path: reports, merge-multiple: true}
+      - name: Apply security policy (security/gate-policy.json)
+        run: |
+          ls reports
+          python3 security/gate.py reports security/gate-policy.json
+
+  # 9 ----------------------------------------------------------- PUSH IMAGE
+  push-image:
+    name: "9 Push image"
+    needs: security-gate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.push.outputs.image }}
+    steps:
+      - name: Download the scanned image (exactly what passed the gate)
+        uses: actions/download-artifact@v4
+        with: {name: image}
+      - name: Log in to registry
+        env:
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: echo "$REGISTRY_PASSWORD" | docker login "$REGISTRY" -u "$REGISTRY_USERNAME" --password-stdin
+      - name: Tag and push
+        id: push
+        run: |
+          docker load -i image.tar
+          IMAGE=$(echo "${REGISTRY}/${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')
+          docker tag "$LOCAL_TAG" "$IMAGE:${GITHUB_SHA::7}"
+          docker push "$IMAGE:${GITHUB_SHA::7}"
+          echo "image=$IMAGE:${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+  # 10 ---------------------------------------------------------- DEPLOY K8S
+  deploy:
+    name: "10 Deploy to Kubernetes"
+    needs: push-image
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      IMAGE: ${{ needs.push-image.outputs.image }}
+      NS: secure-notes
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install kubectl
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          ARCH=$(uname -m); [ "$ARCH" = "x86_64" ] && ARCH=amd64; [ "$ARCH" = "aarch64" ] && ARCH=arm64
+          curl -sSLo "$HOME/.local/bin/kubectl" "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl"
+          chmod +x "$HOME/.local/bin/kubectl"
+          "$HOME/.local/bin/kubectl" version --client
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Configure cluster access from the KUBE_CONFIG secret
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+          kubectl get nodes
+      - name: Create namespace and secrets
+        env:
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          APP_API_TOKEN: ${{ secrets.APP_API_TOKEN }}
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl -n $NS create secret docker-registry regcred --docker-server="$REGISTRY" \
+            --docker-username="$REGISTRY_USERNAME" --docker-password="$REGISTRY_PASSWORD" \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl -n $NS create secret generic secure-notes-api --from-literal=token="$APP_API_TOKEN" \
+            --dry-run=client -o yaml | kubectl apply -f -
+      - name: Deploy
+        run: |
+          sed -i "s|__IMAGE__|${IMAGE}|" k8s/deployment.yaml
+          grep -n "image:" k8s/deployment.yaml
+          kubectl apply -f k8s/deployment.yaml -f k8s/service.yaml
+          kubectl -n $NS rollout status deployment/secure-notes --timeout=180s
+      - name: Smoke test
+        env:
+          APP_API_TOKEN: ${{ secrets.APP_API_TOKEN }}
+        run: |
+          kubectl -n $NS port-forward svc/secure-notes 18431:80 >/dev/null 2>&1 &
+          sleep 3
+          curl -fsS localhost:18431/health; echo
+          curl -fsS localhost:18431/; echo
+          echo "write without token -> $(curl -s -o /dev/null -w '%{http_code}' -X POST localhost:18431/api/notes -H 'Content-Type: application/json' -d '{"title":"x"}')"
+          curl -fsS -X POST localhost:18431/api/notes -H "X-API-Token: $APP_API_TOKEN" \
+            -H 'Content-Type: application/json' -d '{"title":"deployed by the pipeline","tags":["devsecops"]}'; echo
+          kubectl -n $NS get deploy,pods,svc -o wide

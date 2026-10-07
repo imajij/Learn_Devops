@@ -1,0 +1,11 @@
+### final check: nothing secret-shaped is left in either homework folder
+$ gitleaks dir DevSecOps --config DevSecOps/.gitleaks.toml --redact --no-banner
+10:29PM INF scanned ~217529 bytes (217.53 KB) in 62.6ms
+10:29PM INF no leaks found
+$ gitleaks dir CICD_GitHub_Actions --redact --no-banner
+10:29PM INF scanned ~169675 bytes (169.68 KB) in 46.1ms
+10:29PM INF no leaks found
+$ ls DevSecOps/app
+__init__.py
+main.py
+notes.py
