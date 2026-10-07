@@ -1,0 +1,28 @@
+$ kubectl --context obs create namespace argocd
+namespace/argocd created
+$ kubectl --context obs apply -n argocd --server-side --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/v3.5.4/manifests/install.yaml | tail -4
+networkpolicy.networking.k8s.io/argocd-notifications-controller-network-policy serverside-applied
+networkpolicy.networking.k8s.io/argocd-redis-network-policy serverside-applied
+networkpolicy.networking.k8s.io/argocd-repo-server-network-policy serverside-applied
+networkpolicy.networking.k8s.io/argocd-server-network-policy serverside-applied
+$ kubectl --context obs -n argocd patch configmap argocd-cm --type merge -p '{"data":{"timeout.reconciliation":"30s"}}'
+configmap/argocd-cm patched
+$ kubectl --context obs -n argocd scale deploy argocd-dex-server argocd-notifications-controller --replicas=0
+deployment.apps/argocd-dex-server scaled
+deployment.apps/argocd-notifications-controller scaled
+$ kubectl --context obs -n argocd rollout restart statefulset argocd-application-controller
+statefulset.apps/argocd-application-controller restarted
+$ kubectl --context obs -n argocd rollout status deploy/argocd-server --timeout=300s
+Waiting for deployment "argocd-server" rollout to finish: 0 of 1 updated replicas are available...
+deployment "argocd-server" successfully rolled out
+$ kubectl --context obs -n argocd rollout status deploy/argocd-repo-server --timeout=300s
+deployment "argocd-repo-server" successfully rolled out
+$ kubectl --context obs -n argocd rollout status statefulset/argocd-application-controller --timeout=300s
+partitioned roll out complete: 1 new pods have been updated...
+$ kubectl --context obs -n argocd get pods
+NAME                                                READY   STATUS    RESTARTS   AGE
+argocd-application-controller-0                     1/1     Running   0          19s
+argocd-applicationset-controller-76fd8cdd4f-6w44r   1/1     Running   0          76s
+argocd-redis-bdbdffcb4-gfdzb                        1/1     Running   0          76s
+argocd-repo-server-d89c7967d-xcmtc                  1/1     Running   0          76s
+argocd-server-776b7cdd4d-nw4pm                      1/1     Running   0          76s

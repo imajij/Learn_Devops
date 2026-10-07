@@ -1,0 +1,19 @@
+### [22:39:27] recovery: scale payments back up and wait for the alerts to resolve
+$ kubectl --context obs -n shop scale deploy/payments --replicas=1
+deployment.apps/payments scaled
+$ kubectl --context obs -n shop rollout status deploy/payments --timeout=90s
+Waiting for deployment "payments" rollout to finish: 0 out of 1 new replicas have been updated...
+Waiting for deployment "payments" rollout to finish: 0 of 1 updated replicas are available...
+deployment "payments" successfully rolled out
+### [22:39:33] shop alerts still active: 3
+### [22:39:53] shop alerts still active: 3
+### [22:40:13] shop alerts still active: 2
+### [22:40:33] shop alerts still active: 2
+### [22:40:53] shop alerts still active: 0
+$ alerts
+(no shop alerts pending or firing)
+$ pq 'sum by (service, code) (rate(http_requests_total{namespace="shop",path!="/metrics"}[1m]))'
+code=200,service=shop => 3.155555555555555
+code=502,service=shop => 0
+code=500,service=shop => 0
+code=200,service=payments => 3.1999999999999997

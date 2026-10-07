@@ -1,0 +1,21 @@
+$ minikube -p obs image build -t shop-app:1.0 app/ | tail -3
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 172B done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-alpine
+#2 ERROR: unexpected status from HEAD request to https://registry-1.docker.io/v2/library/python/manifests/3.12-alpine: 429 Too Many Requests
+------
+ > [internal] load metadata for docker.io/library/python:3.12-alpine:
+------
+Dockerfile:1
+--------------------
+   1 | >>> FROM python:3.12-alpine
+   2 |     WORKDIR /app
+   3 |     COPY app.py .
+--------------------
+$ kubectl --context obs -n shop get pods,svc,servicemonitor,prometheusrule
+NAME                            READY   STATUS              RESTARTS   AGE
+pod/payments-7b69985546-mgr8f   0/1     ErrImageNeverPull   0          4m1s
+pod/shop-7445f554f6-5wmnq       0/1     ErrImageNeverPull   0          4m1s
+pod/shop-7445f554f6-qfpkz       0/1     ErrImageNeverPull   0          4m1s

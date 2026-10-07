@@ -1,0 +1,18 @@
+### Prometheus scrape targets (health / job / URL) - app pods discovered via the ServiceMonitor
+$ targets
+up	apiserver	https://192.168.67.2:8443/metrics
+up	coredns	http://10.244.0.3:9153/metrics
+up	kps-alertmanager	http://10.244.0.8:8080/metrics
+up	kps-alertmanager	http://10.244.0.8:9093/metrics
+up	kps-grafana	http://10.244.0.21:3000/metrics
+up	kps-operator	https://10.244.0.6:10250/metrics
+up	kps-prometheus	http://10.244.0.9:8080/metrics
+up	kps-prometheus	http://10.244.0.9:9090/metrics
+up	kube-state-metrics	http://10.244.0.5:8080/metrics
+up	kubelet	https://192.168.67.2:10250/metrics
+up	kubelet	https://192.168.67.2:10250/metrics/cadvisor
+up	kubelet	https://192.168.67.2:10250/metrics/probes
+up	node-exporter	http://192.168.67.2:9100/metrics
+up	payments	http://10.244.0.16:8080/metrics
+up	shop	http://10.244.0.17:8080/metrics
+up	shop	http://10.244.0.18:8080/metrics

@@ -1,0 +1,30 @@
+### the Git remote is a pod inside the cluster (lighttpd + git-http-backend), not GitHub
+$ kubectl --context obs -n git get deploy,pod,svc,pvc
+NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/git-server   1/1     1            1           11m
+
+NAME                             READY   STATUS    RESTARTS   AGE
+pod/git-server-6b5865c84-bpjfz   1/1     Running   0          11m
+
+NAME                 TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+service/git-server   ClusterIP   10.98.23.69   <none>        3000/TCP   11m
+
+NAME                              STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+persistentvolumeclaim/git-repos   Bound    pvc-970f1a98-d4de-4fe0-a6bc-9baea1df316f   256Mi      RWO            standard       <unset>                 11m
+$ kubectl --context obs -n git logs deploy/git-server | head -3
+Initialized empty Git repository in /srv/git/shop-gitops.git/
+created empty repo /srv/git/shop-gitops.git
+2026-10-07 17:03:53: (../src/server.c.1973) server started (lighttpd/1.4.85)
+### first commit of the desired state, authored as Ajij Uttam
+$ git status --short
+?? README.md
+?? app/
+$ git add . && git commit -q -m 'Initial desired state: web v1.0.0 with 2 replicas' && git log --oneline
+8ccc06c Initial desired state: web v1.0.0 with 2 replicas
+$ git remote add origin http://localhost:23001/shop-gitops.git   # kubectl port-forward svc/git-server 23001:3000
+$ git push -u origin main 2>&1
+To http://localhost:23001/shop-gitops.git
+ * [new branch]      main -> main
+branch 'main' set up to track 'origin/main'.
+$ kubectl --context obs -n git exec deploy/git-server -- git -C /srv/git/shop-gitops.git log --format='%h %an %s'
+8ccc06c Ajij Uttam Initial desired state: web v1.0.0 with 2 replicas

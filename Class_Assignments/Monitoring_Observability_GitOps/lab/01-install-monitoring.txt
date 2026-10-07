@@ -1,0 +1,17 @@
+$ helm upgrade --install kps prometheus-community/kube-prometheus-stack --version 92.1.0 --kube-context obs -n monitoring --create-namespace -f manifests/monitoring/kps-values.yaml --wait --timeout 10m | head -8
+Release "kps" does not exist. Installing it now.
+NAME: kps
+LAST DEPLOYED: Wed Oct  7 22:18:39 2026
+NAMESPACE: monitoring
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+NOTES:
+$ kubectl --context obs -n monitoring get pods
+NAME                                      READY   STATUS            RESTARTS   AGE
+alertmanager-kps-alertmanager-0           0/2     PodInitializing   0          2m4s
+kps-grafana-694448fc69-cz6sv              3/3     Running           0          2m41s
+kps-kube-state-metrics-785f74f8db-kb9hw   1/1     Running           0          2m42s
+kps-operator-586785c8f4-xsmqx             1/1     Running           0          2m42s
+kps-prometheus-node-exporter-qn7m7        1/1     Running           0          2m43s
+prometheus-kps-prometheus-0               0/2     PodInitializing   0          2m3s

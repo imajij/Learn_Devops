@@ -1,0 +1,21 @@
+### services that have sent spans to Jaeger
+$ curl -s http://localhost:26686/api/v3/services; echo
+{"services":["shop","payments","jaeger"]}
+### 1) a FAILED request from the incident: its trace_id appeared in BOTH the shop and payments error logs (05b)
+### (the payments pod was replaced in 05c, so the log lines come from the saved transcript)
+$ grep f833ba40df1597aad9fb2f6f0ca02fe0 lab/05b-incident-logs.txt
+{"ts":"2026-10-07T17:05:42Z","service":"shop","status":502,"trace_id":"f833ba40df1597aad9fb2f6f0ca02fe0"}
+{"ts":"2026-10-07T17:05:42Z","service":"payments","status":500,"trace_id":"f833ba40df1597aad9fb2f6f0ca02fe0"}
+$ spans f833ba40df1597aad9fb2f6f0ca02fe0
+shop	GET /order	80 ms	status=502	parent=root	span=8d436e968ff32a02
+shop	db SELECT inventory	20 ms	status=-	parent=8d436e968ff32a02	span=272a24fa077c08e7
+shop	GET /pay	59 ms	status=500	parent=8d436e968ff32a02	span=4f70211cab1eb0ab
+payments	GET /pay	49 ms	status=500	parent=4f70211cab1eb0ab	span=b8447476dee34880
+### 2) a HEALTHY request right now: newest shop log line -> its trace
+$ kubectl --context obs -n shop logs pod/shop-6f975d5756-2jlkg --tail=1 | jq -c '{ts, path, status, duration_ms, trace_id}'
+{"ts":"2026-10-07T17:13:04Z","path":"/order","status":200,"duration_ms":60.8,"trace_id":"5c1581b1eeb0d5d1883f4468f6b89a67"}
+$ spans 5c1581b1eeb0d5d1883f4468f6b89a67
+shop	GET /order	60 ms	status=200	parent=root	span=fa674cf1f90b093e
+shop	db SELECT inventory	8 ms	status=-	parent=fa674cf1f90b093e	span=fd38587aeb7f532c
+shop	GET /pay	51 ms	status=200	parent=fa674cf1f90b093e	span=21c46d9be88d5799
+payments	GET /pay	48 ms	status=200	parent=21c46d9be88d5799	span=931a3c7bed783df3

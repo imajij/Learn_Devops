@@ -1,0 +1,21 @@
+$ minikube version --short
+v1.39.0
+$ kubectl --context obs version | grep -E "Client|Server"
+Client Version: v1.37.1
+Server Version: v1.37.0
+$ helm --kube-context obs list -n monitoring
+NAME	NAMESPACE 	REVISION	UPDATED                             	STATUS  	CHART                       	APP VERSION
+kps 	monitoring	2       	2026-10-07 22:31:48.881258 +0530 IST	deployed	kube-prometheus-stack-92.1.0	v0.94.1    
+$ kubectl --context obs -n monitoring get pod prometheus-kps-prometheus-0 -o jsonpath="{.spec.containers[0].image}"; echo
+quay.io/prometheus/prometheus:v3.15.0-distroless
+$ kubectl --context obs -n monitoring get deploy kps-grafana -o jsonpath="{.spec.template.spec.containers[?(@.name==\"grafana\")].image}"; echo
+docker.io/grafana/grafana:13.2.3-distroless
+$ kubectl --context obs -n monitoring get pod alertmanager-kps-alertmanager-0 -o jsonpath="{.spec.containers[0].image}"; echo
+quay.io/prometheus/alertmanager:v0.34.1
+$ kubectl --context obs -n observability get deploy jaeger -o jsonpath="{.spec.template.spec.containers[0].image}"; echo
+jaegertracing/jaeger:2.22.0
+$ argocd version --grpc-web | grep -E "^argocd|argocd-server"
+argocd: v3.5.4+d6d5b24.dirty
+argocd-server: v3.5.4
+$ git --version
+git version 2.55.0

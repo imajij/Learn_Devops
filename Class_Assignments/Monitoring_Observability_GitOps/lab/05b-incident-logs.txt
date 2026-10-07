@@ -1,0 +1,17 @@
+### during the incident: error log lines carry the trace_id of the failing request
+$ kubectl --context obs -n shop logs -l app=shop --tail=300 | jq -c 'select(.level=="error") | {ts, service, status, trace_id}' | tail -3
+{"ts":"2026-10-07T17:05:38Z","service":"shop","status":502,"trace_id":"bf96b6d3c0b956a8a89deb64efdcc152"}
+{"ts":"2026-10-07T17:05:40Z","service":"shop","status":502,"trace_id":"b698958c9c3ff98d97a4a14d5f5b67b6"}
+{"ts":"2026-10-07T17:05:42Z","service":"shop","status":502,"trace_id":"f833ba40df1597aad9fb2f6f0ca02fe0"}
+$ kubectl --context obs -n shop logs -l app=payments --tail=300 | jq -c 'select(.level=="error") | {ts, service, status, trace_id}' | tail -3
+{"ts":"2026-10-07T17:05:42Z","service":"payments","status":500,"trace_id":"72c9a915952477e32bdc4eb6e4be545a"}
+{"ts":"2026-10-07T17:05:42Z","service":"payments","status":500,"trace_id":"f833ba40df1597aad9fb2f6f0ca02fe0"}
+{"ts":"2026-10-07T17:05:43Z","service":"payments","status":500,"trace_id":"f9f098b69cfb9fc0871c044337b9b2ac"}
+$ kubectl --context obs -n shop logs -l app=shop --tail=-1 | jq -r 'select(.msg=="request handled") | "\(.level) \(.status)"' | sort | uniq -c
+ 159 error 502
+ 805 info 200
+### Alertmanager received the firing alerts (it would route them to Slack/e-mail/PagerDuty)
+$ curl -s http://localhost:29093/api/v2/alerts | jq -r '.[] | select(.labels.alertname|startswith("Shop")) | "\(.status.state)\t\(.labels.alertname)\t\(.labels.severity)\t\(.startsAt)"'
+active	ShopHighCPU	warning	2026-10-07T17:05:04.887Z
+active	ShopHighErrorRate	critical	2026-10-07T17:04:34.887Z
+active	ShopHighErrorRate	critical	2026-10-07T17:04:34.887Z

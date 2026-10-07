@@ -1,0 +1,18 @@
+$ kubectl --context obs -n monitoring get pods -l app.kubernetes.io/name=grafana
+NAME                           READY   STATUS    RESTARTS      AGE
+kps-grafana-694448fc69-cz6sv   2/3     Running   2 (16s ago)   12m
+$ kubectl --context obs -n monitoring describe pod -l app.kubernetes.io/name=grafana | grep -A5 'Last State'
+    Last State:      Terminated
+      Reason:        OOMKilled
+      Exit Code:     137
+      Started:       Wed, 07 Oct 2026 22:31:11 +0530
+      Finished:      Wed, 07 Oct 2026 22:31:32 +0530
+    Ready:           False
+$ helm upgrade kps prometheus-community/kube-prometheus-stack --version 92.1.0 --kube-context obs -n monitoring -f manifests/monitoring/kps-values.yaml --wait --timeout 6m | grep -E 'STATUS|REVISION'
+STATUS: deployed
+REVISION: 2
+$ kubectl --context obs -n monitoring get pods -l app.kubernetes.io/name=grafana
+NAME                           READY   STATUS    RESTARTS   AGE
+kps-grafana-7bd5877579-vckph   3/3     Running   0          18s
+$ kubectl --context obs -n monitoring get deploy kps-grafana -o jsonpath='{.spec.template.spec.containers[?(@.name=="grafana")].resources}'; echo
+{"limits":{"memory":"512Mi"},"requests":{"cpu":"50m","memory":"192Mi"}}

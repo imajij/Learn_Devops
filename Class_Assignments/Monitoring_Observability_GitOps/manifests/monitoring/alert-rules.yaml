@@ -1,0 +1,51 @@
+# Alert rules for the shop app. "for" times are short on purpose so the demo fires quickly.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: shop-alerts
+  namespace: shop
+  labels: {release: kps}
+spec:
+  groups:
+    - name: shop.rules
+      rules:
+        - alert: ShopHighErrorRate
+          expr: |
+            sum by (service) (rate(http_requests_total{namespace="shop",code=~"5.."}[1m]))
+              /
+            sum by (service) (rate(http_requests_total{namespace="shop",path!="/metrics"}[1m])) > 0.10
+          for: 1m
+          labels: {severity: critical}
+          annotations:
+            summary: "{{ $labels.service }}: {{ $value | humanizePercentage }} of requests are failing"
+            description: "More than 10% of requests returned HTTP 5xx for 1 minute."
+        - alert: ShopTargetDown
+          expr: up{namespace="shop"} == 0
+          for: 30s
+          labels: {severity: critical}
+          annotations:
+            summary: "Prometheus cannot scrape {{ $labels.pod }}"
+        - alert: ShopNoReadyReplicas
+          expr: kube_deployment_status_replicas_available{namespace="shop"} == 0
+          for: 30s
+          labels: {severity: critical}
+          annotations:
+            summary: "Deployment {{ $labels.deployment }} has 0 available replicas"
+        - alert: ShopHighCPU
+          expr: |
+            sum by (pod) (rate(container_cpu_usage_seconds_total{namespace="shop",container="app"}[1m]))
+              /
+            sum by (pod) (kube_pod_container_resource_limits{namespace="shop",container="app",resource="cpu"}) > 0.8
+          for: 1m
+          labels: {severity: warning}
+          annotations:
+            summary: "{{ $labels.pod }} is using {{ $value | humanizePercentage }} of its CPU limit"
+        - alert: ShopHighMemory
+          expr: |
+            sum by (pod) (container_memory_working_set_bytes{namespace="shop",container="app"})
+              /
+            sum by (pod) (kube_pod_container_resource_limits{namespace="shop",container="app",resource="memory"}) > 0.9
+          for: 2m
+          labels: {severity: warning}
+          annotations:
+            summary: "{{ $labels.pod }} is above 90% of its memory limit"

@@ -1,0 +1,27 @@
+### raw JSON log lines (one object per request, with trace_id/span_id)
+$ kubectl --context obs -n shop logs deploy/payments --tail=3
+{"ts": "2026-10-07T17:00:39Z", "level": "info", "service": "payments", "version": "1.0.0", "msg": "request handled", "method": "GET", "path": "/pay", "status": 200, "duration_ms": 54.6, "trace_id": "cd79b0b96b8b50ea66476ffb46d13ef4", "span_id": "146383d7a92c9357"}
+{"ts": "2026-10-07T17:00:39Z", "level": "info", "service": "payments", "version": "1.0.0", "msg": "request handled", "method": "GET", "path": "/pay", "status": 200, "duration_ms": 20.4, "trace_id": "3c515d54fd0a3ca62d8334c22505eb1b", "span_id": "8fa09fbb84dfd5ec"}
+{"ts": "2026-10-07T17:00:39Z", "level": "info", "service": "payments", "version": "1.0.0", "msg": "request handled", "method": "GET", "path": "/pay", "status": 200, "duration_ms": 33.0, "trace_id": "4f278facb383fd139f52fb8ac4d26263", "span_id": "fcf2f5dc3421b40f"}
+### pretty-print and filter: only the fields we care about, from all shop pods
+$ kubectl --context obs -n shop logs -l app=shop --tail=200 --prefix=false | jq -c 'select(.msg=="request handled") | {ts, service, status, duration_ms, trace_id}' | tail -4
+{"ts":"2026-10-07T17:00:37Z","service":"shop","status":200,"duration_ms":65.5,"trace_id":"ef9059fa14f8c41177ac717b58e414c5"}
+{"ts":"2026-10-07T17:00:38Z","service":"shop","status":200,"duration_ms":67.3,"trace_id":"eeaf14c3293cf172d73d62d259d75bd9"}
+{"ts":"2026-10-07T17:00:38Z","service":"shop","status":200,"duration_ms":47.3,"trace_id":"2ec015259d26f70aec8474d8a12823b4"}
+{"ts":"2026-10-07T17:00:39Z","service":"shop","status":200,"duration_ms":30.9,"trace_id":"3c515d54fd0a3ca62d8334c22505eb1b"}
+### count log lines by level and status across the shop pods
+$ kubectl --context obs -n shop logs -l app=shop --tail=-1 | jq -r 'select(.msg=="request handled") | "\(.level) \(.status)"' | sort | uniq -c
+  97 info 200
+### slow requests (> 60 ms)
+$ kubectl --context obs -n shop logs -l app=shop --tail=-1 | jq -c 'select(.duration_ms? > 60) | {ts, path, duration_ms, trace_id}' | tail -3
+{"ts":"2026-10-07T17:00:36Z","path":"/order","duration_ms":67.8,"trace_id":"aae93a4b9c381dc73b288d5af371ceb4"}
+{"ts":"2026-10-07T17:00:37Z","path":"/order","duration_ms":65.5,"trace_id":"ef9059fa14f8c41177ac717b58e414c5"}
+{"ts":"2026-10-07T17:00:38Z","path":"/order","duration_ms":67.3,"trace_id":"eeaf14c3293cf172d73d62d259d75bd9"}
+### cluster-level events are logs too
+$ kubectl --context obs -n shop get events --sort-by=.lastTimestamp | tail -6
+31s         Normal    Scheduled           pod/loadgen-6f9d7b696-fd9tz      Successfully assigned shop/loadgen-6f9d7b696-fd9tz to obs
+31s         Normal    Pulled              pod/loadgen-6f9d7b696-fd9tz      Container image "shop-app:1.0" already present on machine and can be accessed by the pod
+31s         Normal    Created             pod/loadgen-6f9d7b696-fd9tz      Container created
+31s         Normal    Started             pod/loadgen-6f9d7b696-fd9tz      Container started
+31s         Normal    SuccessfulCreate    replicaset/loadgen-6f9d7b696     Created pod: loadgen-6f9d7b696-fd9tz
+31s         Normal    ScalingReplicaSet   deployment/loadgen               Scaled up replica set loadgen-6f9d7b696 from 0 to 1

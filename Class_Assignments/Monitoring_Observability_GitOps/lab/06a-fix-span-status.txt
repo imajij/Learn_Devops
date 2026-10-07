@@ -1,0 +1,27 @@
+$ docker build -q -t shop-app:1.0 app/ 2>/dev/null
+sha256:907adc682a8eb9648bb517c6a5616a194a1ec586af8e3a523e97bfa3738e23c0
+$ minikube -p obs image load --overwrite=true shop-app:1.0
+$ kubectl --context obs -n shop rollout restart deploy/shop deploy/payments deploy/loadgen
+deployment.apps/shop restarted
+deployment.apps/payments restarted
+deployment.apps/loadgen restarted
+$ kubectl --context obs -n shop rollout status deploy/shop --timeout=120s
+Waiting for deployment "shop" rollout to finish: 0 out of 2 new replicas have been updated...
+Waiting for deployment "shop" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "shop" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "shop" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "shop" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "shop" rollout to finish: 1 old replicas are pending termination...
+deployment "shop" successfully rolled out
+$ kubectl --context obs -n shop rollout status deploy/payments --timeout=120s
+deployment "payments" successfully rolled out
+$ kubectl --context obs -n shop get pods
+NAME                        READY   STATUS        RESTARTS   AGE
+loadgen-6dc7ff4cb4-8ljwb    1/1     Running       0          7s
+loadgen-6f9d7b696-fd9tz     1/1     Terminating   0          12m
+payments-6c8689748d-xz78r   1/1     Running       0          7s
+payments-7756ddb57d-tcc7c   1/1     Terminating   0          3m22s
+shop-6f975d5756-2jlkg       1/1     Running       0          6s
+shop-6f975d5756-2pz5m       1/1     Running       0          7s
+shop-74d5fc4f96-ddxgg       1/1     Terminating   0          13m
+shop-74d5fc4f96-pqmw7       1/1     Terminating   0          13m

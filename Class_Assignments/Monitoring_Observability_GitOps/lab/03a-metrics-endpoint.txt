@@ -1,0 +1,27 @@
+### what Prometheus scrapes: the app's /metrics endpoint (Prometheus text format)
+$ kubectl --context obs -n shop exec deploy/payments -- python -c "import urllib.request as u; print(u.urlopen('http://localhost:8080/metrics').read().decode())" | grep -vE '_bucket.*le=\"0.0(05|1)\"' | head -32
+# HELP app_info Static information about the running app.
+# TYPE app_info gauge
+app_info{service="payments",version="1.0.0"} 1
+# HELP app_uptime_seconds Seconds since the process started.
+# TYPE app_uptime_seconds gauge
+app_uptime_seconds 214.4
+# HELP app_error_injection_percent Current injected error rate (demo knob).
+# TYPE app_error_injection_percent gauge
+app_error_injection_percent 0
+# HELP http_requests_total Total HTTP requests by path and status code.
+# TYPE http_requests_total counter
+http_requests_total{path="/pay",code="200"} 491
+# HELP http_request_duration_seconds Request latency.
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{path="/pay",le="0.025"} 141
+http_request_duration_seconds_bucket{path="/pay",le="0.05"} 400
+http_request_duration_seconds_bucket{path="/pay",le="0.1"} 491
+http_request_duration_seconds_bucket{path="/pay",le="0.25"} 491
+http_request_duration_seconds_bucket{path="/pay",le="0.5"} 491
+http_request_duration_seconds_bucket{path="/pay",le="1.0"} 491
+http_request_duration_seconds_bucket{path="/pay",le="2.5"} 491
+http_request_duration_seconds_bucket{path="/pay",le="+Inf"} 491
+http_request_duration_seconds_sum{path="/pay"} 17.605425
+http_request_duration_seconds_count{path="/pay"} 491
+

@@ -1,0 +1,48 @@
+$ argocd login localhost:28080 --username admin --password "$(kubectl --context obs -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)" --insecure --grpc-web
+'admin:login' logged in successfully
+Context 'localhost:28080' updated
+$ argocd repo add http://git-server.git.svc:3000/shop-gitops.git --grpc-web
+Repository 'http://git-server.git.svc:3000/shop-gitops.git' added
+$ argocd repo list --grpc-web
+TYPE  NAME  REPO                                            INSECURE  OCI    LFS    CREDS  STATUS      MESSAGE  PROJECT
+git         http://git-server.git.svc:3000/shop-gitops.git  false     false  false  false  Successful           
+$ kubectl --context obs apply -f manifests/gitops/application.yaml
+application.argoproj.io/shop-web created
+$ argocd app wait shop-web --sync --health --timeout 180 --grpc-web | tail -8
+Health Status:      Healthy
+
+
+GROUP  KIND        NAMESPACE    NAME         STATUS   HEALTH   HOOK  MESSAGE
+       Namespace   gitops-demo  gitops-demo  Running  Synced         namespace/gitops-demo created
+       Service     gitops-demo  web          Synced   Healthy        service/web created
+apps   Deployment  gitops-demo  web          Synced   Healthy        deployment.apps/web created
+       Namespace                gitops-demo  Synced                  
+$ argocd app get shop-web --grpc-web | head -16
+Name:               argocd/shop-web
+Project:            default
+Server:             https://kubernetes.default.svc
+Namespace:          gitops-demo
+URL:                https://localhost:28080/applications/shop-web
+Source:
+- Repo:             http://git-server.git.svc:3000/shop-gitops.git
+  Target:           main
+  Path:             app
+SyncWindow:         Sync Allowed
+Sync Policy:        Automated (Prune)
+Sync Status:        Synced to main (8ccc06c)
+Health Status:      Healthy
+
+GROUP  KIND        NAMESPACE    NAME         STATUS   HEALTH   HOOK  MESSAGE
+       Namespace   gitops-demo  gitops-demo  Running  Synced         namespace/gitops-demo created
+$ kubectl --context obs -n gitops-demo get deploy,pods,svc
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/web   2/2     2            2           12s
+
+NAME                       READY   STATUS    RESTARTS   AGE
+pod/web-57b646695b-jn7z5   1/1     Running   0          12s
+pod/web-57b646695b-qjmmf   1/1     Running   0          12s
+
+NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+service/web   ClusterIP   10.111.229.122   <none>        80/TCP    12s
+$ web
+{"service": "shop", "version": "1.0.0", "hint": "try /order", "trace_id": "694d3efab1d9e2fd307ce7f94d3e9481"}

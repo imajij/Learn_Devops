@@ -1,0 +1,35 @@
+$ git diff --stat && git diff | grep -E '^[-+] '
+ app/deployment.yaml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+-          image: shop-app:1.0
++          image: shop-app:2.0
+-              value: "1.1.0"
++              value: "2.0.0"
+$ git commit -qam 'Release web v2.0.0' && git push -q origin main 2>&1 && git log --oneline -1
+6832cb4 Release web v2.0.0
+### [22:50:59] argo: sync=Synced rev=81c54aa health=Healthy
+### [22:51:10] argo: sync=Synced rev=81c54aa health=Healthy
+### [22:51:20] argo: sync=Synced rev=81c54aa health=Healthy
+### [22:51:30] argo: sync=Synced rev=81c54aa health=Healthy
+### [22:51:40] argo: sync=Synced rev=81c54aa health=Healthy
+### [22:51:50] argo: sync=Synced rev=6832cb4 health=Progressing
+### [22:52:00] argo: sync=Synced rev=6832cb4 health=Progressing
+### [22:52:10] argo: sync=Synced rev=6832cb4 health=Progressing
+### [22:52:20] argo: sync=Synced rev=6832cb4 health=Progressing
+### [22:52:30] argo: sync=Synced rev=6832cb4 health=Progressing
+### [22:52:40] argo: sync=Synced rev=6832cb4 health=Progressing
+### [22:52:50] argo: sync=Synced rev=6832cb4 health=Degraded
+$ kubectl --context obs -n gitops-demo get pods
+NAME                   READY   STATUS              RESTARTS   AGE
+web-677b94b4c6-qgwkb   0/1     ErrImageNeverPull   0          68s
+web-6fcb745f45-b57bv   1/1     Running             0          5m42s
+web-6fcb745f45-qcwzq   1/1     Running             0          4m21s
+web-6fcb745f45-s9xzx   1/1     Running             0          4m32s
+$ argocd app get shop-web --grpc-web | sed -n '11,13p'
+Sync Policy:        Automated (Prune)
+Sync Status:        Synced to main (6832cb4)
+Health Status:      Degraded
+$ kubectl --context obs -n gitops-demo get deploy web -o jsonpath='{.status.conditions[?(@.type=="Progressing")].message}'; echo
+ReplicaSet "web-677b94b4c6" has timed out progressing.
+$ web
+{"service": "shop", "version": "1.1.0", "hint": "try /order", "trace_id": "83f979a3c7f62d928cbec9d1c86eef15"}

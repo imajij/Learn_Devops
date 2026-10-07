@@ -1,0 +1,21 @@
+$ colima ssh -- sysctl fs.inotify.max_user_instances
+fs.inotify.max_user_instances = 1024
+$ minikube -p obs status
+obs
+type: Control Plane
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+
+$ kubectl --context obs get nodes -o wide
+NAME   STATUS   ROLES           AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION              CONTAINER-RUNTIME
+obs    Ready    control-plane   37m   v1.37.0   192.168.67.2   <none>        Debian GNU/Linux 12 (bookworm)   6.8.0-117-generic (arm64)   containerd://2.3.4
+$ kubectl --context obs version | grep -E "Client|Server"
+Client Version: v1.37.1
+Server Version: v1.37.0
+$ helm version --short
+v4.3.0+gbec5b06
+$ kubectl --context obs top nodes
+NAME   CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+obs    490m         4%       3819Mi          23%         

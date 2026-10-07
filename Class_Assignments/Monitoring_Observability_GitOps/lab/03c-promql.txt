@@ -1,0 +1,38 @@
+### traffic: requests per second by service and status code
+$ pq 'sum by (service, code) (rate(http_requests_total{namespace="shop",path!="/metrics"}[1m]))'
+code=200,service=payments => 3.133333333333333
+code=200,service=shop => 3.155555555555555
+### latency: p95 of /order in seconds
+$ pq 'histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{namespace="shop",path="/order"}[5m])))'
+ => 0.09828831025831075
+### CPU utilization: cores used per pod (cAdvisor)
+$ pq 'sum by (pod) (rate(container_cpu_usage_seconds_total{namespace="shop",container!=""}[1m]))'
+pod=shop-74d5fc4f96-pqmw7 => 0.011810198748911233
+pod=shop-74d5fc4f96-ddxgg => 0.011285975397376273
+pod=payments-7756ddb57d-zb6pz => 0.010612748230727357
+pod=loadgen-6f9d7b696-fd9tz => 0.004419942354435129
+### memory utilization: working set per pod in MiB
+$ pq 'sum by (pod) (container_memory_working_set_bytes{namespace="shop",container!=""}) / 1024 / 1024'
+pod=shop-74d5fc4f96-pqmw7 => 15.2265625
+pod=shop-74d5fc4f96-ddxgg => 15.32421875
+pod=payments-7756ddb57d-zb6pz => 14.51953125
+pod=loadgen-6f9d7b696-fd9tz => 12.28515625
+### application health: scrape status and available replicas
+$ pq 'up{namespace="shop"}'
+namespace=shop,pod=payments-7756ddb57d-zb6pz,service=payments => 1
+namespace=shop,pod=shop-74d5fc4f96-ddxgg,service=shop => 1
+namespace=shop,pod=shop-74d5fc4f96-pqmw7,service=shop => 1
+$ pq 'max by (deployment) (kube_deployment_status_replicas_available{namespace="shop"})'
+deployment=payments => 1
+deployment=shop => 2
+deployment=loadgen => 1
+### same CPU/memory numbers from metrics-server
+$ kubectl --context obs -n shop top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+loadgen-6f9d7b696-fd9tz     6m           12Mi            
+payments-7756ddb57d-zb6pz   11m          14Mi            
+shop-74d5fc4f96-ddxgg       12m          15Mi            
+shop-74d5fc4f96-pqmw7       12m          15Mi            
+$ kubectl --context obs top nodes
+NAME   CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+obs    1110m        11%      3669Mi          22%         

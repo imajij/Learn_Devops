@@ -1,0 +1,19 @@
+### [22:33:05] baseline: alerts for namespace shop
+$ alerts
+$ pq 'sum by (service) (rate(http_requests_total{namespace="shop",code=~"5.."}[1m]))'
+### [22:33:05] INCIDENT START: inject 40% failures in payments, burn CPU in one shop pod
+$ admin pod/payments-7756ddb57d-zb6pz '/admin/errors?pct=40'
+{"error_pct": 40}
+$ admin pod/shop-74d5fc4f96-ddxgg '/admin/burn?seconds=420'
+{"burning_for": 420}
+### [22:33:06] ShopHighErrorRate state: inactive
+### [22:33:21] ShopHighErrorRate state: inactive
+### [22:33:36] ShopHighErrorRate state: inactive
+### [22:33:51] ShopHighErrorRate state: pending
+### [22:34:06] ShopHighErrorRate state: pending
+### [22:34:21] ShopHighErrorRate state: pending
+### [22:34:36] ShopHighErrorRate state: pending
+### [22:34:51] ShopHighErrorRate state: firing
+### [22:34:51] ShopHighCPU state: pending
+### [22:35:07] ShopHighCPU state: pending
+### [22:35:22] ShopHighCPU state: firing

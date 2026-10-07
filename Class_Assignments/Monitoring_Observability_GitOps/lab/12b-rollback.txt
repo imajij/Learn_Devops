@@ -1,0 +1,41 @@
+$ git revert --no-edit HEAD && git push -q origin main 2>&1
+[main eaa2310] Revert "Release web v2.0.0"
+ Date: Wed Oct 7 22:53:01 2026 +0530
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+$ git log --oneline
+eaa2310 Revert "Release web v2.0.0"
+6832cb4 Release web v2.0.0
+81c54aa Remove feature-flags ConfigMap
+f5c7515 Add feature-flags ConfigMap; progressDeadlineSeconds 60
+aad1dc1 Release web v1.1.0 and scale to 3 replicas
+8ccc06c Initial desired state: web v1.0.0 with 2 replicas
+### [22:53:01] argo: sync=Synced rev=6832cb4 health=Degraded
+### [22:53:11] argo: sync=Synced rev=6832cb4 health=Degraded
+### [22:53:21] argo: sync=Synced rev=6832cb4 health=Degraded
+### [22:53:31] argo: sync=Synced rev=6832cb4 health=Degraded
+### [22:53:42] argo: sync=Synced rev=eaa2310 health=Healthy
+$ kubectl --context obs -n gitops-demo rollout status deploy/web --timeout=120s
+deployment "web" successfully rolled out
+$ kubectl --context obs -n gitops-demo get pods
+NAME                   READY   STATUS    RESTARTS   AGE
+web-6fcb745f45-b57bv   1/1     Running   0          6m34s
+web-6fcb745f45-qcwzq   1/1     Running   0          5m13s
+web-6fcb745f45-s9xzx   1/1     Running   0          5m24s
+$ web
+{"service": "shop", "version": "1.1.0", "hint": "try /order", "trace_id": "a1d5540048d97ec3abd7224d6a4f52f6"}
+$ argocd app history shop-web --grpc-web
+SOURCE  http://git-server.git.svc:3000/shop-gitops.git
+ID      DATE                           REVISION
+0       2026-10-07 22:45:32 +0530 IST  main (8ccc06c)
+1       2026-10-07 22:47:08 +0530 IST  main (aad1dc1)
+2       2026-10-07 22:49:34 +0530 IST  main (f5c7515)
+3       2026-10-07 22:50:34 +0530 IST  main (81c54aa)
+4       2026-10-07 22:51:42 +0530 IST  main (6832cb4)
+5       2026-10-07 22:53:35 +0530 IST  main (eaa2310)
+$ kubectl --context obs -n git exec deploy/git-server -- git -C /srv/git/shop-gitops.git log --format='%h %an  %s'
+eaa2310 Ajij Uttam  Revert "Release web v2.0.0"
+6832cb4 Ajij Uttam  Release web v2.0.0
+81c54aa Ajij Uttam  Remove feature-flags ConfigMap
+f5c7515 Ajij Uttam  Add feature-flags ConfigMap; progressDeadlineSeconds 60
+aad1dc1 Ajij Uttam  Release web v1.1.0 and scale to 3 replicas
+8ccc06c Ajij Uttam  Initial desired state: web v1.0.0 with 2 replicas

@@ -1,0 +1,31 @@
+### [22:48:15] Git says replicas=3 and APP_VERSION=1.1.0. Now change the live objects by hand:
+$ kubectl --context obs -n gitops-demo scale deploy web --replicas=1
+deployment.apps/web scaled
+$ kubectl --context obs -n gitops-demo set env deploy/web APP_VERSION=hotfix-by-hand
+deployment.apps/web env updated
+### [22:48:16] spec.replicas=1 APP_VERSION=hotfix-by-hand ready=3 | argo: Synced/Healthy
+### [22:48:19] spec.replicas=3 APP_VERSION=1.1.0 ready=1 | argo: Synced/Progressing
+### [22:48:22] spec.replicas=3 APP_VERSION=1.1.0 ready=1 | argo: Synced/Progressing
+### [22:48:25] spec.replicas=3 APP_VERSION=1.1.0 ready=1 | argo: Synced/Progressing
+### [22:48:28] spec.replicas=3 APP_VERSION=1.1.0 ready=2 | argo: Synced/Progressing
+### [22:48:31] spec.replicas=3 APP_VERSION=1.1.0 ready=3 | argo: Synced/Progressing
+$ kubectl --context obs -n gitops-demo rollout status deploy/web --timeout=120s
+Waiting for deployment "web" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "web" rollout to finish: 1 old replicas are pending termination...
+deployment "web" successfully rolled out
+$ kubectl --context obs -n gitops-demo get deploy web
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+web    3/3     3            3           3m10s
+$ web
+{"service": "shop", "version": "1.1.0", "hint": "try /order", "trace_id": "1b982e74d91a21939ce932ed0303ef9e"}
+### Argo CD's own record of what it did (reason: self-heal / auto-sync)
+$ kubectl --context obs -n argocd get events --field-selector involvedObject.name=shop-web --sort-by=.lastTimestamp | tail -4
+28s         Normal   ResourceUpdated      application/shop-web   Updated health status: Healthy -> Progressing
+26s         Normal   OperationCompleted   application/shop-web   Partial sync operation to aad1dc122f68680c030e2f82a59ea47b9f50833a succeeded
+25s         Normal   ResourceUpdated      application/shop-web   Updated sync status: OutOfSync -> Synced
+2s          Normal   ResourceUpdated      application/shop-web   Updated health status: Progressing -> Healthy
+$ kubectl --context obs -n argocd logs statefulset/argocd-application-controller --since=3m | grep shop-web | jq -rR 'fromjson? | select(.msg|test("automated sync|OutOfSync|self.?heal";"i")) | "\(.time) \(.msg)"' | cut -c1-150 | tail -4
+2026-10-07T17:18:16Z Initiated automated sync to 'aad1dc122f68680c030e2f82a59ea47b9f50833a'
+2026-10-07T17:18:16Z Updated sync status: Synced -> OutOfSync
+2026-10-07T17:18:16Z Initialized new operation: {&SyncOperation{Revision:aad1dc122f68680c030e2f82a59ea47b9f50833a,Prune:true,DryRun:false,SyncStrategy
+2026-10-07T17:18:19Z Updated sync status: OutOfSync -> Synced

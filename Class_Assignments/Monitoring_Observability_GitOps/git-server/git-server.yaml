@@ -1,0 +1,51 @@
+# In-cluster Git server (the "remote" that Argo CD watches). No GitHub involved.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: git
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: git-repos
+  namespace: git
+spec:
+  accessModes: [ReadWriteOnce]
+  resources: {requests: {storage: 256Mi}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-server
+  namespace: git
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: git-server}}
+  template:
+    metadata:
+      labels: {app: git-server}
+    spec:
+      containers:
+        - name: git
+          image: git-http-server:1.0
+          imagePullPolicy: Never
+          env: [{name: REPOS, value: shop-gitops}]
+          ports: [{name: http, containerPort: 3000}]
+          volumeMounts: [{name: repos, mountPath: /srv/git}]
+          readinessProbe: {tcpSocket: {port: http}, periodSeconds: 5}
+          resources:
+            requests: {cpu: 10m, memory: 16Mi}
+            limits: {memory: 64Mi}
+      volumes:
+        - name: repos
+          persistentVolumeClaim: {claimName: git-repos}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: git-server
+  namespace: git
+spec:
+  selector: {app: git-server}
+  ports: [{name: http, port: 3000, targetPort: http}]

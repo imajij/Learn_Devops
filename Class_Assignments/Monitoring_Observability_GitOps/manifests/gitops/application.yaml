@@ -1,0 +1,22 @@
+# Argo CD Application: applied ONCE by hand. It is kept outside the Git source path (same advice as
+# the course's 07-argocd / 08-mini-project). After this, all changes go through Git.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shop-web
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: http://git-server.git.svc:3000/shop-gitops.git   # in-cluster git server, not GitHub
+    targetRevision: main
+    path: app
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops-demo
+  syncPolicy:
+    automated:
+      prune: true      # delete resources whose YAML was removed from Git
+      selfHeal: true   # undo manual kubectl changes (drift) back to what Git says
+    syncOptions:
+      - CreateNamespace=true

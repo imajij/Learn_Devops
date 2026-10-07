@@ -1,0 +1,33 @@
+# Steady background traffic (~4 requests/s) against the shop so dashboards have real data.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgen
+  namespace: shop
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: loadgen}}
+  template:
+    metadata:
+      labels: {app: loadgen}
+    spec:
+      containers:
+        - name: loadgen
+          image: shop-app:1.0
+          imagePullPolicy: Never
+          command: ["python", "-u", "-c"]
+          args:
+            - |
+              import time, urllib.request, urllib.error
+              ok = err = 0
+              while True:
+                  try:
+                      urllib.request.urlopen("http://shop.shop.svc:8080/order", timeout=3).read(); ok += 1
+                  except Exception:
+                      err += 1
+                  if (ok + err) % 200 == 0:
+                      print(f"sent={ok+err} ok={ok} failed={err}", flush=True)
+                  time.sleep(0.25)
+          resources:
+            requests: {cpu: 20m, memory: 24Mi}
+            limits: {cpu: 200m, memory: 64Mi}

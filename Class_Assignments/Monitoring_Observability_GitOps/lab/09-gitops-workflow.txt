@@ -1,0 +1,60 @@
+### [22:46:27] before: what is running
+$ kubectl --context obs -n gitops-demo get deploy web -o wide
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES         SELECTOR
+web    2/2     2            2           55s   web          shop-app:1.0   app=web
+### edit the desired state: 3 replicas and app version 1.1.0
+$ git diff
+diff --git a/app/deployment.yaml b/app/deployment.yaml
+index b0614bd..5b06a14 100644
+--- a/app/deployment.yaml
++++ b/app/deployment.yaml
+@@ -5,7 +5,7 @@ metadata:
+   namespace: gitops-demo
+   labels: {app: web}
+ spec:
+-  replicas: 2
++  replicas: 3
+   selector:
+     matchLabels: {app: web}
+   template:
+@@ -20,7 +20,7 @@ spec:
+             - name: ROLE
+               value: shop
+             - name: APP_VERSION
+-              value: "1.0.0"
++              value: "1.1.0"
+           ports:
+             - containerPort: 8080
+           readinessProbe:
+$ git commit -qam 'Release web v1.1.0 and scale to 3 replicas' && git push -q origin main 2>&1 && git log --oneline -1
+aad1dc1 Release web v1.1.0 and scale to 3 replicas
+### [22:46:27] pushed - now waiting for Argo CD (polls every 30 s); no kubectl apply is run
+### [22:46:27] argo: sync=Synced rev=8ccc06c health=Healthy
+### [22:46:37] argo: sync=Synced rev=8ccc06c health=Healthy
+### [22:46:47] argo: sync=Synced rev=8ccc06c health=Healthy
+### [22:46:57] argo: sync=Synced rev=8ccc06c health=Healthy
+### [22:47:07] argo: sync=Synced rev=8ccc06c health=Healthy
+### [22:47:17] argo: sync=Synced rev=aad1dc1 health=Progressing
+### [22:47:27] argo: sync=Synced rev=aad1dc1 health=Progressing
+### [22:47:37] argo: sync=Synced rev=aad1dc1 health=Progressing
+### [22:47:47] argo: sync=Synced rev=aad1dc1 health=Healthy
+$ kubectl --context obs -n gitops-demo rollout status deploy/web --timeout=120s
+deployment "web" successfully rolled out
+$ kubectl --context obs -n gitops-demo get deploy web -o wide
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS   IMAGES         SELECTOR
+web    3/3     3            3           2m16s   web          shop-app:1.0   app=web
+$ kubectl --context obs -n gitops-demo get pods
+NAME                   READY   STATUS        RESTARTS   AGE
+web-57b646695b-jn7z5   1/1     Terminating   0          2m16s
+web-57b646695b-qjmmf   1/1     Terminating   0          2m16s
+web-57b646695b-tvgjh   1/1     Terminating   0          40s
+web-6fcb745f45-4885g   1/1     Running       0          28s
+web-6fcb745f45-b57bv   1/1     Running       0          40s
+web-6fcb745f45-kwvjl   1/1     Running       0          17s
+$ web
+{"service": "shop", "version": "1.1.0", "hint": "try /order", "trace_id": "76a0213a6a7d658bc758aca36b727186"}
+$ argocd app history shop-web --grpc-web
+SOURCE  http://git-server.git.svc:3000/shop-gitops.git
+ID      DATE                           REVISION
+0       2026-10-07 22:45:32 +0530 IST  main (8ccc06c)
+1       2026-10-07 22:47:08 +0530 IST  main (aad1dc1)

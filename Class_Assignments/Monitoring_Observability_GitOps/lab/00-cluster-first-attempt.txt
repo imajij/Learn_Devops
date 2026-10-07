@@ -1,0 +1,8 @@
+$ minikube start -p obs --driver=docker --cpus=3 --memory=4096 --addons=metrics-server
+! StartHost failed, but will try again: creating host: create: creating: prepare kic ssh: container name "obs" state Stopped: log: 2026-10-07T16:45:26.568120298Z  Failed to create control group inotify object: Too many open files
+2026-10-07T16:45:26.569866859Z  Exiting PID 1...: container exited unexpectedly
+* Failed to start docker container. Running "minikube delete -p obs" may fix it: creating host: create: creating: create kic node: container name "obs": log: 2026-10-07T16:45:43.832548248Z  Failed to create control group inotify object: Too many open files
+2026-10-07T16:45:43.832552873Z  Exiting PID 1...: container exited unexpectedly
+### fix: Colima VM default fs.inotify.max_user_instances = 128 was used up by the other clusters on this VM
+$ colima ssh -- sudo sysctl -w fs.inotify.max_user_instances=1024
+fs.inotify.max_user_instances = 1024

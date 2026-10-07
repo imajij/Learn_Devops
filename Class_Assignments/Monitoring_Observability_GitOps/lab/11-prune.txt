@@ -1,0 +1,38 @@
+### add a ConfigMap (and fail stuck rollouts after 60 s, used later in the rollback demo)
+$ git add -A && git commit -qm 'Add feature-flags ConfigMap; progressDeadlineSeconds 60' && git push -q origin main 2>&1 && git log --oneline -1
+f5c7515 Add feature-flags ConfigMap; progressDeadlineSeconds 60
+### [22:49:00] argo: sync=Synced rev=aad1dc1 health=Healthy
+### [22:49:10] argo: sync=Synced rev=aad1dc1 health=Healthy
+### [22:49:20] argo: sync=Synced rev=aad1dc1 health=Healthy
+### [22:49:30] argo: sync=Synced rev=aad1dc1 health=Healthy
+### [22:49:40] argo: sync=Synced rev=f5c7515 health=Healthy
+$ kubectl --context obs -n gitops-demo get configmap web-feature-flags
+NAME                DATA   AGE
+web-feature-flags   1      7s
+### a ConfigMap created by hand is NOT in Git, so Argo CD does not manage (or prune) it
+$ kubectl --context obs -n gitops-demo create configmap made-by-hand --from-literal=note=not-in-git
+configmap/made-by-hand created
+### now remove the feature-flags YAML from Git
+$ git rm -q app/configmap.yaml && git commit -qm 'Remove feature-flags ConfigMap' && git push -q origin main 2>&1 && git log --oneline -1
+81c54aa Remove feature-flags ConfigMap
+### [22:49:41] argo: sync=Synced rev=f5c7515 health=Healthy
+### [22:49:51] argo: sync=Synced rev=f5c7515 health=Healthy
+### [22:50:01] argo: sync=Synced rev=f5c7515 health=Healthy
+### [22:50:11] argo: sync=Synced rev=f5c7515 health=Healthy
+### [22:50:21] argo: sync=Synced rev=f5c7515 health=Healthy
+### [22:50:31] argo: sync=Synced rev=f5c7515 health=Healthy
+### [22:50:41] argo: sync=Synced rev=81c54aa health=Healthy
+$ kubectl --context obs -n gitops-demo get configmap
+NAME               DATA   AGE
+kube-root-ca.crt   1      5m9s
+made-by-hand       1      60s
+$ kubectl --context obs -n argocd get events --field-selector involvedObject.name=shop-web --sort-by=.lastTimestamp | grep -iE 'prune|delet|OperationCompleted' | tail -2
+67s         Normal   OperationCompleted   application/shop-web   Sync operation to f5c75159b267569689a34c8128fb6b4bdc6d2ef8 succeeded
+7s          Normal   OperationCompleted   application/shop-web   Sync operation to 81c54aae08c104ea64b5a38c78f42684d232d150 succeeded
+$ kubectl --context obs -n gitops-demo delete configmap made-by-hand
+configmap "made-by-hand" deleted from gitops-demo namespace
+### the last sync operation, as Argo CD reports it
+$ argocd app get shop-web --show-operation --grpc-web | grep -iE 'Operation:|Phase:|ConfigMap'
+Operation:          Sync
+Phase:              Succeeded
+       ConfigMap   gitops-demo  web-feature-flags  Succeeded  Pruned         pruned

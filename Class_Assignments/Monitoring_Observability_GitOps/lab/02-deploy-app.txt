@@ -1,0 +1,53 @@
+### first try: minikube -p obs image build hit Docker Hub 429 Too Many Requests, so build with the host Docker (base image cached) and load it
+$ docker build -q -t shop-app:1.0 app/
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+sha256:128d7ccb1bac520fe8ea4141404d4410e8baedd2b737721660a4455e75389a7c
+$ minikube -p obs image load --overwrite=true shop-app:1.0
+$ minikube -p obs image ls | grep shop-app
+docker.io/library/shop-app:1.0
+$ kubectl --context obs apply -f manifests/monitoring/shop-app.yaml -f manifests/monitoring/alert-rules.yaml
+namespace/shop unchanged
+deployment.apps/shop configured
+deployment.apps/payments configured
+service/shop unchanged
+service/payments unchanged
+servicemonitor.monitoring.coreos.com/shop-apps unchanged
+prometheusrule.monitoring.coreos.com/shop-alerts unchanged
+$ kubectl --context obs -n shop rollout status deploy/shop --timeout=120s
+Waiting for deployment "shop" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "shop" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "shop" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "shop" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "shop" rollout to finish: 1 old replicas are pending termination...
+deployment "shop" successfully rolled out
+$ kubectl --context obs -n shop rollout status deploy/payments --timeout=120s
+deployment "payments" successfully rolled out
+$ kubectl --context obs -n shop get pods,svc,servicemonitor,prometheusrule
+NAME                            READY   STATUS        RESTARTS   AGE
+pod/payments-7756ddb57d-zb6pz   1/1     Running       0          13s
+pod/payments-7b69985546-mgr8f   1/1     Terminating   0          7m16s
+pod/shop-7445f554f6-5wmnq       1/1     Terminating   0          7m16s
+pod/shop-7445f554f6-qfpkz       1/1     Terminating   0          7m16s
+pod/shop-74d5fc4f96-ddxgg       1/1     Running       0          13s
+pod/shop-74d5fc4f96-pqmw7       1/1     Running       0          6s
+
+NAME               TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+service/payments   ClusterIP   10.103.63.13     <none>        8080/TCP   7m16s
+service/shop       ClusterIP   10.110.208.252   <none>        8080/TCP   7m16s
+
+NAME                                             AGE
+servicemonitor.monitoring.coreos.com/shop-apps   7m16s
+
+NAME                                               AGE
+prometheusrule.monitoring.coreos.com/shop-alerts   7m16s
+$ kubectl --context obs -n monitoring get pods
+NAME                                      READY   STATUS    RESTARTS   AGE
+alertmanager-kps-alertmanager-0           2/2     Running   0          9m24s
+kps-grafana-694448fc69-cz6sv              3/3     Running   0          10m
+kps-kube-state-metrics-785f74f8db-kb9hw   1/1     Running   0          10m
+kps-operator-586785c8f4-xsmqx             1/1     Running   0          10m
+kps-prometheus-node-exporter-qn7m7        1/1     Running   0          10m
+prometheus-kps-prometheus-0               2/2     Running   0          9m23s

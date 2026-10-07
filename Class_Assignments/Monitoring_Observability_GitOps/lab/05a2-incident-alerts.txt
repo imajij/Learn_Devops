@@ -1,0 +1,18 @@
+### [22:35:38] alerts while the incident is running
+$ alerts
+firing	ShopHighErrorRate	payments	payments: 35.04% of requests are failing
+firing	ShopHighErrorRate	shop	shop: 35.9% of requests are failing
+firing	ShopHighCPU	shop-74d5fc4f96-ddxgg	shop-74d5fc4f96-ddxgg is using 99.96% of its CPU limit
+$ pq 'sum by (service) (rate(http_requests_total{namespace="shop",code=~"5.."}[1m])) / sum by (service) (rate(http_requests_total{namespace="shop",path!="/metrics"}[1m]))'
+service=payments => 0.375
+service=shop => 0.3833333333333333
+$ pq 'sum by (pod) (rate(container_cpu_usage_seconds_total{namespace="shop",container="app"}[1m]))'
+pod=shop-74d5fc4f96-pqmw7 => 0.008606838398813935
+pod=shop-74d5fc4f96-ddxgg => 0.49945817296690037
+pod=payments-7756ddb57d-zb6pz => 0.006776620479764091
+$ kubectl --context obs -n shop top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+loadgen-6f9d7b696-fd9tz     4m           12Mi            
+payments-7756ddb57d-zb6pz   7m           14Mi            
+shop-74d5fc4f96-ddxgg       501m         15Mi            
+shop-74d5fc4f96-pqmw7       8m           15Mi            
