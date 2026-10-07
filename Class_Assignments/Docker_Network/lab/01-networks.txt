@@ -1,0 +1,30 @@
+### 1. three user-defined bridge networks (the database one is --internal: no route to the internet)
+$ docker network create --subnet 172.30.1.0/24 ajij-frontend-net
+94000e5b02e91584da306ccce26db8c49473bc878d7c3471525b609f6a9dd837
+$ docker network create --subnet 172.30.2.0/24 ajij-backend-net
+ef3f849df8105dd0e5428bceed703993999f5dc165c959512d44f946a5b948ae
+$ docker network create --subnet 172.30.3.0/24 --internal ajij-database-net
+e3154368c67a62b7102bbdfdf3460fd11c30c05ff89df17a96ee33c71522b9f2
+### 2. three containers (lab-only DB password, not a real secret)
+$ docker run -d --name ajij-frontend --network ajij-frontend-net nginx:alpine
+c41abfead0f627077ff88935fef06cd8984bbda8c9ec6a7033a5db6479070889
+$ docker run -d --name ajij-backend --network ajij-frontend-net alpine:3.22 sleep infinity
+1da6e82500a7c25a85740963d314b2397e9575196d7ac95ede3dbce384947004
+$ docker network connect ajij-backend-net ajij-backend
+$ docker run -d --name ajij-database --network ajij-backend-net -e MYSQL_ROOT_PASSWORD=labpass -e MYSQL_DATABASE=school mysql:8.4
+ec18bb170774b0a692c85e5f29e292b50ef5669981db0c63567523afb62e9971
+$ docker network connect ajij-database-net ajij-database
+### 3. who is on which network
+$ for n in ajij-frontend-net ajij-backend-net ajij-database-net; do echo "$n: $(docker network inspect -f '{{range .Containers}}{{.Name}}({{.IPv4Address}}) {{end}}' $n)"; done
+ajij-frontend-net: ajij-backend(172.30.1.3/24) ajij-frontend(172.30.1.2/24) 
+ajij-backend-net: ajij-backend(172.30.2.2/24) ajij-database(172.30.2.3/24) 
+ajij-database-net: ajij-database(172.30.3.2/24) 
+$ docker inspect -f '{{.Name}} -> {{range $k, $v := .NetworkSettings.Networks}}{{$k}}={{$v.IPAddress}} {{end}}' ajij-frontend ajij-backend ajij-database
+/ajij-frontend -> ajij-frontend-net=172.30.1.2 
+/ajij-backend -> ajij-backend-net=172.30.2.2 ajij-frontend-net=172.30.1.3 
+/ajij-database -> ajij-backend-net=172.30.2.3 ajij-database-net=172.30.3.2 
+$ docker ps --filter name=ajij-frontend --filter name=ajij-backend --filter name=ajij-database --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Networks}}'
+NAMES           IMAGE          STATUS                  NETWORKS
+ajij-database   mysql:8.4      Up Less than a second   ajij-backend-net,ajij-database-net
+ajij-backend    alpine:3.22    Up Less than a second   ajij-backend-net,ajij-frontend-net
+ajij-frontend   nginx:alpine   Up Less than a second   ajij-frontend-net

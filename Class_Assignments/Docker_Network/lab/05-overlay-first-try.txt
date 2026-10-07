@@ -1,0 +1,61 @@
+### safety check: swarm is off, and other people's containers (kind/minikube nodes) are running
+$ docker info --format 'Swarm: {{.Swarm.LocalNodeState}}'
+Swarm: inactive
+$ docker ps --filter name=k8s- --format '{{.Names}}: {{.Status}}'
+k8s-b: Up 4 minutes
+k8s-a: Up 10 minutes
+### 1. turn this daemon into a one-node swarm (overlay networks need the swarm control plane)
+$ docker swarm init --advertise-addr 192.168.5.1 | head -2
+Swarm initialized: current node (z9b6phkfyrkvdgfxkwdczsvl8) is now a manager.
+
+$ docker node ls
+ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+z9b6phkfyrkvdgfxkwdczsvl8 *   colima     Ready     Active         Leader           29.5.2
+### 2. create an attachable overlay network
+$ docker network create -d overlay --attachable --subnet 10.20.0.0/24 ajij-overlay
+pefhr9llpnm01y2sicy7w550p
+$ docker network ls --filter driver=overlay
+NETWORK ID     NAME           DRIVER    SCOPE
+pefhr9llpnm0   ajij-overlay   overlay   swarm
+sk85bxhdranp   ingress        overlay   swarm
+### 3. a 2-replica service on the overlay network, published through the swarm routing mesh
+$ docker service create --quiet --name ajij-web --replicas 2 --network ajij-overlay -p 8131:80 nginx:alpine
+zkk8nl9v4sc36ac0xwg5dq23k
+$ docker service ls --filter name=ajij-web
+ID             NAME       MODE         REPLICAS   IMAGE          PORTS
+zkk8nl9v4sc3   ajij-web   replicated   2/2        nginx:alpine   *:8131->80/tcp
+$ docker service ps ajij-web --format 'table {{.Name}}\t{{.Node}}\t{{.CurrentState}}'
+NAME         NODE      CURRENT STATE
+ajij-web.1   colima    Running 10 seconds ago
+ajij-web.2   colima    Running 10 seconds ago
+### 4. a plain container joins the same overlay and finds the service by name
+$ docker run --rm --name ajij-overlay-client --network ajij-overlay alpine:3.22 sh -c 'nslookup ajij-web | tail -3; nslookup tasks.ajij-web | grep Address | tail -2; wget -qO- http://ajij-web | grep -o "<title>.*</title>"'
+Name:	ajij-web
+Address: 10.20.0.2
+
+Address: 10.20.0.4
+Address: 10.20.0.3
+<title>Welcome to nginx!</title>
+$ docker network inspect -f 'driver={{.Driver}} scope={{.Scope}} subnet={{range .IPAM.Config}}{{.Subnet}}{{end}} vxlan-id={{index .Options "com.docker.network.driver.overlay.vxlanid_list"}}' ajij-overlay
+driver=overlay scope=swarm subnet=10.20.0.0/24 vxlan-id=4097
+### 5. routing mesh: the published port answers on the node (the Colima VM)
+$ colima ssh -- curl -s -m 5 http://localhost:8131 | grep -o '<title>.*</title>'
+time="2026-10-07T22:08:53+05:30" level=fatal msg="exit status 28"
+$ curl -s -m 5 http://localhost:8131 | grep -o '<title>.*</title>' || echo 'not reachable from macOS (exit '$?')'
+not reachable from macOS (exit 1)
+### 6. clean up and leave the swarm so the shared daemon is back to normal
+$ docker service rm ajij-web
+ajij-web
+$ docker network rm ajij-overlay
+ajij-overlay
+$ docker swarm leave --force
+Node left the swarm.
+$ docker network rm docker_gwbridge
+docker_gwbridge
+$ docker info --format 'Swarm: {{.Swarm.LocalNodeState}}'
+Swarm: inactive
+$ docker network ls --filter driver=overlay
+NETWORK ID   NAME      DRIVER    SCOPE
+$ docker ps --filter name=k8s- --format '{{.Names}}: {{.Status}}'
+k8s-b: Up 5 minutes
+k8s-a: Up 11 minutes

@@ -1,0 +1,16 @@
+$ cat > bind-mount-site/index.html <<'HTML'
+<h1>Hello students</h1>
+<p>This line was added on the Mac while the container kept running.</p>
+HTML
+$ curl -s http://localhost:8121
+<h1>Hello students</h1>
+<p>This line was added on the Mac while the container kept running.</p>
+$ docker exec ajij-nginx-bind cat /usr/share/nginx/html/index.html
+<h1>Hello students</h1>
+<p>This line was added on the Mac while the container kept running.</p>
+### same start time and RestartCount=0: the container was never restarted
+$ docker inspect -f 'StartedAt={{.State.StartedAt}} RestartCount={{.RestartCount}}' ajij-nginx-bind
+StartedAt=2026-10-07T16:38:05.11586989Z RestartCount=0
+$ docker ps --filter name=ajij-nginx-bind --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+NAMES             STATUS         PORTS
+ajij-nginx-bind   Up 3 seconds   0.0.0.0:8121->80/tcp, [::]:8121->80/tcp

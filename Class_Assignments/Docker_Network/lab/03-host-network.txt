@@ -1,0 +1,40 @@
+### with Colima the Docker 'host' is the Linux VM, so check port 80 is free inside the VM first
+$ colima ssh -- sudo ss -tlnp 'sport = :80'
+State Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+$ docker pull httpd:2.4
+2.4: Pulling from library/httpd
+Digest: sha256:c842ac797bd1fe8b3cd26d002ac9d948aa2814097544600600b35aef42e6785a
+Status: Image is up to date for httpd:2.4
+docker.io/library/httpd:2.4
+$ docker run -d --name ajij-apache-host --network host httpd:2.4
+0f1a15e8645d83e9ba45daa1ddf949db7ec38040c9b55e987ba6e746365ac679
+$ docker ps --filter name=ajij-apache-host --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Networks}}\t{{.Ports}}'
+NAMES              IMAGE       STATUS         NETWORKS   PORTS
+ajij-apache-host   httpd:2.4   Up 3 seconds   host       
+$ docker inspect -f 'NetworkMode={{.HostConfig.NetworkMode}}' ajij-apache-host
+NetworkMode=host
+### no -p mapping and no container IP: httpd binds port 80 directly in the VM's network namespace
+$ colima ssh -- sudo ss -tlnp 'sport = :80'
+State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+LISTEN 0      511                *:80              *:*    users:(("httpd",pid=28579,fd=4),("httpd",pid=28578,fd=4),("httpd",pid=28577,fd=4),("httpd",pid=28562,fd=4))
+$ colima ssh -- curl -s http://localhost:80
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>It works! Apache httpd</title>
+</head>
+<body>
+<p>It works!</p>
+</body>
+</html>
+### from macOS (Colima/Lima forwards ports that listen in the VM to the Mac's localhost)
+$ curl -s -m 5 http://localhost:80
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>It works! Apache httpd</title>
+</head>
+<body>
+<p>It works!</p>
+</body>
+</html>

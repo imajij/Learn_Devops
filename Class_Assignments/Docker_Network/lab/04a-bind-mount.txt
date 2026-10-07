@@ -1,0 +1,12 @@
+$ mkdir -p bind-mount-site
+$ echo '<h1>Hello students</h1>' > bind-mount-site/index.html
+$ cat bind-mount-site/index.html
+<h1>Hello students</h1>
+$ docker run -d --name ajij-nginx-bind -p 8121:80 -v "$PWD/bind-mount-site":/usr/share/nginx/html:ro nginx:alpine
+3c619f4365ea66c72f7abcd0a011e4abe364ee6983a3d5dc1262cbe43690cf43
+$ docker inspect -f '{{range .Mounts}}{{.Type}}: {{.Source}} -> {{.Destination}} (rw={{.RW}}){{end}}' ajij-nginx-bind
+bind: /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/Docker_Network/bind-mount-site -> /usr/share/nginx/html (rw=false)
+$ curl -s http://localhost:8121
+<h1>Hello students</h1>
+$ docker inspect -f 'StartedAt={{.State.StartedAt}} RestartCount={{.RestartCount}}' ajij-nginx-bind
+StartedAt=2026-10-07T16:38:05.11586989Z RestartCount=0
