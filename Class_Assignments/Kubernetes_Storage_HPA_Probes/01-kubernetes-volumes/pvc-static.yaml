@@ -1,0 +1,13 @@
+# Same claim as pvc.yaml, but storageClassName "" turns OFF dynamic provisioning,
+# so the claim can only bind to a pre-created PV with no class (student-pv).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: student-pvc
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi

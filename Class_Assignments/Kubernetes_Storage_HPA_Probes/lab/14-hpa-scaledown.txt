@@ -1,0 +1,87 @@
+### [22:31:14] stopping the load
+$ kubectl --context k8s-b delete pod load-generator load-generator-2 load-generator-3
+pod "load-generator" deleted from default namespace
+pod "load-generator-2" deleted from default namespace
+pod "load-generator-3" deleted from default namespace
+### [22:32:45] snapshot 1 (after stop)
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 43%/50%   1         5         3          11m
+$ kubectl --context k8s-b get pods -l app=hpa-demo
+NAME                        READY   STATUS    RESTARTS   AGE
+hpa-demo-5d6676989b-dvps5   1/1     Running   0          10m
+hpa-demo-5d6676989b-n75zz   1/1     Running   0          11m
+hpa-demo-5d6676989b-vgzkg   1/1     Running   0          4m1s
+### [22:33:46] snapshot 2 (after stop)
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 12%/50%   1         5         3          12m
+$ kubectl --context k8s-b get pods -l app=hpa-demo
+NAME                        READY   STATUS    RESTARTS   AGE
+hpa-demo-5d6676989b-dvps5   1/1     Running   0          11m
+hpa-demo-5d6676989b-n75zz   1/1     Running   0          12m
+hpa-demo-5d6676989b-vgzkg   1/1     Running   0          5m1s
+### [22:34:46] snapshot 3 (after stop)
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 0%/50%   1         5         3          13m
+$ kubectl --context k8s-b get pods -l app=hpa-demo
+NAME                        READY   STATUS    RESTARTS   AGE
+hpa-demo-5d6676989b-dvps5   1/1     Running   0          12m
+hpa-demo-5d6676989b-n75zz   1/1     Running   0          13m
+hpa-demo-5d6676989b-vgzkg   1/1     Running   0          6m1s
+### [22:35:46] snapshot 4 (after stop)
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 0%/50%   1         5         3          14m
+$ kubectl --context k8s-b get pods -l app=hpa-demo
+NAME                        READY   STATUS    RESTARTS   AGE
+hpa-demo-5d6676989b-dvps5   1/1     Running   0          13m
+hpa-demo-5d6676989b-n75zz   1/1     Running   0          14m
+hpa-demo-5d6676989b-vgzkg   1/1     Running   0          7m1s
+### [22:36:46] snapshot 5 (after stop)
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 0%/50%   1         5         3          15m
+$ kubectl --context k8s-b get pods -l app=hpa-demo
+NAME                        READY   STATUS    RESTARTS   AGE
+hpa-demo-5d6676989b-dvps5   1/1     Running   0          14m
+hpa-demo-5d6676989b-n75zz   1/1     Running   0          15m
+hpa-demo-5d6676989b-vgzkg   1/1     Running   0          8m1s
+### [22:37:46] snapshot 6 (after stop)
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 0%/50%   1         5         3          16m
+$ kubectl --context k8s-b get pods -l app=hpa-demo
+NAME                        READY   STATUS    RESTARTS   AGE
+hpa-demo-5d6676989b-n75zz   1/1     Running   0          16m
+### [22:38:46] snapshot 7 (after stop)
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 0%/50%   1         5         1          17m
+$ kubectl --context k8s-b get pods -l app=hpa-demo
+NAME                        READY   STATUS    RESTARTS   AGE
+hpa-demo-5d6676989b-n75zz   1/1     Running   0          17m
+### [22:39:46] snapshot 8 (after stop)
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 0%/50%   1         5         1          18m
+$ kubectl --context k8s-b get pods -l app=hpa-demo
+NAME                        READY   STATUS    RESTARTS   AGE
+hpa-demo-5d6676989b-n75zz   1/1     Running   0          18m
+### [22:40:46] snapshot 9 (after stop)
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 0%/50%   1         5         1          19m
+$ kubectl --context k8s-b get pods -l app=hpa-demo
+NAME                        READY   STATUS    RESTARTS   AGE
+hpa-demo-5d6676989b-n75zz   1/1     Running   0          19m
+$ kubectl --context k8s-b describe hpa hpa-demo | sed -n '/Events/,$p'
+Events:
+  Type     Reason                        Age                From                       Message
+  ----     ------                        ----               ----                       -------
+  Warning  FailedGetResourceMetric       19m (x2 over 19m)  horizontal-pod-autoscaler  failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+  Warning  FailedComputeMetricsReplicas  19m (x2 over 19m)  horizontal-pod-autoscaler  invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+  Normal   SuccessfulRescale             18m                horizontal-pod-autoscaler  New size: 2; reason: cpu resource utilization (percentage of request) above target
+  Normal   SuccessfulRescale             12m                horizontal-pod-autoscaler  New size: 3; reason: cpu resource utilization (percentage of request) above target
+  Normal   SuccessfulRescale             3m14s              horizontal-pod-autoscaler  New size: 1; reason: All metrics below target

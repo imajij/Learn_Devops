@@ -1,0 +1,51 @@
+### Bonus challenge 3: livenessProbe path -> /crash
+$ kubectl --context k8s-b patch deployment web-app -n production-webapp --type=json -p '[{"op":"replace","path":"/spec/template/spec/containers/0/livenessProbe/httpGet/path","value":"/crash"}]'
+deployment.apps/web-app patched
+### [22:51:15] check 1
+$ kubectl --context k8s-b get pods -n production-webapp -l app=web-app
+NAME                      READY   STATUS    RESTARTS     AGE
+web-app-85d86b65d-9rz4n   0/1     Running   1 (4s ago)   19s
+web-app-85d86b65d-mlp4s   0/1     Running   1 (4s ago)   19s
+web-app-85d86b65d-whsq7   0/1     Running   1 (4s ago)   19s
+### [22:51:35] check 2
+$ kubectl --context k8s-b get pods -n production-webapp -l app=web-app
+NAME                      READY   STATUS    RESTARTS     AGE
+web-app-85d86b65d-9rz4n   1/1     Running   2 (9s ago)   39s
+web-app-85d86b65d-mlp4s   1/1     Running   2 (9s ago)   39s
+web-app-85d86b65d-whsq7   1/1     Running   2 (9s ago)   39s
+### [22:51:55] check 3
+$ kubectl --context k8s-b get pods -n production-webapp -l app=web-app
+NAME                      READY   STATUS    RESTARTS      AGE
+web-app-85d86b65d-9rz4n   1/1     Running   3 (14s ago)   59s
+web-app-85d86b65d-mlp4s   1/1     Running   3 (14s ago)   59s
+web-app-85d86b65d-whsq7   1/1     Running   3 (14s ago)   59s
+### [22:52:15] check 4
+$ kubectl --context k8s-b get pods -n production-webapp -l app=web-app
+NAME                      READY   STATUS             RESTARTS      AGE
+web-app-85d86b65d-9rz4n   0/1     CrashLoopBackOff   3 (19s ago)   79s
+web-app-85d86b65d-mlp4s   0/1     CrashLoopBackOff   3 (19s ago)   79s
+web-app-85d86b65d-whsq7   0/1     CrashLoopBackOff   3 (19s ago)   79s
+$ P=$(kubectl --context k8s-b get pods -n production-webapp -l app=web-app -o jsonpath='{.items[0].metadata.name}'); kubectl --context k8s-b describe pod -n production-webapp $P | sed -n '/Events/,$p' | tail -6
+  Normal   Pulled     34s (x4 over 79s)   kubelet            spec.containers{nginx}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal   Created    34s (x4 over 79s)   kubelet            spec.containers{nginx}: Container created
+  Normal   Started    34s (x4 over 79s)   kubelet            spec.containers{nginx}: Container started
+  Warning  Unhealthy  19s (x12 over 74s)  kubelet            spec.containers{nginx}: Liveness probe failed: HTTP probe failed with statuscode: 404
+  Normal   Killing    19s (x4 over 64s)   kubelet            spec.containers{nginx}: Container nginx failed liveness probe, will be restarted
+  Warning  BackOff    16s (x3 over 19s)   kubelet            spec.containers{nginx}: Back-off restarting failed container nginx in pod web-app-85d86b65d-9rz4n_production-webapp(99cf4de4-6f3a-46ec-947b-5adddb6de9ca)
+### revert: path back to /
+$ kubectl --context k8s-b patch deployment web-app -n production-webapp --type=json -p '[{"op":"replace","path":"/spec/template/spec/containers/0/livenessProbe/httpGet/path","value":"/"}]'
+deployment.apps/web-app patched
+$ kubectl --context k8s-b rollout status deployment/web-app -n production-webapp --timeout=120s
+Waiting for deployment "web-app" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "web-app" rollout to finish: 1 of 3 updated replicas are available...
+deployment "web-app" successfully rolled out
+$ kubectl --context k8s-b get pods -n production-webapp -l app=web-app
+NAME                      READY   STATUS    RESTARTS   AGE
+web-app-d45775485-2hkpr   1/1     Running   0          40s
+web-app-d45775485-c6gxr   1/1     Running   0          40s
+web-app-d45775485-cwzxk   1/1     Running   0          40s

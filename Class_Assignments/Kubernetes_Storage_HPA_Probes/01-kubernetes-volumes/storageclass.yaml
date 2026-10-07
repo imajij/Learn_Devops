@@ -1,0 +1,8 @@
+# A custom StorageClass that uses minikube's built-in hostpath provisioner.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ajij-fast
+provisioner: k8s.io/minikube-hostpath
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer   # PV is created only when a Pod uses the PVC

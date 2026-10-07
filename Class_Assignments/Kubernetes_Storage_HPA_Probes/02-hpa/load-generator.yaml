@@ -1,0 +1,18 @@
+# Load generator: a busybox pod that requests the hpa-demo Service in a tight loop.
+# Same idea as the `kubectl run load-generator ...` command in the course notes, kept as YAML.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: load-generator
+  labels:
+    app: load-generator
+spec:
+  restartPolicy: Never
+  containers:
+    - name: load
+      image: busybox:1.36
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "sending requests to http://hpa-demo-service ..."
+          while true; do wget -q -O- http://hpa-demo-service > /dev/null; done

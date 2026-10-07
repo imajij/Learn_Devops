@@ -1,0 +1,48 @@
+$ kubectl --context k8s-b get pods -n production-webapp -l app=web-app
+NAME                      READY   STATUS    RESTARTS   AGE
+web-app-d45775485-6ff4j   1/1     Running   0          3m36s
+web-app-d45775485-cx7nt   1/1     Running   0          10m
+web-app-d45775485-rkfc7   1/1     Running   0          9m16s
+$ P=$(kubectl --context k8s-b get pods -n production-webapp -l app=web-app -o jsonpath='{.items[0].metadata.name}'); echo $P
+web-app-d45775485-6ff4j
+$ kubectl --context k8s-b get endpoints web-service -n production-webapp
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME          ENDPOINTS                                      AGE
+web-service   10.244.0.31:80,10.244.0.33:80,10.244.0.36:80   10m
+### simulate an app fault: delete nginx's index page inside ONE pod, so GET / returns 403
+$ kubectl --context k8s-b exec -n production-webapp $P -- rm /usr/share/nginx/html/index.html
+$ kubectl --context k8s-b exec -n production-webapp $P -- curl -s -o /dev/null -w '%{http_code}\n' http://localhost/
+403
+### poll every 3 s: pod READY/RESTARTS and the Service endpoints
+[22:49:07] web-app-d45775485-6ff4j   true   0 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+[22:49:11] web-app-d45775485-6ff4j   true   0 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+[22:49:14] web-app-d45775485-6ff4j   true   0 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+[22:49:17] web-app-d45775485-6ff4j   false   0 | endpoints: 10.244.0.31 10.244.0.33
+[22:49:20] web-app-d45775485-6ff4j   false   0 | endpoints: 10.244.0.31 10.244.0.33
+[22:49:23] web-app-d45775485-6ff4j   false   1 | endpoints: 10.244.0.31 10.244.0.33
+[22:49:26] web-app-d45775485-6ff4j   false   1 | endpoints: 10.244.0.31 10.244.0.33
+[22:49:29] web-app-d45775485-6ff4j   false   1 | endpoints: 10.244.0.31 10.244.0.33
+[22:49:32] web-app-d45775485-6ff4j   true   1 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+[22:49:35] web-app-d45775485-6ff4j   true   1 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+[22:49:38] web-app-d45775485-6ff4j   true   1 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+[22:49:41] web-app-d45775485-6ff4j   true   1 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+[22:49:45] web-app-d45775485-6ff4j   true   1 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+[22:49:48] web-app-d45775485-6ff4j   true   1 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+[22:49:51] web-app-d45775485-6ff4j   true   1 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+[22:49:54] web-app-d45775485-6ff4j   true   1 | endpoints: 10.244.0.31 10.244.0.33 10.244.0.36
+$ kubectl --context k8s-b get pods -n production-webapp -l app=web-app
+NAME                      READY   STATUS    RESTARTS      AGE
+web-app-d45775485-6ff4j   1/1     Running   1 (35s ago)   4m26s
+web-app-d45775485-cx7nt   1/1     Running   0             10m
+web-app-d45775485-rkfc7   1/1     Running   0             10m
+$ kubectl --context k8s-b describe pod -n production-webapp $P | sed -n '/Events/,$p'
+Events:
+  Type     Reason     Age                  From               Message
+  ----     ------     ----                 ----               -------
+  Normal   Scheduled  4m26s                default-scheduler  Successfully assigned production-webapp/web-app-d45775485-6ff4j to k8s-b
+  Normal   Pulled     35s (x2 over 4m25s)  kubelet            spec.containers{nginx}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal   Created    35s (x2 over 4m25s)  kubelet            spec.containers{nginx}: Container created
+  Normal   Started    35s (x2 over 4m25s)  kubelet            spec.containers{nginx}: Container started
+  Warning  Unhealthy  35s (x5 over 47s)    kubelet            spec.containers{nginx}: Readiness probe failed: HTTP probe failed with statuscode: 403
+  Warning  Unhealthy  35s (x3 over 45s)    kubelet            spec.containers{nginx}: Liveness probe failed: HTTP probe failed with statuscode: 403
+  Normal   Killing    35s                  kubelet            spec.containers{nginx}: Container nginx failed liveness probe, will be restarted

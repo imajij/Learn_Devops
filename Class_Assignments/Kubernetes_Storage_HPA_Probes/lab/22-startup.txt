@@ -1,0 +1,75 @@
+### a) instructor's startup.yaml: nginx starts fast, startup probe passes at once
+$ kubectl --context k8s-b apply -f 03-probes/startup.yaml
+pod/startup-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/startup-demo --timeout=60s
+pod/startup-demo condition met
+$ kubectl --context k8s-b get pod startup-demo
+NAME           READY   STATUS    RESTARTS   AGE
+startup-demo   1/1     Running   0          3s
+$ kubectl --context k8s-b delete pod startup-demo --now
+pod "startup-demo" deleted from default namespace
+### b) slow app (20 s warm-up) with only 6 s of startup budget
+$ grep -A6 ' startupProbe:' 03-probes/startup-slow-broken.yaml
+      startupProbe:
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 2
+        failureThreshold: 3
+      livenessProbe:
+$ kubectl --context k8s-b apply -f 03-probes/startup-slow-broken.yaml
+pod/slow-start created
+### [22:37:26] check 1
+$ kubectl --context k8s-b get pod slow-start
+NAME         READY   STATUS    RESTARTS   AGE
+slow-start   0/1     Running   0          20s
+### [22:37:46] check 2
+$ kubectl --context k8s-b get pod slow-start
+NAME         READY   STATUS    RESTARTS     AGE
+slow-start   0/1     Running   1 (3s ago)   40s
+### [22:38:06] check 3
+$ kubectl --context k8s-b get pod slow-start
+NAME         READY   STATUS    RESTARTS      AGE
+slow-start   0/1     Running   1 (24s ago)   61s
+$ kubectl --context k8s-b describe pod slow-start | sed -n '/Events/,$p'
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  61s                default-scheduler  Successfully assigned default/slow-start to k8s-b
+  Normal   Pulled     24s (x2 over 60s)  kubelet            spec.containers{nginx}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal   Created    24s (x2 over 60s)  kubelet            spec.containers{nginx}: Container created
+  Normal   Started    24s (x2 over 60s)  kubelet            spec.containers{nginx}: Container started
+  Warning  Unhealthy  18s (x6 over 58s)  kubelet            spec.containers{nginx}: Startup probe failed: Get "http://10.244.0.29:80/": dial tcp 10.244.0.29:80: connect: connection refused
+  Normal   Killing    18s (x2 over 54s)  kubelet            spec.containers{nginx}: Container nginx failed startup probe, will be restarted
+$ kubectl --context k8s-b delete pod slow-start --now
+pod "slow-start" deleted from default namespace
+### c) FIX: failureThreshold 30 (60 s budget)
+$ grep -A6 ' startupProbe:' 03-probes/startup-slow-fixed.yaml
+      startupProbe:
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 2
+        failureThreshold: 30
+      livenessProbe:
+$ kubectl --context k8s-b apply -f 03-probes/startup-slow-fixed.yaml
+pod/slow-start created
+### [22:38:32] 10s
+$ kubectl --context k8s-b get pod slow-start
+NAME         READY   STATUS    RESTARTS   AGE
+slow-start   0/1     Running   0          10s
+### [22:38:52] 30s
+$ kubectl --context k8s-b get pod slow-start
+NAME         READY   STATUS    RESTARTS   AGE
+slow-start   1/1     Running   0          30s
+$ kubectl --context k8s-b describe pod slow-start | sed -n '/Events/,$p'
+Events:
+  Type     Reason     Age                 From               Message
+  ----     ------     ----                ----               -------
+  Normal   Scheduled  30s                 default-scheduler  Successfully assigned default/slow-start to k8s-b
+  Normal   Pulled     30s                 kubelet            spec.containers{nginx}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal   Created    30s                 kubelet            spec.containers{nginx}: Container created
+  Normal   Started    30s                 kubelet            spec.containers{nginx}: Container started
+  Warning  Unhealthy  10s (x10 over 28s)  kubelet            spec.containers{nginx}: Startup probe failed: Get "http://10.244.0.30:80/": dial tcp 10.244.0.30:80: connect: connection refused
+$ kubectl --context k8s-b delete pod slow-start --now
+pod "slow-start" deleted from default namespace

@@ -1,0 +1,20 @@
+$ kubectl --context k8s-b get svc,endpoints -n production-webapp
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME                  TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+service/web-service   ClusterIP   10.103.12.31   <none>        80/TCP    58s
+
+NAME                    ENDPOINTS                       AGE
+endpoints/web-service   10.244.0.31:80,10.244.0.33:80   58s
+$ kubectl --context k8s-b port-forward -n production-webapp svc/web-service 8080:80 > /dev/null 2>&1 & PF=$!; sleep 3
+$ curl -s http://localhost:8080 | head -8
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+$ curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://localhost:8080
+HTTP 200
+$ kill $PF

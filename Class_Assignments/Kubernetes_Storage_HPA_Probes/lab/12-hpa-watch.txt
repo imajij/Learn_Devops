@@ -1,0 +1,20 @@
+$ kubectl --context k8s-b get hpa hpa-demo -w     ### each line prefixed with the time it arrived
+[22:21:46] NAME       REFERENCE             TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+[22:21:46] hpa-demo   Deployment/hpa-demo   cpu: 9%/50%   1         5         1          34s
+[22:22:42] hpa-demo   Deployment/hpa-demo   cpu: 57%/50%   1         5         1          90s
+[22:22:57] hpa-demo   Deployment/hpa-demo   cpu: 57%/50%   1         5         2          105s
+[22:23:42] hpa-demo   Deployment/hpa-demo   cpu: 51%/50%   1         5         2          2m30s
+[22:24:43] hpa-demo   Deployment/hpa-demo   cpu: 43%/50%   1         5         2          3m31s
+[22:25:43] hpa-demo   Deployment/hpa-demo   cpu: 45%/50%   1         5         2          4m31s
+[22:26:43] hpa-demo   Deployment/hpa-demo   cpu: 42%/50%   1         5         2          5m31s
+[22:27:44] hpa-demo   Deployment/hpa-demo   cpu: 46%/50%   1         5         2          6m32s
+[22:28:45] hpa-demo   Deployment/hpa-demo   cpu: 59%/50%   1         5         2          7m33s
+[22:29:00] hpa-demo   Deployment/hpa-demo   cpu: 59%/50%   1         5         3          7m48s
+[22:29:45] hpa-demo   Deployment/hpa-demo   cpu: 43%/50%   1         5         3          8m33s
+[22:30:45] hpa-demo   Deployment/hpa-demo   cpu: 44%/50%   1         5         3          9m33s
+[22:31:46] hpa-demo   Deployment/hpa-demo   cpu: 43%/50%   1         5         3          10m
+[22:32:46] hpa-demo   Deployment/hpa-demo   cpu: 12%/50%   1         5         3          11m
+[22:33:46] hpa-demo   Deployment/hpa-demo   cpu: 0%/50%    1         5         3          12m
+[22:37:32] hpa-demo   Deployment/hpa-demo   cpu: 0%/50%    1         5         3          16m
+[22:37:47] hpa-demo   Deployment/hpa-demo   cpu: 0%/50%    1         5         1          16m
+[22:38:32] hpa-demo   Deployment/hpa-demo   cpu: 0%/50%    1         5         1          17m

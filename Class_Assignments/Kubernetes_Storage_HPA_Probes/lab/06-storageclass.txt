@@ -1,0 +1,31 @@
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/storageclass.yaml
+storageclass.storage.k8s.io/ajij-fast created
+$ kubectl --context k8s-b get storageclass
+NAME                 PROVISIONER                RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+ajij-fast            k8s.io/minikube-hostpath   Delete          WaitForFirstConsumer   false                  0s
+standard (default)   k8s.io/minikube-hostpath   Delete          Immediate              false                  6m58s
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/sc-pvc.yaml
+persistentvolumeclaim/fast-pvc created
+$ kubectl --context k8s-b get pvc fast-pvc
+NAME       STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+fast-pvc   Pending                                      ajij-fast      <unset>                 4s
+$ kubectl --context k8s-b describe pvc fast-pvc | sed -n '/Events/,$p'
+Events:
+  Type    Reason                Age   From                         Message
+  ----    ------                ----  ----                         -------
+  Normal  WaitForFirstConsumer  4s    persistentvolume-controller  waiting for first consumer to be created before binding
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/sc-pod.yaml
+pod/fast-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/fast-demo --timeout=120s
+error: timed out waiting for the condition on pods/fast-demo
+$ kubectl --context k8s-b get pvc fast-pvc
+NAME       STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+fast-pvc   Pending                                      ajij-fast      <unset>                 2m4s
+$ kubectl --context k8s-b get pv -o custom-columns=NAME:.metadata.name,CLAIM:.spec.claimRef.name,SC:.spec.storageClassName,RECLAIM:.spec.persistentVolumeReclaimPolicy,STATUS:.status.phase
+NAME   CLAIM   SC    RECLAIM   STATUS
+$ kubectl --context k8s-b delete pod fast-demo
+pod "fast-demo" deleted from default namespace
+$ kubectl --context k8s-b delete pvc fast-pvc
+persistentvolumeclaim "fast-pvc" deleted from default namespace
+$ kubectl --context k8s-b delete storageclass ajij-fast
+storageclass.storage.k8s.io "ajij-fast" deleted

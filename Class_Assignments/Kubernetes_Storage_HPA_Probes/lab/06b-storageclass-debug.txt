@@ -1,0 +1,25 @@
+### re-create the WaitForFirstConsumer class and investigate why the claim never bound
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/storageclass.yaml -f 01-kubernetes-volumes/sc-pvc.yaml -f 01-kubernetes-volumes/sc-pod.yaml
+storageclass.storage.k8s.io/ajij-fast created
+persistentvolumeclaim/fast-pvc created
+pod/fast-demo created
+$ kubectl --context k8s-b get pod fast-demo
+NAME        READY   STATUS    RESTARTS   AGE
+fast-demo   0/1     Pending   0          30s
+$ kubectl --context k8s-b get pvc fast-pvc
+NAME       STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+fast-pvc   Pending                                      ajij-fast      <unset>                 30s
+$ kubectl --context k8s-b describe pvc fast-pvc | sed -n '/Events/,$p' | cut -c1-260
+Events:
+  Type     Reason                Age                From                                                                 Message
+  ----     ------                ----               ----                                                                 -------
+  Normal   WaitForFirstConsumer  30s                persistentvolume-controller                                          waiting for first consumer to be created before binding
+  Warning  ProvisioningFailed    12s (x3 over 30s)  k8s.io/minikube-hostpath_k8s-b_cebb4ab7-723f-4c2e-8f34-b8395cb822f9  failed to get target node: nodes "k8s-b" is forbidden: User "system:serviceaccount:kube-system:storage-provisioner" cannot get resource "no
+  Normal   ExternalProvisioning  8s (x3 over 30s)   persistentvolume-controller                                          Waiting for a volume to be created either by the external provisioner 'k8s.io/minikube-hostpath' or manually by the system administrator. I
+$ kubectl --context k8s-b logs -n kube-system storage-provisioner --tail=40 | grep -E '^E' | tail -2
+E1007 16:50:27.558571       1 controller.go:981] error syncing claim "a32c7879-7459-4f9e-bb1d-607f173e3a85": failed to get target node: nodes "k8s-b" is forbidden: User "system:serviceaccount:kube-system:storage-provisioner" cannot get resource "nodes" in API group "" at the cluster scope
+E1007 16:50:30.693978       1 controller.go:981] error syncing claim "a32c7879-7459-4f9e-bb1d-607f173e3a85": failed to get target node: nodes "k8s-b" is forbidden: User "system:serviceaccount:kube-system:storage-provisioner" cannot get resource "nodes" in API group "" at the cluster scope
+$ kubectl --context k8s-b auth can-i get nodes --as=system:serviceaccount:kube-system:storage-provisioner
+Warning: resource 'nodes' is not namespace scoped
+
+no

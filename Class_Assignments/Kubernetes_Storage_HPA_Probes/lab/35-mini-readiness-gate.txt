@@ -1,0 +1,39 @@
+### Bonus challenge 2: readinessProbe path -> /does-not-exist
+$ kubectl --context k8s-b patch deployment web-app -n production-webapp --type=json -p '[{"op":"replace","path":"/spec/template/spec/containers/0/readinessProbe/httpGet/path","value":"/does-not-exist"}]'
+deployment.apps/web-app patched
+$ kubectl --context k8s-b get pods -n production-webapp -l app=web-app
+NAME                       READY   STATUS    RESTARTS   AGE
+web-app-5945bfc776-dmdkq   0/1     Running   0          45s
+web-app-5945bfc776-km5wd   0/1     Running   0          45s
+web-app-5945bfc776-mbdv4   0/1     Running   0          45s
+$ kubectl --context k8s-b get endpoints web-service -n production-webapp
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME          ENDPOINTS   AGE
+web-service               11m
+$ P=$(kubectl --context k8s-b get pods -n production-webapp -l app=web-app -o jsonpath='{.items[0].metadata.name}'); kubectl --context k8s-b describe pod -n production-webapp $P | sed -n '/Events/,$p' | tail -4
+  Normal   Pulled     44s               kubelet            spec.containers{nginx}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal   Created    44s               kubelet            spec.containers{nginx}: Container created
+  Normal   Started    44s               kubelet            spec.containers{nginx}: Container started
+  Warning  Unhealthy  1s (x8 over 36s)  kubelet            spec.containers{nginx}: Readiness probe failed: HTTP probe failed with statuscode: 404
+### revert: path back to /
+$ kubectl --context k8s-b patch deployment web-app -n production-webapp --type=json -p '[{"op":"replace","path":"/spec/template/spec/containers/0/readinessProbe/httpGet/path","value":"/"}]'
+deployment.apps/web-app patched
+$ kubectl --context k8s-b rollout status deployment/web-app -n production-webapp --timeout=120s
+Waiting for deployment "web-app" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "web-app" rollout to finish: 1 of 3 updated replicas are available...
+Waiting for deployment "web-app" rollout to finish: 2 of 3 updated replicas are available...
+deployment "web-app" successfully rolled out
+$ kubectl --context k8s-b get pods -n production-webapp -l app=web-app
+NAME                      READY   STATUS    RESTARTS   AGE
+web-app-d45775485-mnqwr   1/1     Running   0          9s
+web-app-d45775485-xjmgb   1/1     Running   0          9s
+web-app-d45775485-zszg9   1/1     Running   0          9s
+$ kubectl --context k8s-b get endpoints web-service -n production-webapp
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME          ENDPOINTS                                      AGE
+web-service   10.244.0.40:80,10.244.0.41:80,10.244.0.42:80   11m

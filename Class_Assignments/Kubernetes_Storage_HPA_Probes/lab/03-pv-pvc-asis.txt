@@ -1,0 +1,18 @@
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/pv.yaml
+persistentvolume/student-pv created
+$ kubectl --context k8s-b get pv student-pv
+NAME         CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+student-pv   1Gi        RWO            Retain           Available                          <unset>                          0s
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/pvc.yaml
+persistentvolumeclaim/student-pvc created
+$ kubectl --context k8s-b get pvc student-pvc
+NAME          STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+student-pvc   Bound    pvc-e38bffc3-296d-4453-9837-16b0ddacadac   500Mi      RWO            standard       <unset>                 5s
+$ kubectl --context k8s-b get pv
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                 STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+pvc-e38bffc3-296d-4453-9837-16b0ddacadac   500Mi      RWO            Delete           Bound       default/student-pvc   standard       <unset>                          5s
+student-pv                                 1Gi        RWO            Retain           Available                                        <unset>                          6s
+$ kubectl --context k8s-b get pvc student-pvc -o jsonpath='{.spec.storageClassName}{"\n"}'
+standard
+$ kubectl --context k8s-b get pv student-pv -o jsonpath='storageClassName=[{.spec.storageClassName}]{"\n"}'
+storageClassName=[]

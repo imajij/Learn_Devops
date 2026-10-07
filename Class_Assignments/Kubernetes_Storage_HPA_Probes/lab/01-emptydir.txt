@@ -1,0 +1,32 @@
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/emptydir-pod.yaml
+pod/emptydir-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/emptydir-demo --timeout=180s
+pod/emptydir-demo condition met
+$ kubectl --context k8s-b exec emptydir-demo -- sh -c 'echo "written at $(date +%T) by Ajij" > /data/note.txt; ls -l /data; cat /data/note.txt'
+total 4
+-rw-r--r-- 1 root root 28 Oct  7 16:41 note.txt
+written at 16:41:13 by Ajij
+### 1) crash the container (stop nginx = PID 1). Same Pod, new container.
+$ kubectl --context k8s-b exec emptydir-demo -- nginx -s stop
+2026/10/07 16:41:13 [notice] 48#48: signal process started
+$ kubectl --context k8s-b get pod emptydir-demo
+NAME            READY   STATUS    RESTARTS     AGE
+emptydir-demo   1/1     Running   1 (8s ago)   9s
+$ kubectl --context k8s-b exec emptydir-demo -- cat /data/note.txt
+written at 16:41:13 by Ajij
+### 2) delete the whole Pod and create it again
+$ kubectl --context k8s-b delete pod emptydir-demo
+pod "emptydir-demo" deleted from default namespace
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/emptydir-pod.yaml
+pod/emptydir-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/emptydir-demo --timeout=120s
+pod/emptydir-demo condition met
+$ kubectl --context k8s-b exec emptydir-demo -- ls -la /data
+total 8
+drwxrwxrwx 2 root root 4096 Oct  7 16:41 .
+drwxr-xr-x 1 root root 4096 Oct  7 16:41 ..
+$ kubectl --context k8s-b exec emptydir-demo -- cat /data/note.txt
+cat: /data/note.txt: No such file or directory
+command terminated with exit code 1
+$ kubectl --context k8s-b delete pod emptydir-demo
+pod "emptydir-demo" deleted from default namespace

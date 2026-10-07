@@ -1,0 +1,22 @@
+$ POD_NAME=$(kubectl --context k8s-b get pods -n production-webapp -l app=web-app -o jsonpath='{.items[0].metadata.name}'); echo $POD_NAME
+web-app-d45775485-8g62q
+$ kubectl --context k8s-b exec -n production-webapp $POD_NAME -- sh -c 'echo "Student: Ajij Uttam (24bcs10103)" > /data/student.txt'
+$ kubectl --context k8s-b exec -n production-webapp $POD_NAME -- cat /data/student.txt
+Student: Ajij Uttam (24bcs10103)
+$ kubectl --context k8s-b delete pod -n production-webapp $POD_NAME
+pod "web-app-d45775485-8g62q" deleted from production-webapp namespace
+$ kubectl --context k8s-b rollout status deployment/web-app -n production-webapp --timeout=120s
+Waiting for deployment "web-app" rollout to finish: 1 of 2 updated replicas are available...
+deployment "web-app" successfully rolled out
+$ kubectl --context k8s-b get pods -n production-webapp
+NAME                      READY   STATUS    RESTARTS   AGE
+web-app-d45775485-cx7nt   1/1     Running   0          58s
+web-app-d45775485-rkfc7   1/1     Running   0          9s
+$ NEW_POD=$(kubectl --context k8s-b get pods -n production-webapp -l app=web-app -o jsonpath='{.items[0].metadata.name}'); echo $NEW_POD
+web-app-d45775485-cx7nt
+$ kubectl --context k8s-b exec -n production-webapp $NEW_POD -- cat /data/student.txt
+Student: Ajij Uttam (24bcs10103)
+### both replicas mount the same PVC, so the other Pod sees the file too:
+$ for p in $(kubectl --context k8s-b get pods -n production-webapp -l app=web-app -o name); do echo "$p: $(kubectl --context k8s-b exec -n production-webapp $p -- cat /data/student.txt)"; done
+pod/web-app-d45775485-cx7nt: Student: Ajij Uttam (24bcs10103)
+pod/web-app-d45775485-rkfc7: Student: Ajij Uttam (24bcs10103)

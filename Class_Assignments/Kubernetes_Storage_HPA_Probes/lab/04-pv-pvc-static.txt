@@ -1,0 +1,54 @@
+$ kubectl --context k8s-b delete pvc student-pvc
+persistentvolumeclaim "student-pvc" deleted from default namespace
+$ kubectl --context k8s-b get pv
+NAME         CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+student-pv   1Gi        RWO            Retain           Available                          <unset>                          8s
+$ cat 01-kubernetes-volumes/pvc-static.yaml
+# Same claim as pvc.yaml, but storageClassName "" turns OFF dynamic provisioning,
+# so the claim can only bind to a pre-created PV with no class (student-pv).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: student-pvc
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/pvc-static.yaml
+persistentvolumeclaim/student-pvc created
+$ kubectl --context k8s-b get pvc student-pvc
+NAME          STATUS   VOLUME       CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+student-pvc   Bound    student-pv   1Gi        RWO                           <unset>                 3s
+$ kubectl --context k8s-b get pv student-pv
+NAME         CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                 STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+student-pv   1Gi        RWO            Retain           Bound    default/student-pvc                  <unset>                          12s
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/pv-pod.yaml
+pod/storage-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/storage-demo --timeout=120s
+pod/storage-demo condition met
+$ kubectl --context k8s-b exec storage-demo -- sh -c 'echo "PV data from Ajij" > /data/pv.txt; cat /data/pv.txt'
+PV data from Ajij
+### delete the Pod: the PVC and PV stay, so the data stays
+$ kubectl --context k8s-b delete pod storage-demo
+pod "storage-demo" deleted from default namespace
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/pv-pod.yaml
+pod/storage-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/storage-demo --timeout=120s
+pod/storage-demo condition met
+$ kubectl --context k8s-b exec storage-demo -- cat /data/pv.txt
+PV data from Ajij
+### delete Pod + PVC: reclaimPolicy Retain keeps the PV (Released) and its data
+$ kubectl --context k8s-b delete pod storage-demo
+pod "storage-demo" deleted from default namespace
+$ kubectl --context k8s-b delete pvc student-pvc
+persistentvolumeclaim "student-pvc" deleted from default namespace
+$ kubectl --context k8s-b get pv student-pv
+NAME         CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS     CLAIM                 STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+student-pv   1Gi        RWO            Retain           Released   default/student-pvc                  <unset>                          16s
+$ minikube -p k8s-b ssh -- cat /tmp/student-data/pv.txt
+PV data from Ajij
+$ kubectl --context k8s-b delete pv student-pv
+persistentvolume "student-pv" deleted

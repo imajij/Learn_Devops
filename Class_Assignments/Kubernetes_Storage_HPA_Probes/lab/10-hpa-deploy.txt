@@ -1,0 +1,39 @@
+$ cat 02-hpa/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hpa-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hpa-demo
+  template:
+    metadata:
+      labels:
+        app: hpa-demo
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27
+          resources:
+            requests:
+              cpu: 100m
+            limits:
+              cpu: 200m
+          ports:
+            - containerPort: 80
+$ kubectl --context k8s-b apply -f 02-hpa/deployment.yaml -f 02-hpa/service.yaml
+deployment.apps/hpa-demo created
+service/hpa-demo-service created
+$ kubectl --context k8s-b rollout status deployment/hpa-demo --timeout=180s
+Waiting for deployment "hpa-demo" rollout to finish: 0 of 1 updated replicas are available...
+deployment "hpa-demo" successfully rolled out
+$ kubectl --context k8s-b get deploy,pods,svc -l app=hpa-demo
+NAME                            READY   STATUS    RESTARTS   AGE
+pod/hpa-demo-5d6676989b-n75zz   1/1     Running   0          0s
+$ kubectl --context k8s-b get svc hpa-demo-service
+NAME               TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+hpa-demo-service   ClusterIP   10.106.252.168   <none>        80/TCP    1s
+$ kubectl --context k8s-b top pods
+error: metrics not available yet

@@ -1,0 +1,23 @@
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/hostpath-pod.yaml
+pod/hostpath-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/hostpath-demo --timeout=120s
+pod/hostpath-demo condition met
+$ kubectl --context k8s-b exec hostpath-demo -- sh -c 'echo "hostPath data from Ajij" > /data/host.txt; cat /data/host.txt'
+hostPath data from Ajij
+### the file really lives on the node's disk:
+$ minikube -p k8s-b ssh -- ls -l /tmp/hostpath-data
+total 4
+-rw-r--r-- 1 root root 24 Oct  7 16:41 host.txt
+$ kubectl --context k8s-b delete pod hostpath-demo
+pod "hostpath-demo" deleted from default namespace
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/hostpath-pod.yaml
+pod/hostpath-demo created
+$ kubectl --context k8s-b wait --for=condition=Ready pod/hostpath-demo --timeout=120s
+pod/hostpath-demo condition met
+$ kubectl --context k8s-b exec hostpath-demo -- cat /data/host.txt
+hostPath data from Ajij
+$ kubectl --context k8s-b get pod hostpath-demo -o wide
+NAME            READY   STATUS    RESTARTS   AGE   IP           NODE    NOMINATED NODE   READINESS GATES
+hostpath-demo   1/1     Running   0          1s    10.244.0.9   k8s-b   <none>           <none>
+$ kubectl --context k8s-b delete pod hostpath-demo
+pod "hostpath-demo" deleted from default namespace

@@ -1,0 +1,27 @@
+$ minikube -p k8s-b status
+k8s-b
+type: Control Plane
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+
+$ kubectl --context k8s-b get nodes -o wide
+NAME    STATUS   ROLES           AGE     VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION              CONTAINER-RUNTIME
+k8s-b   Ready    control-plane   6m16s   v1.37.0   192.168.58.2   <none>        Debian GNU/Linux 12 (bookworm)   6.8.0-117-generic (arm64)   containerd://2.3.4
+$ minikube -p k8s-b addons list | grep -E 'metrics-server|storage-provisioner|default-storageclass'
+│ default-storageclass        │ k8s-b   │ enabled ✅ │ Kubernetes                             │
+│ metrics-server              │ k8s-b   │ enabled ✅ │ Kubernetes                             │
+│ storage-provisioner         │ k8s-b   │ enabled ✅ │ minikube                               │
+│ storage-provisioner-rancher │ k8s-b   │ disabled   │ 3rd party (Rancher)                    │
+$ kubectl --context k8s-b get pods -n kube-system
+NAME                              READY   STATUS    RESTARTS   AGE
+coredns-559f6c778d-cvxl2          1/1     Running   0          6m7s
+etcd-k8s-b                        1/1     Running   0          6m13s
+kindnet-dq6z2                     1/1     Running   0          6m7s
+kube-apiserver-k8s-b              1/1     Running   0          6m13s
+kube-controller-manager-k8s-b     1/1     Running   0          6m13s
+kube-proxy-78jgp                  1/1     Running   0          6m7s
+kube-scheduler-k8s-b              1/1     Running   0          6m13s
+metrics-server-768f9f6999-89vrc   1/1     Running   0          6m7s
+storage-provisioner               1/1     Running   0          6m12s

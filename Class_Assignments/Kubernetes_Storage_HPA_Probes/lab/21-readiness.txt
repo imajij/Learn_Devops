@@ -1,0 +1,49 @@
+$ grep -A5 readinessProbe 03-probes/readiness.yaml
+      readinessProbe:
+        httpGet:
+          path: /wrong-path
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 5
+$ kubectl --context k8s-b apply -f 03-probes/readiness.yaml
+pod/readiness-demo created
+$ kubectl --context k8s-b expose pod readiness-demo --port=80 --name=readiness-svc
+service/readiness-svc exposed
+$ kubectl --context k8s-b get pod readiness-demo
+NAME             READY   STATUS    RESTARTS   AGE
+readiness-demo   0/1     Running   0          25s
+$ kubectl --context k8s-b get endpoints readiness-svc
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME            ENDPOINTS   AGE
+readiness-svc               25s
+$ kubectl --context k8s-b describe pod readiness-demo | sed -n '/Events/,$p'
+Events:
+  Type     Reason     Age               From               Message
+  ----     ------     ----              ----               -------
+  Normal   Scheduled  25s               default-scheduler  Successfully assigned default/readiness-demo to k8s-b
+  Normal   Pulled     24s               kubelet            spec.containers{nginx}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal   Created    24s               kubelet            spec.containers{nginx}: Container created
+  Normal   Started    24s               kubelet            spec.containers{nginx}: Container started
+  Warning  Unhealthy  4s (x4 over 19s)  kubelet            spec.containers{nginx}: Readiness probe failed: HTTP probe failed with statuscode: 404
+### RECOVER without restarting: create the page the probe is asking for
+$ kubectl --context k8s-b exec readiness-demo -- sh -c 'echo ready > /usr/share/nginx/html/wrong-path'
+$ kubectl --context k8s-b get pod readiness-demo
+NAME             READY   STATUS    RESTARTS   AGE
+readiness-demo   1/1     Running   0          34s
+$ kubectl --context k8s-b get endpoints readiness-svc
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME            ENDPOINTS        AGE
+readiness-svc   10.244.0.27:80   34s
+### BREAK again: remove the page -> pod leaves the Service, but is NOT restarted
+$ kubectl --context k8s-b exec readiness-demo -- rm /usr/share/nginx/html/wrong-path
+$ kubectl --context k8s-b get pod readiness-demo
+NAME             READY   STATUS    RESTARTS   AGE
+readiness-demo   0/1     Running   0          54s
+$ kubectl --context k8s-b get endpoints readiness-svc
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME            ENDPOINTS   AGE
+readiness-svc               54s
+$ kubectl --context k8s-b delete svc readiness-svc
+service "readiness-svc" deleted from default namespace
+$ kubectl --context k8s-b delete pod readiness-demo --now
+pod "readiness-demo" deleted from default namespace

@@ -1,0 +1,24 @@
+### FIX: allow the provisioner's ServiceAccount to read Nodes
+$ kubectl --context k8s-b apply -f 01-kubernetes-volumes/provisioner-nodes-rbac.yaml
+clusterrole.rbac.authorization.k8s.io/storage-provisioner-read-nodes created
+clusterrolebinding.rbac.authorization.k8s.io/storage-provisioner-read-nodes created
+$ kubectl --context k8s-b auth can-i get nodes --as=system:serviceaccount:kube-system:storage-provisioner
+Warning: resource 'nodes' is not namespace scoped
+
+yes
+$ kubectl --context k8s-b wait --for=condition=Ready pod/fast-demo --timeout=120s
+pod/fast-demo condition met
+$ kubectl --context k8s-b get pvc fast-pvc
+NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+fast-pvc   Bound    pvc-a32c7879-7459-4f9e-bb1d-607f173e3a85   200Mi      RWO            ajij-fast      <unset>                 47s
+$ kubectl --context k8s-b get pv -o custom-columns=NAME:.metadata.name,CLAIM:.spec.claimRef.name,SC:.spec.storageClassName,RECLAIM:.spec.persistentVolumeReclaimPolicy,STATUS:.status.phase
+NAME                                       CLAIM      SC          RECLAIM   STATUS
+pvc-a32c7879-7459-4f9e-bb1d-607f173e3a85   fast-pvc   ajij-fast   Delete    Bound
+$ kubectl --context k8s-b exec fast-demo -- sh -c 'echo on-demand > /data/x.txt; cat /data/x.txt'
+on-demand
+$ kubectl --context k8s-b delete pod fast-demo
+pod "fast-demo" deleted from default namespace
+$ kubectl --context k8s-b delete pvc fast-pvc
+persistentvolumeclaim "fast-pvc" deleted from default namespace
+$ kubectl --context k8s-b delete storageclass ajij-fast
+storageclass.storage.k8s.io "ajij-fast" deleted

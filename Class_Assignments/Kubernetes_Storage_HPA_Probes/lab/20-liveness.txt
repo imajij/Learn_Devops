@@ -1,0 +1,56 @@
+$ grep -A6 livenessProbe 03-probes/liveness.yaml
+      livenessProbe:
+        httpGet:
+          path: /wrong-path
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 2
+$ kubectl --context k8s-b apply -f 03-probes/liveness.yaml
+pod/liveness-demo created
+### [22:31:41] check 1
+$ kubectl --context k8s-b get pod liveness-demo
+NAME            READY   STATUS    RESTARTS     AGE
+liveness-demo   1/1     Running   1 (5s ago)   26s
+### [22:32:06] check 2
+$ kubectl --context k8s-b get pod liveness-demo
+NAME            READY   STATUS    RESTARTS      AGE
+liveness-demo   1/1     Running   2 (15s ago)   51s
+### [22:32:31] check 3
+$ kubectl --context k8s-b get pod liveness-demo
+NAME            READY   STATUS             RESTARTS      AGE
+liveness-demo   0/1     CrashLoopBackOff   3 (10s ago)   76s
+$ kubectl --context k8s-b describe pod liveness-demo | sed -n '/Events/,$p'
+Events:
+  Type     Reason     Age                 From               Message
+  ----     ------     ----                ----               -------
+  Normal   Scheduled  75s                 default-scheduler  Successfully assigned default/liveness-demo to k8s-b
+  Normal   Pulled     25s (x4 over 75s)   kubelet            spec.containers{nginx}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal   Created    25s (x4 over 74s)   kubelet            spec.containers{nginx}: Container created
+  Normal   Started    25s (x4 over 74s)   kubelet            spec.containers{nginx}: Container started
+  Warning  Unhealthy  10s (x12 over 65s)  kubelet            spec.containers{nginx}: Liveness probe failed: HTTP probe failed with statuscode: 404
+  Normal   Killing    10s (x4 over 55s)   kubelet            spec.containers{nginx}: Container nginx failed liveness probe, will be restarted
+  Warning  BackOff    10s (x2 over 10s)   kubelet            spec.containers{nginx}: Back-off restarting failed container nginx in pod liveness-demo_default(f4e13aa2-a302-4b36-ab9f-6a85c8d8adfb)
+### FIX: point the probe at a path nginx really serves (/). Probes of a bare Pod are immutable, so recreate it.
+$ kubectl --context k8s-b delete pod liveness-demo --now
+pod "liveness-demo" deleted from default namespace
+$ grep -A3 httpGet 03-probes/liveness-fixed.yaml
+        httpGet:
+          path: /            # FIX: a path nginx actually serves
+          port: 80
+        initialDelaySeconds: 5
+$ kubectl --context k8s-b apply -f 03-probes/liveness-fixed.yaml
+pod/liveness-demo created
+$ kubectl --context k8s-b get pod liveness-demo
+NAME            READY   STATUS    RESTARTS   AGE
+liveness-demo   1/1     Running   0          45s
+$ kubectl --context k8s-b describe pod liveness-demo | sed -n '/Events/,$p'
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  45s   default-scheduler  Successfully assigned default/liveness-demo to k8s-b
+  Normal  Pulled     45s   kubelet            spec.containers{nginx}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal  Created    45s   kubelet            spec.containers{nginx}: Container created
+  Normal  Started    45s   kubelet            spec.containers{nginx}: Container started
+$ kubectl --context k8s-b delete pod liveness-demo --now
+pod "liveness-demo" deleted from default namespace

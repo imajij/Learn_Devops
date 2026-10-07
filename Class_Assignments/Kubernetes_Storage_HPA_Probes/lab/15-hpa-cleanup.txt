@@ -1,0 +1,4 @@
+$ kubectl --context k8s-b delete -f 02-hpa/hpa.yml -f 02-hpa/service.yaml -f 02-hpa/deployment.yaml
+horizontalpodautoscaler.autoscaling "hpa-demo" deleted from default namespace
+service "hpa-demo-service" deleted from default namespace
+deployment.apps "hpa-demo" deleted from default namespace

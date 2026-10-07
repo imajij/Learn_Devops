@@ -1,0 +1,100 @@
+### increase the load: two more generators (same YAML, different names)
+$ sed 's/name: load-generator$/name: load-generator-2/' 02-hpa/load-generator.yaml | kubectl --context k8s-b apply -f -
+pod/load-generator-2 created
+$ sed 's/name: load-generator$/name: load-generator-3/' 02-hpa/load-generator.yaml | kubectl --context k8s-b apply -f -
+pod/load-generator-3 created
+### [22:27:34] snapshot 1
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 42%/50%   1         5         2          6m22s
+$ kubectl --context k8s-b top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+hpa-demo-5d6676989b-dvps5   42m          8Mi             
+hpa-demo-5d6676989b-n75zz   42m          9Mi             
+load-generator              793m         10Mi            
+### [22:28:05] snapshot 2
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 46%/50%   1         5         2          6m53s
+$ kubectl --context k8s-b top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+hpa-demo-5d6676989b-dvps5   45m          8Mi             
+hpa-demo-5d6676989b-n75zz   48m          8Mi             
+load-generator              558m         7Mi             
+load-generator-2            282m         1Mi             
+load-generator-3            287m         1Mi             
+### [22:28:35] snapshot 3
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 46%/50%   1         5         2          7m23s
+$ kubectl --context k8s-b top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+hpa-demo-5d6676989b-dvps5   51m          8Mi             
+hpa-demo-5d6676989b-n75zz   67m          8Mi             
+load-generator              331m         2Mi             
+load-generator-2            328m         2Mi             
+load-generator-3            331m         1Mi             
+### [22:29:05] snapshot 4
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 59%/50%   1         5         3          7m53s
+$ kubectl --context k8s-b top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+hpa-demo-5d6676989b-dvps5   51m          8Mi             
+hpa-demo-5d6676989b-n75zz   67m          8Mi             
+load-generator              331m         2Mi             
+load-generator-2            328m         2Mi             
+load-generator-3            331m         1Mi             
+### [22:29:35] snapshot 5
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 59%/50%   1         5         3          8m23s
+$ kubectl --context k8s-b top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+hpa-demo-5d6676989b-dvps5   45m          8Mi             
+hpa-demo-5d6676989b-n75zz   41m          8Mi             
+hpa-demo-5d6676989b-vgzkg   44m          11Mi            
+load-generator              299m         3Mi             
+load-generator-2            331m         3Mi             
+load-generator-3            288m         3Mi             
+### [22:30:05] snapshot 6
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 43%/50%   1         5         3          8m54s
+$ kubectl --context k8s-b top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+hpa-demo-5d6676989b-dvps5   45m          8Mi             
+hpa-demo-5d6676989b-n75zz   41m          8Mi             
+hpa-demo-5d6676989b-vgzkg   44m          11Mi            
+load-generator              299m         3Mi             
+load-generator-2            331m         3Mi             
+load-generator-3            288m         3Mi             
+### [22:30:36] snapshot 7
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 43%/50%   1         5         3          9m24s
+$ kubectl --context k8s-b top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+hpa-demo-5d6676989b-dvps5   44m          8Mi             
+hpa-demo-5d6676989b-n75zz   45m          9Mi             
+hpa-demo-5d6676989b-vgzkg   45m          11Mi            
+load-generator              395m         3Mi             
+load-generator-2            397m         2Mi             
+load-generator-3            397m         3Mi             
+### [22:31:06] snapshot 8
+$ kubectl --context k8s-b get hpa hpa-demo
+NAME       REFERENCE             TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 44%/50%   1         5         3          9m54s
+$ kubectl --context k8s-b top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+hpa-demo-5d6676989b-dvps5   44m          8Mi             
+hpa-demo-5d6676989b-n75zz   45m          9Mi             
+hpa-demo-5d6676989b-vgzkg   45m          11Mi            
+load-generator              395m         3Mi             
+load-generator-2            397m         2Mi             
+load-generator-3            397m         3Mi             
+$ kubectl --context k8s-b get pods -l app=hpa-demo -o wide
+NAME                        READY   STATUS    RESTARTS   AGE     IP            NODE    NOMINATED NODE   READINESS GATES
+hpa-demo-5d6676989b-dvps5   1/1     Running   0          8m24s   10.244.0.17   k8s-b   <none>           <none>
+hpa-demo-5d6676989b-n75zz   1/1     Running   0          9m55s   10.244.0.15   k8s-b   <none>           <none>
+hpa-demo-5d6676989b-vgzkg   1/1     Running   0          2m21s   10.244.0.20   k8s-b   <none>           <none>
