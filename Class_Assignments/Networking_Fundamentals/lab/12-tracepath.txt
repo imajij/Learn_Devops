@@ -1,0 +1,15 @@
+# tracepath -n -m 10 1.1.1.1
+ 1?: [LOCALHOST]                      pmtu 1500
+ 1:  172.17.0.1                                            0.076ms 
+ 1:  172.17.0.1                                            0.015ms 
+ 2:  no reply
+ 3:  no reply
+ 4:  no reply
+ 5:  no reply
+ 6:  no reply
+ 7:  no reply
+ 8:  no reply
+ 9:  no reply
+10:  no reply
+     Too many hops: pmtu 1500
+     Resume: pmtu 1500 

@@ -1,0 +1,15 @@
+# curl -sI https://example.com
+HTTP/2 200 
+date: Wed, 07 Oct 2026 16:11:25 GMT
+content-type: text/html; charset=utf-8
+server: cloudflare
+last-modified: Sun, 04 Oct 2026 20:44:03 GMT
+allow: GET, HEAD
+accept-ranges: bytes
+age: 14354
+cf-cache-status: HIT
+cf-ray: a46e2e7c7db894dd-BOM
+alt-svc: h3=":443"; ma=86400
+
+# curl -s -o /dev/null -w "status=%{http_code} ip=%{remote_ip} time=%{time_total}s\n" https://example.com
+status=200 ip=104.20.23.154 time=0.188160s

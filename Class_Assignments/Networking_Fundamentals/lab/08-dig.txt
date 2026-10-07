@@ -1,0 +1,6 @@
+# dig +short github.com
+20.207.73.82
+# dig github.com | sed -n "/ANSWER SECTION/,/^$/p"
+;; ANSWER SECTION:
+github.com.		0	IN	A	20.207.73.82
+

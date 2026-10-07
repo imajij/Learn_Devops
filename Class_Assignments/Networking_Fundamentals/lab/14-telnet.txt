@@ -1,0 +1,16 @@
+# (printf "HEAD / HTTP/1.1\nHost: google.com\nConnection: close\n\n"; sleep 3) | telnet google.com 80 | head -9
+Trying 192.178.174.139...
+Connected to google.com.
+Escape character is '^]'.
+HTTP/1.1 301 Moved Permanently
+Location: http://www.google.com/
+Content-Type: text/html; charset=UTF-8
+Content-Security-Policy-Report-Only: object-src 'none';base-uri 'self';script-src 'nonce-fazjl4GnbMZhXPmX_eZrvA' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other-hp
+Date: Wed, 07 Oct 2026 16:12:38 GMT
+Expires: Fri, 06 Nov 2026 16:12:38 GMT
+Connection closed by foreign host.
+# (sleep 1) | telnet localhost 81
+Connection failed: Connection refused
+telnet: Unable to connect to remote host: Connection refused
+Trying ::1...
+Trying 127.0.0.1...

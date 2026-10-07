@@ -1,0 +1,18 @@
+$ ping -c 4 google.com
+PING google.com (192.178.174.139): 56 data bytes
+64 bytes from 192.178.174.139: icmp_seq=0 ttl=114 time=20.652 ms
+64 bytes from 192.178.174.139: icmp_seq=1 ttl=114 time=29.446 ms
+64 bytes from 192.178.174.139: icmp_seq=2 ttl=114 time=48.841 ms
+64 bytes from 192.178.174.139: icmp_seq=3 ttl=114 time=66.817 ms
+
+--- google.com ping statistics ---
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 20.652/41.439/66.817/17.852 ms
+$ traceroute -n -m 12 -q 1 1.1.1.1
+traceroute to 1.1.1.1 (1.1.1.1), 12 hops max, 40 byte packets
+ 1  100.128.160.1  9.737 ms
+ 2  202.131.146.145  13.348 ms
+ 3  172.20.20.17  66.255 ms
+ 4  *
+ 5  *
+ 6  1.1.1.1  55.570 ms
