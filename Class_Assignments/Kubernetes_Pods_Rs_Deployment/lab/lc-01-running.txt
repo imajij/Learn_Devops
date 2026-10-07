@@ -1,0 +1,30 @@
+$ kubectl apply -f 01-running.yaml
+pod/lifecycle-running created
+$ kubectl wait --for=condition=Ready pod/lifecycle-running --timeout=90s
+pod/lifecycle-running condition met
+$ kubectl get pod lifecycle-running -o wide
+NAME                READY   STATUS    RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES
+lifecycle-running   1/1     Running   0          0s    10.244.0.64   k8s-a   <none>           <none>
+$ kubectl get pod lifecycle-running -o jsonpath='phase={.status.phase}{"\n"}state={.status.containerStatuses[*].state}{"\n"}lastState={.status.containerStatuses[*].lastState}{"\n"}'
+phase=Running
+state={"running":{"startedAt":"2026-10-07T16:47:56Z"}}
+lastState={}
+$ kubectl describe pod lifecycle-running | sed -n '/^Conditions:/,/^Volumes:/p'
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+$ kubectl describe pod lifecycle-running | sed -n '/^Events:/,$p' | cut -c1-170
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  1s    default-scheduler  Successfully assigned default/lifecycle-running to k8s-a
+  Normal  Pulled     1s    kubelet            spec.containers{nginx}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal  Created    1s    kubelet            spec.containers{nginx}: Container created
+  Normal  Started    1s    kubelet            spec.containers{nginx}: Container started
+$ kubectl delete pod lifecycle-running
+pod "lifecycle-running" deleted from default namespace

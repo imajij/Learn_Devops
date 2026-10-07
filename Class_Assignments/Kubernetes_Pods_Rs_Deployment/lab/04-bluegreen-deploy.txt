@@ -1,0 +1,26 @@
+$ kubectl apply -f 02-blue-green/deployment-blue.yaml -f 02-blue-green/deployment-green.yaml -f 02-blue-green/service-blue.yaml
+deployment.apps/app-blue created
+deployment.apps/app-green created
+service/myapp-service created
+$ kubectl rollout status deployment/app-blue --timeout=180s
+Waiting for deployment "app-blue" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "app-blue" rollout to finish: 1 of 3 updated replicas are available...
+Waiting for deployment "app-blue" rollout to finish: 2 of 3 updated replicas are available...
+deployment "app-blue" successfully rolled out
+$ kubectl rollout status deployment/app-green --timeout=180s
+deployment "app-green" successfully rolled out
+$ kubectl get pods -l app=myapp -L slot,version -o wide
+NAME                        READY   STATUS    RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES   SLOT    VERSION
+app-blue-5c69d7785c-jszbq   1/1     Running   0          8s    10.244.0.39   k8s-a   <none>           <none>            blue    v1
+app-blue-5c69d7785c-vjp5z   1/1     Running   0          8s    10.244.0.43   k8s-a   <none>           <none>            blue    v1
+app-blue-5c69d7785c-zlfj7   1/1     Running   0          8s    10.244.0.41   k8s-a   <none>           <none>            blue    v1
+app-green-84df7f978-4s4kb   1/1     Running   0          8s    10.244.0.42   k8s-a   <none>           <none>            green   v2
+app-green-84df7f978-h6hzb   1/1     Running   0          8s    10.244.0.38   k8s-a   <none>           <none>            green   v2
+app-green-84df7f978-vxr4f   1/1     Running   0          8s    10.244.0.40   k8s-a   <none>           <none>            green   v2
+$ kubectl get svc myapp-service -o jsonpath="{.spec.selector}"; echo
+{"app":"myapp","slot":"blue"}
+$ kubectl get endpointslices -l kubernetes.io/service-name=myapp-service
+NAME                  ADDRESSTYPE   PORTS   ENDPOINTS                             AGE
+myapp-service-jthfr   IPv4          80      10.244.0.39,10.244.0.41,10.244.0.43   8s
+$ kubectl exec client -- sh -c "for i in \$(seq 1 10); do curl -s http://myapp-service | grep -o \"[A-Z]* ENVIRONMENT\"; done" | sort | uniq -c
+  10 BLUE ENVIRONMENT

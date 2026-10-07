@@ -1,0 +1,55 @@
+$ until [ $(wc -l < ~/devops-lab/k8s-a/rolling-curl.log) -ge 150 ]; do sleep 2; done; uniq -c ~/devops-lab/k8s-a/rolling-curl.log
+  59 VERSION: v1
+   1 VERSION: v2
+   1 VERSION: v1
+   1 FAILED
+   1 VERSION: v1
+   1 VERSION: v2
+   4 VERSION: v1
+   1 VERSION: v2
+   2 VERSION: v1
+   1 VERSION: v2
+   3 VERSION: v1
+   1 VERSION: v2
+   1 VERSION: v1
+   1 VERSION: v2
+   1 VERSION: v1
+   1 VERSION: v2
+   3 VERSION: v1
+   1 VERSION: v2
+  12 VERSION: v1
+   1 VERSION: v2
+   1 FAILED
+  11 VERSION: v2
+   3 VERSION: v1
+  38 VERSION: v2
+### pod watch during the update, only lines where a pod changed (time, pod, phase, ready, being-deleted?)
+$ awk '{d=($5=="<none>")?"-":"TERMINATING"; s=$3" "$4" "d; if(last[$2]!=s){printf "%s %-30s %-9s %-6s %s\n",$1,$2,$3,$4,d; last[$2]=s}}' ~/devops-lab/k8s-a/watch-app-rolling.log
+22:13:59 app-rolling-86d7d44d5b-frlbg   Running   true   -
+22:13:59 app-rolling-86d7d44d5b-qhqcp   Running   true   -
+22:13:59 app-rolling-86d7d44d5b-tqsnp   Running   true   -
+22:13:59 app-rolling-86d7d44d5b-whwsb   Running   true   -
+22:14:01 app-rolling-56bff6d88c-8jl87   Pending   <none> -
+22:14:01 app-rolling-56bff6d88c-8jl87   Pending   false  -
+22:14:12 app-rolling-56bff6d88c-8jl87   Running   false  -
+22:14:17 app-rolling-56bff6d88c-8jl87   Running   true   -
+22:14:17 app-rolling-86d7d44d5b-whwsb   Running   true   TERMINATING
+22:14:17 app-rolling-56bff6d88c-pm4vm   Pending   <none> -
+22:14:17 app-rolling-56bff6d88c-pm4vm   Pending   false  -
+22:14:18 app-rolling-86d7d44d5b-whwsb   Succeeded false  TERMINATING
+22:14:18 app-rolling-56bff6d88c-pm4vm   Running   false  -
+22:14:23 app-rolling-56bff6d88c-pm4vm   Running   true   -
+22:14:23 app-rolling-86d7d44d5b-qhqcp   Running   true   TERMINATING
+22:14:23 app-rolling-56bff6d88c-fwx8w   Pending   <none> -
+22:14:24 app-rolling-56bff6d88c-fwx8w   Pending   false  -
+22:14:24 app-rolling-86d7d44d5b-qhqcp   Succeeded false  TERMINATING
+22:14:24 app-rolling-56bff6d88c-fwx8w   Running   false  -
+22:14:29 app-rolling-56bff6d88c-fwx8w   Running   true   -
+22:14:29 app-rolling-86d7d44d5b-frlbg   Running   true   TERMINATING
+22:14:29 app-rolling-56bff6d88c-zwm89   Pending   <none> -
+22:14:29 app-rolling-56bff6d88c-zwm89   Pending   false  -
+22:14:30 app-rolling-86d7d44d5b-frlbg   Succeeded false  TERMINATING
+22:14:30 app-rolling-56bff6d88c-zwm89   Running   false  -
+22:14:35 app-rolling-56bff6d88c-zwm89   Running   true   -
+22:14:35 app-rolling-86d7d44d5b-tqsnp   Running   true   TERMINATING
+22:14:36 app-rolling-86d7d44d5b-tqsnp   Succeeded false  TERMINATING

@@ -1,0 +1,21 @@
+$ kubectl apply -f 04-failed.yaml
+pod/lifecycle-failed created
+$ timeout 20 kubectl get pod lifecycle-failed -w | while read l; do echo "$(date +%T) $l"; done
+22:20:03 NAME               READY   STATUS              RESTARTS   AGE
+22:20:03 lifecycle-failed   0/1     ContainerCreating   0          0s
+22:20:04 lifecycle-failed   0/1     ContainerCreating   0          1s
+22:20:04 lifecycle-failed   1/1     Running             0          1s
+22:20:11 lifecycle-failed   0/1     Error               0          8s
+22:20:12 lifecycle-failed   0/1     Error               0          9s
+$ kubectl get pod lifecycle-failed
+NAME               READY   STATUS   RESTARTS   AGE
+lifecycle-failed   0/1     Error    0          20s
+$ kubectl get pod lifecycle-failed -o jsonpath='phase={.status.phase}{"\n"}state={.status.containerStatuses[*].state}{"\n"}lastState={.status.containerStatuses[*].lastState}{"\n"}'
+phase=Failed
+state={"terminated":{"containerID":"containerd://ba943620b652e65ed761348c4381454634606c384963e01bb13411f4b8ce12c6","exitCode":1,"finishedAt":"2026-10-07T16:50:09Z","reason":"Error","startedAt":"2026-10-07T16:50:04Z"}}
+lastState={}
+$ kubectl logs lifecycle-failed
+Task started
+Task failed
+$ kubectl delete pod lifecycle-failed
+pod "lifecycle-failed" deleted from default namespace

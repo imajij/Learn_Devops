@@ -1,0 +1,26 @@
+$ kubectl apply -f 02-pending.yaml
+pod/lifecycle-pending created
+$ sleep 10; kubectl get pod lifecycle-pending -o wide
+NAME                READY   STATUS    RESTARTS   AGE   IP       NODE     NOMINATED NODE   READINESS GATES
+lifecycle-pending   0/1     Pending   0          11s   <none>   <none>   <none>           <none>
+$ kubectl get pod lifecycle-pending -o jsonpath='phase={.status.phase}{"\n"}state={.status.containerStatuses[*].state}{"\n"}lastState={.status.containerStatuses[*].lastState}{"\n"}'
+phase=Pending
+state=
+lastState=
+$ kubectl describe pod lifecycle-pending | grep -A3 -E '^ +Requests:|^Conditions:'
+    Requests:
+      cpu:        1k
+      memory:     999Gi
+    Environment:  <none>
+--
+Conditions:
+  Type           Status
+  PodScheduled   False 
+Volumes:
+$ kubectl describe pod lifecycle-pending | sed -n '/^Events:/,$p' | cut -c1-170
+Events:
+  Type     Reason            Age   From               Message
+  ----     ------            ----  ----               -------
+  Warning  FailedScheduling  11s   default-scheduler  0/1 nodes are available: 1 Insufficient cpu, 1 Insufficient memory. preemption: 0/1 nodes are available: 1 Preemptio
+$ kubectl delete pod lifecycle-pending
+pod "lifecycle-pending" deleted from default namespace

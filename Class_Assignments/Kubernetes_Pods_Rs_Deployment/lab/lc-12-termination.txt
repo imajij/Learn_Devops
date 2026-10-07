@@ -1,0 +1,28 @@
+$ kubectl apply -f 12-termination.yaml
+pod/lifecycle-termination created
+$ kubectl wait --for=condition=Ready pod/lifecycle-termination --timeout=90s
+pod/lifecycle-termination condition met
+$ (kubectl logs -f lifecycle-termination > ~/devops-lab/k8s-a/term.log 2>&1 &); sleep 2; echo following logs
+following logs
+$ (timeout 25 kubectl get pod lifecycle-termination -w | while read l; do echo "$(date +%T) $l"; done > ~/devops-lab/k8s-a/term-watch.log &); sleep 1; echo watching
+watching
+$ date +%T; time kubectl delete pod lifecycle-termination; date +%T
+22:27:32
+pod "lifecycle-termination" deleted from default namespace
+
+real	0m11.899s
+user	0m0.041s
+sys	0m0.044s
+22:27:44
+$ sleep 3; cat ~/devops-lab/k8s-a/term-watch.log
+22:27:31 NAME                    READY   STATUS    RESTARTS   AGE
+22:27:31 lifecycle-termination   1/1     Running   0          3s
+22:27:32 lifecycle-termination   1/1     Terminating   0          4s
+22:27:32 lifecycle-termination   1/1     Terminating   0          4s
+22:27:43 lifecycle-termination   0/1     Completed     0          15s
+22:27:44 lifecycle-termination   0/1     Completed     0          16s
+22:27:44 lifecycle-termination   0/1     Completed     0          16s
+$ cat ~/devops-lab/k8s-a/term.log
+Application running
+SIGTERM received; cleaning up...
+Cleanup complete

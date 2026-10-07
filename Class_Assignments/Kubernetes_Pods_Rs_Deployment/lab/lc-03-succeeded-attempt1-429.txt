@@ -1,0 +1,29 @@
+$ kubectl apply -f 03-succeeded.yaml
+pod/lifecycle-succeeded created
+$ timeout 20 kubectl get pod lifecycle-succeeded -w | while read l; do echo "$(date +%T) $l"; done
+22:18:10 NAME                  READY   STATUS              RESTARTS   AGE
+22:18:10 lifecycle-succeeded   0/1     ContainerCreating   0          0s
+22:18:11 lifecycle-succeeded   0/1     ContainerCreating   0          1s
+22:18:13 lifecycle-succeeded   0/1     ErrImagePull        0          3s
+22:18:26 lifecycle-succeeded   0/1     ImagePullBackOff    0          16s
+$ kubectl get pod lifecycle-succeeded
+NAME                  READY   STATUS             RESTARTS   AGE
+lifecycle-succeeded   0/1     ImagePullBackOff   0          20s
+$ kubectl get pod lifecycle-succeeded -o jsonpath='phase={.status.phase}{"\n"}state={.status.containerStatuses[*].state}{"\n"}lastState={.status.containerStatuses[*].lastState}{"\n"}'
+phase=Pending
+state={"waiting":{"message":"Back-off pulling image \"busybox:1.36\": ErrImagePull: failed to pull and unpack image \"docker.io/library/busybox:1.36\": failed to resolve reference \"docker.io/library/busybox:1.36\": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/busybox/manifests/1.36: 429 Too Many Requests","reason":"ImagePullBackOff"}}
+lastState={}
+$ kubectl logs lifecycle-succeeded
+Error from server (BadRequest): container "task" in pod "lifecycle-succeeded" is waiting to start: trying and failing to pull image
+$ kubectl describe pod lifecycle-succeeded | sed -n '/^Events:/,$p' | cut -c1-170
+Events:
+  Type     Reason     Age               From               Message
+  ----     ------     ----              ----               -------
+  Normal   Scheduled  21s               default-scheduler  Successfully assigned default/lifecycle-succeeded to k8s-a
+  Normal   BackOff    18s               kubelet            spec.containers{task}: Back-off pulling image "busybox:1.36"
+  Warning  Failed     18s               kubelet            spec.containers{task}: Error: ImagePullBackOff
+  Normal   Pulling    5s (x2 over 20s)  kubelet            spec.containers{task}: Pulling image "busybox:1.36"
+  Warning  Failed     1s (x2 over 18s)  kubelet            spec.containers{task}: Failed to pull image "busybox:1.36": failed to pull and unpack image "docker.io/library/
+  Warning  Failed     1s (x2 over 18s)  kubelet            spec.containers{task}: Error: ErrImagePull
+$ kubectl delete pod lifecycle-succeeded
+pod "lifecycle-succeeded" deleted from default namespace

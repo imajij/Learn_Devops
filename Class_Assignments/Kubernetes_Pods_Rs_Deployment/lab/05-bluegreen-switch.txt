@@ -1,0 +1,34 @@
+$ diff 02-blue-green/service-blue.yaml 02-blue-green/service-green.yaml | grep slot
+< # To switch to GREEN: change selector slot: blue -> slot: green
+<     slot: blue     # <-- Currently routing to BLUE (v1)
+>     slot: green    # <-- NOW routing to GREEN (v2)
+$ kubectl apply -f 02-blue-green/service-green.yaml
+service/myapp-service configured
+$ kubectl get svc myapp-service -o jsonpath="{.spec.selector}"; echo
+{"app":"myapp","slot":"green"}
+$ kubectl get endpointslices -l kubernetes.io/service-name=myapp-service
+NAME                  ADDRESSTYPE   PORTS   ENDPOINTS                             AGE
+myapp-service-jthfr   IPv4          80      10.244.0.42,10.244.0.38,10.244.0.40   8s
+$ kubectl exec client -- sh -c "for i in \$(seq 1 10); do curl -s http://myapp-service | grep -o \"[A-Z]* ENVIRONMENT\"; done" | sort | uniq -c
+  10 BLUE ENVIRONMENT
+### instant rollback = switch the selector back
+$ kubectl patch svc myapp-service -p '{"spec":{"selector":{"slot":"blue"}}}'
+service/myapp-service patched
+$ kubectl exec client -- sh -c "for i in \$(seq 1 10); do curl -s http://myapp-service | grep -o \"[A-Z]* ENVIRONMENT\"; done" | sort | uniq -c
+  10 BLUE ENVIRONMENT
+### same test again 3 seconds later (kube-proxy updates its rules asynchronously):
+$ sleep 3; kubectl exec client -- sh -c "for i in \$(seq 1 10); do curl -s http://myapp-service | grep -o \"[A-Z]* ENVIRONMENT\"; done" | sort | uniq -c
+  10 BLUE ENVIRONMENT
+$ kubectl apply -f 02-blue-green/service-green.yaml
+service/myapp-service configured
+### green is live and verified, so blue is scaled to 0 (kept for a quick rollback)
+$ kubectl scale deployment app-blue --replicas=0
+deployment.apps/app-blue scaled
+$ kubectl get deploy -l app=myapp -L slot,version
+NAME        READY   UP-TO-DATE   AVAILABLE   AGE   SLOT    VERSION
+app-blue    0/0     0            0           15s   blue    v1
+app-green   3/3     3            3           15s   green   v2
+$ kubectl delete deployment/app-blue deployment/app-green service/myapp-service
+deployment.apps "app-blue" deleted from default namespace
+deployment.apps "app-green" deleted from default namespace
+service "myapp-service" deleted from default namespace

@@ -1,0 +1,29 @@
+$ kubectl apply -f 09-startup.yaml
+pod/lifecycle-startup created
+$ timeout 50 kubectl get pod lifecycle-startup -w | while read l; do echo "$(date +%T) $l"; done
+22:25:22 NAME                READY   STATUS    RESTARTS   AGE
+22:25:23 lifecycle-startup   0/1     Pending   0          1s
+22:25:23 lifecycle-startup   0/1     ContainerCreating   0          1s
+22:25:23 lifecycle-startup   0/1     ContainerCreating   0          1s
+22:25:23 lifecycle-startup   0/1     Running             0          1s
+22:25:58 lifecycle-startup   0/1     Running             0          36s
+22:25:58 lifecycle-startup   1/1     Running             0          36s
+$ kubectl describe pod lifecycle-startup | grep -E 'Startup:|Restart Count:|^  (Ready|ContainersReady) '
+    Restart Count:  0
+    Startup:        exec [sh -c test -f /tmp/started] delay=0s timeout=1s period=5s successThreshold=1 failureThreshold=10
+  Ready                       True 
+  ContainersReady             True 
+$ kubectl logs lifecycle-startup
+Application starting...
+Application started
+$ kubectl describe pod lifecycle-startup | sed -n '/^Events:/,$p' | cut -c1-170
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  50s                default-scheduler  Successfully assigned default/lifecycle-startup to k8s-a
+  Normal   Pulled     50s                kubelet            spec.containers{slow-app}: Container image "busybox:1.36" already present on machine and can be accessed by th
+  Normal   Created    50s                kubelet            spec.containers{slow-app}: Container created
+  Normal   Started    50s                kubelet            spec.containers{slow-app}: Container started
+  Warning  Unhealthy  20s (x6 over 45s)  kubelet            spec.containers{slow-app}: Startup probe failed:
+$ kubectl delete pod lifecycle-startup --grace-period=1
+pod "lifecycle-startup" deleted from default namespace

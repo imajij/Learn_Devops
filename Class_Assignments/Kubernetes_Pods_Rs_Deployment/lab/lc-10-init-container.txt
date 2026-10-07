@@ -1,0 +1,28 @@
+$ kubectl apply -f 10-init-container.yaml
+pod/lifecycle-init created
+$ timeout 25 kubectl get pod lifecycle-init -w | while read l; do echo "$(date +%T) $l"; done
+22:26:16 NAME             READY   STATUS     RESTARTS   AGE
+22:26:16 lifecycle-init   0/1     Init:0/1   0          0s
+22:26:16 lifecycle-init   0/1     Init:0/1   0          0s
+22:26:16 lifecycle-init   0/1     Init:0/1   0          0s
+22:26:27 lifecycle-init   0/1     PodInitializing   0          11s
+22:26:27 lifecycle-init   1/1     Running           0          11s
+$ kubectl logs lifecycle-init -c setup
+Init container running
+Init complete
+$ kubectl get pod lifecycle-init -o jsonpath="init: {.status.initContainerStatuses[0].state}{\"\\n\"}app:  {.status.containerStatuses[0].state}{\"\\n\"}"
+init: {"terminated":{"containerID":"containerd://d380bd8573d0e54606c4cee0f0c32d706dc70dbef4c02f15d536e59f0793d4a5","exitCode":0,"finishedAt":"2026-10-07T16:56:26Z","reason":"Completed","startedAt":"2026-10-07T16:56:16Z"}}
+app:  {"running":{"startedAt":"2026-10-07T16:56:27Z"}}
+$ kubectl describe pod lifecycle-init | sed -n '/^Events:/,$p' | cut -c1-170
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  25s   default-scheduler  Successfully assigned default/lifecycle-init to k8s-a
+  Normal  Pulled     25s   kubelet            spec.initContainers{setup}: Container image "busybox:1.36" already present on machine and can be accessed by the pod
+  Normal  Created    25s   kubelet            spec.initContainers{setup}: Container created
+  Normal  Started    25s   kubelet            spec.initContainers{setup}: Container started
+  Normal  Pulled     14s   kubelet            spec.containers{app}: Container image "nginx:1.27" already present on machine and can be accessed by the pod
+  Normal  Created    14s   kubelet            spec.containers{app}: Container created
+  Normal  Started    14s   kubelet            spec.containers{app}: Container started
+$ kubectl delete pod lifecycle-init
+pod "lifecycle-init" deleted from default namespace

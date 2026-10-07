@@ -1,0 +1,29 @@
+### pod watch during the update, only lines where a pod changed (time, pod, phase, ready, being-deleted?)
+$ awk '{d=($5=="<none>")?"-":"TERMINATING"; s=$3" "$4" "d; if(last[$2]!=s){printf "%s %-30s %-9s %-6s %s\n",$1,$2,$3,$4,d; last[$2]=s}}' ~/devops-lab/k8s-a/watch-app-recreate.log
+22:16:44 app-recreate-6c78cb55bb-99kfz  Running   true   -
+22:16:44 app-recreate-6c78cb55bb-l6wnk  Running   true   -
+22:16:44 app-recreate-6c78cb55bb-lpq9k  Running   true   -
+22:16:44 app-recreate-6c78cb55bb-l6wnk  Running   true   TERMINATING
+22:16:44 app-recreate-6c78cb55bb-99kfz  Running   true   TERMINATING
+22:16:44 app-recreate-6c78cb55bb-lpq9k  Running   true   TERMINATING
+22:16:45 app-recreate-6c78cb55bb-l6wnk  Succeeded false  TERMINATING
+22:16:45 app-recreate-6c78cb55bb-lpq9k  Succeeded false  TERMINATING
+22:16:50 app-recreate-6c78cb55bb-99kfz  Succeeded false  TERMINATING
+22:16:50 app-recreate-7bd8d89b8b-5sgfj  Pending   <none> -
+22:16:50 app-recreate-7bd8d89b8b-qqgz4  Pending   <none> -
+22:16:50 app-recreate-7bd8d89b8b-zlcwb  Pending   <none> -
+22:16:50 app-recreate-7bd8d89b8b-5sgfj  Pending   false  -
+22:16:50 app-recreate-7bd8d89b8b-qqgz4  Pending   false  -
+22:16:50 app-recreate-7bd8d89b8b-zlcwb  Pending   false  -
+22:16:51 app-recreate-7bd8d89b8b-5sgfj  Running   true   -
+22:16:51 app-recreate-7bd8d89b8b-qqgz4  Running   true   -
+22:16:51 app-recreate-7bd8d89b8b-zlcwb  Running   true   -
+$ until [ $(wc -l < ~/devops-lab/k8s-a/recreate-curl.log) -ge 60 ]; do sleep 2; done; uniq -c -f1 ~/devops-lab/k8s-a/recreate-curl.log | head -20
+   1 16:46:44 VERSION: v1
+   3 16:46:45 NO-RESPONSE
+   1 16:46:49 VERSION: v1
+   1 16:46:50 NO-RESPONSE
+  54 16:46:51 VERSION: v2
+$ kubectl delete deployment/app-recreate service/app-recreate-service
+deployment.apps "app-recreate" deleted from default namespace
+service "app-recreate-service" deleted from default namespace

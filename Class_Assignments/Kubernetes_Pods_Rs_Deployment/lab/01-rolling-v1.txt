@@ -1,0 +1,29 @@
+$ grep -A4 "strategy:" 01-rolling-update/deployment-v1.yaml
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+$ kubectl apply -f 01-rolling-update/deployment-v1.yaml -f 01-rolling-update/service.yaml
+deployment.apps/app-rolling created
+service/app-rolling-service created
+$ kubectl rollout status deployment/app-rolling --timeout=180s
+Waiting for deployment "app-rolling" rollout to finish: 0 of 4 updated replicas are available...
+Waiting for deployment "app-rolling" rollout to finish: 1 of 4 updated replicas are available...
+Waiting for deployment "app-rolling" rollout to finish: 2 of 4 updated replicas are available...
+Waiting for deployment "app-rolling" rollout to finish: 3 of 4 updated replicas are available...
+deployment "app-rolling" successfully rolled out
+$ kubectl get deploy,rs,pods -l app=app-rolling -L version
+NAME                          READY   UP-TO-DATE   AVAILABLE   AGE   VERSION
+deployment.apps/app-rolling   4/4     4            4           71s   
+
+NAME                                     DESIRED   CURRENT   READY   AGE   VERSION
+replicaset.apps/app-rolling-86d7d44d5b   4         4         4       71s   v1
+
+NAME                               READY   STATUS    RESTARTS   AGE   VERSION
+pod/app-rolling-86d7d44d5b-frlbg   1/1     Running   0          71s   v1
+pod/app-rolling-86d7d44d5b-qhqcp   1/1     Running   0          71s   v1
+pod/app-rolling-86d7d44d5b-tqsnp   1/1     Running   0          71s   v1
+pod/app-rolling-86d7d44d5b-whwsb   1/1     Running   0          71s   v1
+$ kubectl exec client -- curl -s http://app-rolling-service | grep -o "VERSION: v[0-9]"
+VERSION: v1

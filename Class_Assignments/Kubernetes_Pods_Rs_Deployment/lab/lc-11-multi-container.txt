@@ -1,0 +1,17 @@
+$ kubectl apply -f 11-multi-container.yaml
+pod/lifecycle-multi-container created
+$ kubectl wait --for=condition=Ready pod/lifecycle-multi-container --timeout=90s
+pod/lifecycle-multi-container condition met
+$ kubectl get pod lifecycle-multi-container
+NAME                        READY   STATUS    RESTARTS   AGE
+lifecycle-multi-container   2/2     Running   0          1s
+$ kubectl get pod lifecycle-multi-container -o jsonpath="{range .status.containerStatuses[*]}{.name}: ready={.ready} state={.state}{\"\\n\"}{end}"
+app: ready=true state={"running":{"startedAt":"2026-10-07T16:56:44Z"}}
+sidecar: ready=true state={"running":{"startedAt":"2026-10-07T16:56:44Z"}}
+$ sleep 12; kubectl logs lifecycle-multi-container -c sidecar
+Sidecar is running
+Sidecar is running
+$ kubectl exec lifecycle-multi-container -c sidecar -- wget -qO- http://localhost:80 | grep -o "<title>.*</title>"
+<title>Welcome to nginx!</title>
+$ kubectl delete pod lifecycle-multi-container
+pod "lifecycle-multi-container" deleted from default namespace

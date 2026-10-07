@@ -1,0 +1,4 @@
+$ kubectl run client --image=curlimages/curl:8.10.1 -- sleep 36000
+pod/client created
+$ kubectl wait --for=condition=Ready pod/client --timeout=120s
+pod/client condition met

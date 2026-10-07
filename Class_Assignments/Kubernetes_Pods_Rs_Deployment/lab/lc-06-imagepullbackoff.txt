@@ -1,0 +1,35 @@
+$ kubectl apply -f 06-imagepullbackoff.yaml
+pod/lifecycle-image-error created
+$ timeout 30 kubectl get pod lifecycle-image-error -w | while read l; do echo "$(date +%T) $l"; done
+22:21:40 NAME                    READY   STATUS              RESTARTS   AGE
+22:21:40 lifecycle-image-error   0/1     ContainerCreating   0          0s
+22:21:40 lifecycle-image-error   0/1     ContainerCreating   0          1s
+22:21:44 lifecycle-image-error   0/1     ErrImagePull        0          4s
+22:21:58 lifecycle-image-error   0/1     ImagePullBackOff    0          18s
+$ kubectl get pod lifecycle-image-error -o jsonpath='phase={.status.phase}{"\n"}state={.status.containerStatuses[*].state}{"\n"}lastState={.status.containerStatuses[*].lastState}{"\n"}'
+phase=Pending
+state={"waiting":{"message":"Back-off pulling image \"nginx:this-tag-does-not-exist-99999\": ErrImagePull: failed to pull and unpack image \"docker.io/library/nginx:this-tag-does-not-exist-99999\": failed to resolve reference \"docker.io/library/nginx:this-tag-does-not-exist-99999\": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/nginx/manifests/this-tag-does-not-exist-99999: 429 Too Many Requests","reason":"ImagePullBackOff"}}
+lastState={}
+$ kubectl describe pod lifecycle-image-error | sed -n '/^Events:/,$p' | cut -c1-170
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  30s                default-scheduler  Successfully assigned default/lifecycle-image-error to k8s-a
+  Normal   BackOff    26s                kubelet            spec.containers{broken-image}: Back-off pulling image "nginx:this-tag-does-not-exist-99999"
+  Warning  Failed     26s                kubelet            spec.containers{broken-image}: Error: ImagePullBackOff
+  Normal   Pulling    12s (x2 over 29s)  kubelet            spec.containers{broken-image}: Pulling image "nginx:this-tag-does-not-exist-99999"
+  Warning  Failed     9s (x2 over 27s)   kubelet            spec.containers{broken-image}: Failed to pull image "nginx:this-tag-does-not-exist-99999": failed to pull and 
+  Warning  Failed     9s (x2 over 27s)   kubelet            spec.containers{broken-image}: Error: ErrImagePull
+$ kubectl delete pod lifecycle-image-error
+pod "lifecycle-image-error" deleted from default namespace
+### Docker Hub rate-limited the pull (429), which hides the real problem. Same bad tag through the mirror registry:
+$ kubectl run bad-tag --image=mirror.gcr.io/library/nginx:this-tag-does-not-exist-99999
+pod/bad-tag created
+$ sleep 15; kubectl get pod bad-tag
+NAME      READY   STATUS             RESTARTS   AGE
+bad-tag   0/1     ImagePullBackOff   0          15s
+$ kubectl get pod bad-tag -o jsonpath='{.status.containerStatuses[0].state.waiting.message}' | cut -c1-200; echo
+Back-off pulling image "mirror.gcr.io/library/nginx:this-tag-does-not-exist-99999": ErrImagePull: rpc error: code = NotFound desc = failed to pull and unpack image "mirror.gcr.io/library/nginx:this-ta
+
+$ kubectl delete pod bad-tag
+pod "bad-tag" deleted from default namespace

@@ -1,0 +1,21 @@
+$ kubectl apply -f 07-readiness.yaml
+pod/lifecycle-readiness created
+$ timeout 20 kubectl get pod lifecycle-readiness -w | while read l; do echo "$(date +%T) $l"; done
+22:23:35 NAME                  READY   STATUS    RESTARTS   AGE
+22:23:35 lifecycle-readiness   0/1     Pending   0          0s
+22:23:35 lifecycle-readiness   0/1     ContainerCreating   0          0s
+22:23:36 lifecycle-readiness   0/1     ContainerCreating   0          1s
+22:23:36 lifecycle-readiness   0/1     Running             0          1s
+22:23:41 lifecycle-readiness   1/1     Running             0          6s
+$ kubectl describe pod lifecycle-readiness | grep -E 'Readiness:|^  (Ready|ContainersReady) '
+    Readiness:      http-get http://:80/ delay=5s timeout=1s period=5s successThreshold=1 failureThreshold=3
+  Ready                       True 
+  ContainersReady             True 
+$ kubectl get pod lifecycle-readiness -o jsonpath="{range .status.conditions[*]}{.type}={.status} at {.lastTransitionTime}{\"\\n\"}{end}"
+PodReadyToStartContainers=True at 2026-10-07T16:53:36Z
+Initialized=True at 2026-10-07T16:53:35Z
+Ready=True at 2026-10-07T16:53:41Z
+ContainersReady=True at 2026-10-07T16:53:41Z
+PodScheduled=True at 2026-10-07T16:53:35Z
+$ kubectl delete pod lifecycle-readiness
+pod "lifecycle-readiness" deleted from default namespace

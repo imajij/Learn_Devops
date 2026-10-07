@@ -1,0 +1,10 @@
+### Docker Hub answered 429 Too Many Requests (anonymous pull limit, several clusters share this IP).
+### Workaround: pull the same image from Google's Docker Hub mirror inside the node and tag it busybox:1.36,
+### so the instructor's YAML stays unchanged (imagePullPolicy defaults to IfNotPresent for a fixed tag).
+$ minikube -p k8s-a ssh -- sudo crictl pull mirror.gcr.io/library/busybox:1.36
+Image is up to date for sha256:b7c873bd97bdc9046fc894e0b216c8aef31e0db4c5b761fb53022e40577ab6c0
+$ minikube -p k8s-a ssh -- sudo ctr -n k8s.io images tag mirror.gcr.io/library/busybox:1.36 docker.io/library/busybox:1.36
+docker.io/library/busybox:1.36
+$ minikube -p k8s-a ssh -- sudo crictl images | grep busybox
+docker.io/library/busybox                   1.36                 b7c873bd97bdc       1.91MB
+mirror.gcr.io/library/busybox               1.36                 b7c873bd97bdc       1.91MB

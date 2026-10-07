@@ -1,0 +1,29 @@
+$ kubectl apply -f 08-liveness.yaml
+pod/lifecycle-liveness created
+$ timeout 75 kubectl get pod lifecycle-liveness -w | while read l; do echo "$(date +%T) $l"; done
+22:23:58 NAME                 READY   STATUS              RESTARTS   AGE
+22:23:58 lifecycle-liveness   0/1     ContainerCreating   0          0s
+22:24:00 lifecycle-liveness   0/1     ContainerCreating   0          2s
+22:24:00 lifecycle-liveness   1/1     Running             0          2s
+22:24:59 lifecycle-liveness   1/1     Running             1 (0s ago)   61s
+$ kubectl describe pod lifecycle-liveness | grep -E 'Liveness:|Restart Count:|Last State|Reason:|Exit Code:'
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    137
+    Restart Count:  1
+    Liveness:       exec [sh -c test -f /tmp/healthy] delay=5s timeout=1s period=5s successThreshold=1 failureThreshold=2
+$ kubectl logs lifecycle-liveness --previous
+App started
+Health file removed
+$ kubectl describe pod lifecycle-liveness | sed -n '/^Events:/,$p' | cut -c1-170
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  75s                default-scheduler  Successfully assigned default/lifecycle-liveness to k8s-a
+  Warning  Unhealthy  45s (x2 over 50s)  kubelet            spec.containers{app}: Liveness probe failed:
+  Normal   Killing    45s                kubelet            spec.containers{app}: Container app failed liveness probe, will be restarted
+  Normal   Pulled     14s (x2 over 74s)  kubelet            spec.containers{app}: Container image "busybox:1.36" already present on machine and can be accessed by the pod
+  Normal   Created    14s (x2 over 74s)  kubelet            spec.containers{app}: Container created
+  Normal   Started    14s (x2 over 73s)  kubelet            spec.containers{app}: Container started
+$ kubectl delete pod lifecycle-liveness --grace-period=1
+pod "lifecycle-liveness" deleted from default namespace
