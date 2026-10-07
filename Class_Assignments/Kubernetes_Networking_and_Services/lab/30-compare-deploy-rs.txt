@@ -1,0 +1,57 @@
+$ kubectl create deployment demo --image=registry.k8s.io/e2e-test-images/agnhost:2.53 --replicas=3 -- /agnhost netexec --http-port=8080
+deployment.apps/demo created
+$ kubectl rollout status deployment/demo --timeout=120s
+Waiting for deployment "demo" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "demo" rollout to finish: 1 of 3 updated replicas are available...
+Waiting for deployment "demo" rollout to finish: 2 of 3 updated replicas are available...
+deployment "demo" successfully rolled out
+$ kubectl get deploy,rs,pods -l app=demo
+NAME                   READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/demo   3/3     3            3           0s
+
+NAME                             DESIRED   CURRENT   READY   AGE
+replicaset.apps/demo-5f77bc8f5   3         3         3       0s
+
+NAME                       READY   STATUS    RESTARTS   AGE
+pod/demo-5f77bc8f5-2wtfq   1/1     Running   0          0s
+pod/demo-5f77bc8f5-69hxv   1/1     Running   0          0s
+pod/demo-5f77bc8f5-bnbfc   1/1     Running   0          0s
+### ownership chain: Pod -> ReplicaSet -> Deployment
+$ kubectl get pods -l app=demo -o jsonpath='{range .items[*]}{.metadata.name} owner={.metadata.ownerReferences[0].kind}/{.metadata.ownerReferences[0].name}{"\n"}{end}'
+demo-5f77bc8f5-2wtfq owner=ReplicaSet/demo-5f77bc8f5
+demo-5f77bc8f5-69hxv owner=ReplicaSet/demo-5f77bc8f5
+demo-5f77bc8f5-bnbfc owner=ReplicaSet/demo-5f77bc8f5
+$ kubectl get rs -l app=demo -o jsonpath='{range .items[*]}{.metadata.name} owner={.metadata.ownerReferences[0].kind}/{.metadata.ownerReferences[0].name}{"\n"}{end}'
+demo-5f77bc8f5 owner=Deployment/demo
+### ReplicaSet self-healing: delete a pod, a new one appears
+$ kubectl delete pod $(kubectl get pods -l app=demo -o name | head -1 | cut -d/ -f2) --wait=false
+pod "demo-5f77bc8f5-2wtfq" deleted from default namespace
+$ sleep 3; kubectl get pods -l app=demo
+NAME                   READY   STATUS    RESTARTS   AGE
+demo-5f77bc8f5-69hxv   1/1     Running   0          4s
+demo-5f77bc8f5-6x22q   1/1     Running   0          3s
+demo-5f77bc8f5-bnbfc   1/1     Running   0          4s
+### editing the ReplicaSet directly does not survive: the Deployment owns it
+$ kubectl scale rs $(kubectl get rs -l app=demo -o name | cut -d/ -f2) --replicas=5; sleep 3; kubectl get rs -l app=demo
+replicaset.apps/demo-5f77bc8f5 scaled
+NAME             DESIRED   CURRENT   READY   AGE
+demo-5f77bc8f5   3         3         3       7s
+### a rolling update = the Deployment creates a NEW ReplicaSet
+$ kubectl set env deployment/demo VERSION=2; kubectl rollout status deployment/demo --timeout=120s; kubectl get rs -l app=demo
+deployment.apps/demo env updated
+Waiting for deployment "demo" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "demo" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "demo" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "demo" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "demo" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "demo" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "demo" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "demo" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "demo" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "demo" rollout to finish: 1 old replicas are pending termination...
+deployment "demo" successfully rolled out
+NAME              DESIRED   CURRENT   READY   AGE
+demo-5f77bc8f5    0         0         0       8s
+demo-6445568797   3         3         3       1s
+$ kubectl delete deployment demo
+deployment.apps "demo" deleted from default namespace

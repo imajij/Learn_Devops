@@ -1,0 +1,31 @@
+$ kubectl create namespace team-b
+namespace/team-b created
+$ kubectl -n team-b create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 -- /agnhost netexec --http-port=8080
+deployment.apps/api created
+$ kubectl -n team-b expose deployment api --port=80 --target-port=8080
+service/api exposed
+$ kubectl -n team-b rollout status deployment/api --timeout=120s; sleep 3
+Waiting for deployment "api" rollout to finish: 0 of 1 updated replicas are available...
+deployment "api" successfully rolled out
+### from a pod in namespace "default":
+$ kubectl exec dnsutils -- nslookup api
+Server:		10.96.0.10
+Address:	10.96.0.10#53
+
+** server can't find api: NXDOMAIN
+
+command terminated with exit code 1
+$ kubectl exec dnsutils -- nslookup api.team-b
+Server:		10.96.0.10
+Address:	10.96.0.10#53
+
+Name:	api.team-b.svc.cluster.local
+Address: 10.106.69.26
+
+$ kubectl exec dnsutils -- dig +short api.team-b.svc.cluster.local
+10.106.69.26
+$ kubectl exec curl -- curl -s http://api.team-b/hostname; echo
+api-c4994b678-kz29h
+$ kubectl exec curl -- curl -s -m 3 http://api/hostname || echo "curl exit $? (could not resolve host 'api' from namespace default)"
+command terminated with exit code 6
+curl exit 6 (could not resolve host 'api' from namespace default)

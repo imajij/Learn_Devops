@@ -1,0 +1,21 @@
+# Test client with dig, nslookup and curl (the dnsutils image used in the Kubernetes DNS debugging docs).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dnsutils
+spec:
+  containers:
+    - name: dnsutils
+      image: registry.k8s.io/e2e-test-images/jessie-dnsutils:1.7
+      command: ["sleep", "36000"]
+---
+# HTTP client (curl). dnsutils has no curl, so HTTP tests run from this pod.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: curl
+spec:
+  containers:
+    - name: curl
+      image: curlimages/curl:8.10.1
+      command: ["sleep", "36000"]

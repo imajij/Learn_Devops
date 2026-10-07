@@ -1,0 +1,9 @@
+# ExternalName: no selector, no pods, no ClusterIP. CoreDNS answers with a CNAME to an outside name,
+# so in-cluster apps can use a stable internal name for an external dependency.
+apiVersion: v1
+kind: Service
+metadata:
+  name: github-api
+spec:
+  type: ExternalName
+  externalName: api.github.com

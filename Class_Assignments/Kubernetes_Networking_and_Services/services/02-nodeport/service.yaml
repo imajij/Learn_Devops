@@ -1,0 +1,14 @@
+# NodePort: everything ClusterIP does, plus the same port (30000-32767) opened on every node's IP.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: web-nodeport
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      nodePort: 30080

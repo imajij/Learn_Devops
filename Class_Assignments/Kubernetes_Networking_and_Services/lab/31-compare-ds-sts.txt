@@ -1,0 +1,23 @@
+$ kubectl get daemonsets -A
+NAMESPACE     NAME         DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+kube-system   kindnet      1         1         1       1            1           <none>                   32m
+kube-system   kube-proxy   1         1         1       1            1           kubernetes.io/os=linux   32m
+$ kubectl -n kube-system get pods -l k8s-app=kube-proxy -o wide
+NAME               READY   STATUS    RESTARTS   AGE   IP             NODE    NOMINATED NODE   READINESS GATES
+kube-proxy-qlrb4   1/1     Running   0          32m   192.168.49.2   k8s-a   <none>           <none>
+### StatefulSet: ordered names, stable identity; delete web-1 -> comes back as web-1 (new IP, same DNS name)
+$ kubectl get pods -l app=web-headless -o wide | awk "{print \$1, \$3, \$6}"
+NAME STATUS IP
+web-0 Running 10.244.0.109
+web-1 Running 10.244.0.110
+web-2 Running 10.244.0.111
+$ kubectl delete pod web-1
+pod "web-1" deleted from default namespace
+$ kubectl wait --for=condition=Ready pod/web-1 --timeout=60s; kubectl get pods -l app=web-headless -o wide | awk "{print \$1, \$3, \$6}"
+pod/web-1 condition met
+NAME STATUS IP
+web-0 Running 10.244.0.109
+web-1 Running 10.244.0.121
+web-2 Running 10.244.0.111
+$ sleep 2; kubectl exec dnsutils -- dig +noall +answer web-1.web-headless.default.svc.cluster.local
+web-1.web-headless.default.svc.cluster.local. 30 IN A 10.244.0.121

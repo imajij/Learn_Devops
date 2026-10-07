@@ -1,0 +1,33 @@
+$ kubectl exec dnsutils -- cat /etc/resolv.conf
+search default.svc.cluster.local svc.cluster.local cluster.local
+nameserver 10.96.0.10
+options ndots:5
+### the same Service, from short name to full FQDN
+$ kubectl exec dnsutils -- nslookup web-clusterip
+Server:		10.96.0.10
+Address:	10.96.0.10#53
+
+Name:	web-clusterip.default.svc.cluster.local
+Address: 10.103.84.210
+
+$ kubectl exec dnsutils -- nslookup web-clusterip.default
+Server:		10.96.0.10
+Address:	10.96.0.10#53
+
+Name:	web-clusterip.default.svc.cluster.local
+Address: 10.103.84.210
+
+$ kubectl exec dnsutils -- nslookup web-clusterip.default.svc
+Server:		10.96.0.10
+Address:	10.96.0.10#53
+
+Name:	web-clusterip.default.svc.cluster.local
+Address: 10.103.84.210
+
+$ kubectl exec dnsutils -- nslookup web-clusterip.default.svc.cluster.local.
+Server:		10.96.0.10
+Address:	10.96.0.10#53
+
+Name:	web-clusterip.default.svc.cluster.local
+Address: 10.103.84.210
+

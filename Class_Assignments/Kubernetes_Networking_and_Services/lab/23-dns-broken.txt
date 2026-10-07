@@ -1,0 +1,31 @@
+### Troubleshooting demo. Break DNS: scale CoreDNS to 0 (simulates crashed/evicted DNS pods)
+$ kubectl -n kube-system scale deployment coredns --replicas=0
+deployment.apps/coredns scaled
+$ kubectl -n kube-system wait --for=delete pod -l k8s-app=kube-dns --timeout=60s
+pod/coredns-559f6c778d-rn5zl condition met
+### symptom seen by an application:
+$ kubectl exec curl -- curl -s -m 8 http://web-clusterip/hostname || echo "curl exit $?"
+command terminated with exit code 6
+curl exit 6
+### step 1: is it DNS or the network? -> same request by IP works
+$ kubectl exec curl -- curl -s http://$(kubectl get svc web-clusterip -o jsonpath='{.spec.clusterIP}')/hostname; echo
+web-clusterip-89dc48646-85x5p
+### step 2: query DNS directly
+$ kubectl exec dnsutils -- nslookup -timeout=3 web-clusterip
+;; connection timed out; no servers could be reached
+
+command terminated with exit code 1
+$ kubectl exec dnsutils -- cat /etc/resolv.conf | grep nameserver
+nameserver 10.96.0.10
+### step 3: does the DNS Service have endpoints? are the DNS pods running?
+$ kubectl -n kube-system get svc kube-dns
+NAME       TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE
+kube-dns   ClusterIP   10.96.0.10   <none>        53/UDP,53/TCP,9153/TCP   31m
+$ kubectl -n kube-system get endpointslices -l kubernetes.io/service-name=kube-dns
+NAME             ADDRESSTYPE   PORTS     ENDPOINTS   AGE
+kube-dns-8q6cz   IPv4          <unset>   <unset>     31m
+$ kubectl -n kube-system get pods -l k8s-app=kube-dns
+No resources found in kube-system namespace.
+$ kubectl -n kube-system get deployment coredns
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+coredns   0/0     0            0           31m

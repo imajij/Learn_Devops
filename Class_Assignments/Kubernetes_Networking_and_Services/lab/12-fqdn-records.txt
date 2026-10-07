@@ -1,0 +1,22 @@
+### SRV record: named port "http" over TCP -> port number + target name
+$ kubectl exec dnsutils -- dig +noall +answer SRV _http._tcp.web-clusterip.default.svc.cluster.local
+_http._tcp.web-clusterip.default.svc.cluster.local. 30 IN SRV 0 100 80 web-clusterip.default.svc.cluster.local.
+$ kubectl exec dnsutils -- dig +noall +answer SRV _http._tcp.web-headless.default.svc.cluster.local
+_http._tcp.web-headless.default.svc.cluster.local. 30 IN SRV 0 33 8080 web-0.web-headless.default.svc.cluster.local.
+_http._tcp.web-headless.default.svc.cluster.local. 30 IN SRV 0 33 8080 web-1.web-headless.default.svc.cluster.local.
+_http._tcp.web-headless.default.svc.cluster.local. 30 IN SRV 0 33 8080 web-2.web-headless.default.svc.cluster.local.
+### pod A record: <pod-ip-with-dashes>.<namespace>.pod.cluster.local
+$ IP=$(kubectl get pod curl -o jsonpath="{.status.podIP}"); echo $IP
+10.244.0.87
+$ kubectl exec dnsutils -- dig +noall +answer $(echo $IP | tr . -).default.pod.cluster.local
+10-244-0-87.default.pod.cluster.local. 30 IN A	10.244.0.87
+### reverse lookup of a Service IP and the kubernetes API service
+$ kubectl exec dnsutils -- dig +noall +answer -x $(kubectl get svc web-clusterip -o jsonpath='{.spec.clusterIP}')
+210.84.103.10.in-addr.arpa. 30	IN	PTR	web-clusterip.default.svc.cluster.local.
+$ kubectl exec dnsutils -- dig +noall +answer kubernetes.default.svc.cluster.local
+kubernetes.default.svc.cluster.local. 30 IN A	10.96.0.1
+$ kubectl exec dnsutils -- nslookup google.com | tail -4
+Non-authoritative answer:
+Name:	google.com
+Address: 142.250.206.174
+

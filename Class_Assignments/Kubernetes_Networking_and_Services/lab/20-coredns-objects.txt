@@ -1,0 +1,24 @@
+$ kubectl -n kube-system get deployment,pods,svc -l k8s-app=kube-dns -o wide
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                                    SELECTOR
+deployment.apps/coredns   1/1     1            1           31m   coredns      registry.k8s.io/coredns/coredns:v1.14.6   k8s-app=kube-dns
+
+NAME                           READY   STATUS    RESTARTS   AGE   IP           NODE    NOMINATED NODE   READINESS GATES
+pod/coredns-559f6c778d-rn5zl   1/1     Running   0          31m   10.244.0.2   k8s-a   <none>           <none>
+
+NAME               TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE   SELECTOR
+service/kube-dns   ClusterIP   10.96.0.10   <none>        53/UDP,53/TCP,9153/TCP   31m   k8s-app=kube-dns
+$ kubectl -n kube-system get endpointslices -l kubernetes.io/service-name=kube-dns
+NAME             ADDRESSTYPE   PORTS        ENDPOINTS    AGE
+kube-dns-8q6cz   IPv4          53,53,9153   10.244.0.2   31m
+$ kubectl -n kube-system get deployment coredns -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}{.spec.template.spec.containers[0].args}{"\n"}'
+registry.k8s.io/coredns/coredns:v1.14.6
+["-conf","/etc/coredns/Corefile"]
+$ kubectl -n kube-system logs deployment/coredns | head -8
+maxprocs: Leaving GOMAXPROCS=10: CPU quota undefined
+.:53
+[INFO] plugin/reload: Running configuration SHA512 = 89a6e05fc67eecdffa7003093b79b2cbea9005d1cc1b8f901e34af9fad50528fd7f4ecc8f373809541bdde67adfb654f0999ac01123c7cfb387d7193a359ab6e
+CoreDNS-1.14.6
+linux/arm64, go1.26.5, 424d125
+[INFO] 127.0.0.1:40347 - 22150 "HINFO IN 808424643987108714.1063177858374690894. udp 56 false 512" NOERROR qr,rd,ra 56 0.001280378s
+[INFO] 10.244.0.6:59961 - 49218 "AAAA IN kubernetes-bootcamp.default.svc.cluster.local. udp 63 false 512" NOERROR qr,aa,rd 156 0.000993941s
+[INFO] 10.244.0.6:59961 - 49135 "A IN kubernetes-bootcamp.default.svc.cluster.local. udp 63 false 512" NOERROR qr,aa,rd 124 0.001038818s

@@ -1,0 +1,39 @@
+$ kubectl apply -f 01-clusterip/
+deployment.apps/web-clusterip created
+service/web-clusterip created
+$ kubectl rollout status deployment/web-clusterip --timeout=120s
+Waiting for deployment spec update to be observed...
+Waiting for deployment "web-clusterip" rollout to finish: 0 out of 3 new replicas have been updated...
+Waiting for deployment "web-clusterip" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "web-clusterip" rollout to finish: 1 of 3 updated replicas are available...
+deployment "web-clusterip" successfully rolled out
+### short pause: kube-proxy programs the new endpoints a moment after the pods turn Ready
+$ sleep 5
+$ kubectl get svc web-clusterip -o wide
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE   SELECTOR
+web-clusterip   ClusterIP   10.103.84.210   <none>        80/TCP    7s    app=web-clusterip
+$ kubectl get pods -l app=web-clusterip -o wide
+NAME                            READY   STATUS    RESTARTS   AGE   IP             NODE    NOMINATED NODE   READINESS GATES
+web-clusterip-89dc48646-85x5p   1/1     Running   0          7s    10.244.0.98    k8s-a   <none>           <none>
+web-clusterip-89dc48646-ltsr5   1/1     Running   0          7s    10.244.0.99    k8s-a   <none>           <none>
+web-clusterip-89dc48646-rjpfg   1/1     Running   0          7s    10.244.0.100   k8s-a   <none>           <none>
+$ kubectl get endpointslices -l kubernetes.io/service-name=web-clusterip
+NAME                  ADDRESSTYPE   PORTS   ENDPOINTS                              AGE
+web-clusterip-c8622   IPv4          8080    10.244.0.98,10.244.0.100,10.244.0.99   7s
+### connectivity from a pod: by DNS name, 30 requests -> which pod answered?
+$ kubectl exec curl -- sh -c 'for i in $(seq 1 30); do curl -s http://web-clusterip/hostname; echo; done' | sort | uniq -c
+   8 web-clusterip-89dc48646-85x5p
+  14 web-clusterip-89dc48646-ltsr5
+   8 web-clusterip-89dc48646-rjpfg
+$ kubectl exec curl -- curl -s -m 3 http://$(kubectl get svc web-clusterip -o jsonpath='{.spec.clusterIP}')/hostname; echo
+web-clusterip-89dc48646-85x5p
+$ kubectl exec dnsutils -- nslookup web-clusterip
+Server:		10.96.0.10
+Address:	10.96.0.10#53
+
+Name:	web-clusterip.default.svc.cluster.local
+Address: 10.103.84.210
+
+### from the Mac (outside the cluster) the ClusterIP is not reachable:
+$ curl -s -m 3 http://$(kubectl get svc web-clusterip -o jsonpath='{.spec.clusterIP}')/hostname || echo "curl exit $? -> no route from outside the cluster"
+curl exit 28 -> no route from outside the cluster

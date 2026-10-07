@@ -1,0 +1,13 @@
+# ClusterIP (the default type): a stable virtual IP + DNS name reachable only inside the cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    app: web-clusterip
+  ports:
+    - name: http
+      port: 80          # port on the Service IP
+      targetPort: 8080  # containerPort on the pods

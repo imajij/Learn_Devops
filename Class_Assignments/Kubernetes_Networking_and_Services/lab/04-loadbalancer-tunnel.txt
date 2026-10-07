@@ -1,0 +1,24 @@
+### start minikube tunnel in the background (it must keep running)
+$ (minikube -p k8s-a tunnel > ~/devops-lab/k8s-a/tunnel.log 2>&1 &); sleep 1; echo tunnel started
+tunnel started
+$ until kubectl get svc web-loadbalancer -o jsonpath="{.status.loadBalancer.ingress[0].ip}" | grep -q .; do sleep 1; done; kubectl get svc web-loadbalancer
+NAME               TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)           AGE
+web-loadbalancer   LoadBalancer   10.109.122.97   127.0.0.1     18080:30761/TCP   65s
+$ until grep -q web-loadbalancer ~/devops-lab/k8s-a/tunnel.log; do sleep 1; done; sleep 2; cat ~/devops-lab/k8s-a/tunnel.log
+* Tunnel successfully started
+
+* NOTE: Please do not close this terminal as this process must stay alive for the tunnel to be accessible ...
+
+* Starting tunnel for service web-loadbalancer.
+$ for i in $(seq 1 9); do curl -s http://127.0.0.1:18080/hostname; echo; done | sort | uniq -c
+   6 web-loadbalancer-677f7f8d5f-8smnf
+   1 web-loadbalancer-677f7f8d5f-r2dz8
+   2 web-loadbalancer-677f7f8d5f-tb8fd
+$ kubectl get svc web-loadbalancer -o jsonpath='{.status.loadBalancer}'; echo
+{"ingress":[{"ip":"127.0.0.1","ipMode":"VIP"}]}
+### stop the tunnel: kill minikube tunnel and the ssh port-forward it started
+$ pkill -f "minikube -p k8s-a tunnel"; pkill -f "machines/k8s-a/id_rsa -L"; sleep 3; kubectl get svc web-loadbalancer
+NAME               TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)           AGE
+web-loadbalancer   LoadBalancer   10.109.122.97   127.0.0.1     18080:30761/TCP   70s
+$ curl -s -m 3 http://127.0.0.1:18080/hostname || echo "curl exit $? -> tunnel stopped, nothing listening on 127.0.0.1:18080"
+curl exit 7 -> tunnel stopped, nothing listening on 127.0.0.1:18080

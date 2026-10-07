@@ -1,0 +1,14 @@
+# Headless Service: clusterIP None. No virtual IP and no kube-proxy load balancing; DNS returns
+# the pod IPs directly and gives every StatefulSet pod its own stable name.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-headless
+spec:
+  clusterIP: None
+  selector:
+    app: web-headless
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

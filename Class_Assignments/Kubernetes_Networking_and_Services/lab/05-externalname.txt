@@ -1,0 +1,16 @@
+$ kubectl apply -f 04-externalname/service.yaml
+service/github-api created
+$ kubectl get svc github-api -o wide
+NAME         TYPE           CLUSTER-IP   EXTERNAL-IP      PORT(S)   AGE   SELECTOR
+github-api   ExternalName   <none>       api.github.com   <none>    0s    <none>
+$ kubectl get endpointslices -l kubernetes.io/service-name=github-api
+No resources found in default namespace.
+$ kubectl exec dnsutils -- dig +noall +answer github-api.default.svc.cluster.local
+github-api.default.svc.cluster.local. 5	IN CNAME api.github.com.
+api.github.com.		5	IN	A	20.207.73.85
+$ kubectl exec curl -- curl -s -m 10 -o /dev/null -w 'http=%{http_code} ip=%{remote_ip}\n' https://github-api/zen
+http=000 ip=
+command terminated with exit code 60
+### TLS fails: the certificate is for api.github.com, not github-api. ExternalName is only a DNS alias.
+$ kubectl exec curl -- curl -s -m 10 --resolve api.github.com:443:$(kubectl exec dnsutils -- dig +short github-api.default.svc.cluster.local | tail -1) https://api.github.com/zen; echo
+Keep it logically awesome.

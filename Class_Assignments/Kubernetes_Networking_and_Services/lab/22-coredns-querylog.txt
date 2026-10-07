@@ -1,0 +1,31 @@
+### minikube already enables the "log" plugin (first line of the Corefile), so every query is logged
+$ kubectl exec dnsutils -- nslookup web-clusterip >/dev/null; kubectl exec dnsutils -- nslookup api.team-b >/dev/null; kubectl exec dnsutils -- nslookup github.com >/dev/null; sleep 2; echo queries sent from $(kubectl get pod dnsutils -o jsonpath='{.status.podIP}')
+queries sent from 10.244.0.81
+$ kubectl -n kube-system logs deployment/coredns --since=20s | grep $(kubectl get pod dnsutils -o jsonpath='{.status.podIP}') | grep -E ' "A IN ' | sed -E 's/^.*"A IN ([^ ]+) .*" ([A-Z]+) .*$/A \1 -> \2/'
+A web-clusterip.default.svc.cluster.local. -> NOERROR
+A web-clusterip.default.default.svc.cluster.local. -> NXDOMAIN
+A web-clusterip.default.svc.cluster.local. -> NOERROR
+A web-clusterip.default.svc.default.svc.cluster.local. -> NXDOMAIN
+A web-clusterip.default.svc.svc.cluster.local. -> NXDOMAIN
+A web-clusterip.default.svc.cluster.local. -> NOERROR
+A web-clusterip.default.svc.cluster.local. -> NOERROR
+A api.default.svc.cluster.local. -> NXDOMAIN
+A api.svc.cluster.local. -> NXDOMAIN
+A api.cluster.local. -> NXDOMAIN
+A api. -> NXDOMAIN
+A api.team-b.default.svc.cluster.local. -> NXDOMAIN
+A api.team-b.svc.cluster.local. -> NOERROR
+A api.team-b.svc.cluster.local. -> NOERROR
+A 10-244-0-87.default.pod.cluster.local. -> NOERROR
+A kubernetes.default.svc.cluster.local. -> NOERROR
+A google.com.default.svc.cluster.local. -> NXDOMAIN
+A google.com.svc.cluster.local. -> NXDOMAIN
+A google.com.cluster.local. -> NXDOMAIN
+A google.com. -> NOERROR
+A web-clusterip.default.svc.cluster.local. -> NOERROR
+A api.team-b.default.svc.cluster.local. -> NXDOMAIN
+A api.team-b.svc.cluster.local. -> NOERROR
+A github.com.default.svc.cluster.local. -> NXDOMAIN
+A github.com.svc.cluster.local. -> NXDOMAIN
+A github.com.cluster.local. -> NXDOMAIN
+A github.com. -> NOERROR

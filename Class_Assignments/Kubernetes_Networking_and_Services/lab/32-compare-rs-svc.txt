@@ -1,0 +1,33 @@
+### ReplicaSet keeps pods alive; Service gives them one address. Pod IPs change, the Service IP does not:
+$ kubectl get svc web-clusterip -o jsonpath='{.spec.clusterIP}{"\n"}'
+10.103.84.210
+$ kubectl get endpointslices -l kubernetes.io/service-name=web-clusterip
+NAME                  ADDRESSTYPE   PORTS   ENDPOINTS                                AGE
+web-clusterip-c8622   IPv4          8080    10.244.0.122,10.244.0.123,10.244.0.124   3m56s
+$ kubectl rollout restart deployment/web-clusterip; kubectl rollout status deployment/web-clusterip --timeout=120s
+deployment.apps/web-clusterip restarted
+Waiting for deployment "web-clusterip" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "web-clusterip" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "web-clusterip" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "web-clusterip" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "web-clusterip" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "web-clusterip" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "web-clusterip" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "web-clusterip" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "web-clusterip" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "web-clusterip" rollout to finish: 1 old replicas are pending termination...
+deployment "web-clusterip" successfully rolled out
+$ sleep 3; kubectl get endpointslices -l kubernetes.io/service-name=web-clusterip
+NAME                  ADDRESSTYPE   PORTS   ENDPOINTS                                AGE
+web-clusterip-c8622   IPv4          8080    10.244.0.125,10.244.0.126,10.244.0.127   4m13s
+$ kubectl get svc web-clusterip -o jsonpath='{.spec.clusterIP}{"\n"}'
+10.103.84.210
+### how traffic reaches the pods: kube-proxy iptables rules for this Service IP
+$ minikube -p k8s-a ssh -- sudo iptables -t nat -S | grep 'default/web-clusterip' | grep -E 'KUBE-SVC|probability|DNAT' | grep -v '! -s' | sed -E 's/ -m comment --comment "[^"]*"//; s/ -p tcp -m tcp//'
+-A KUBE-SEP-23EH3AX3WVRS5NGB -j DNAT --to-destination 10.244.0.126:8080
+-A KUBE-SEP-BL3DL5RI26SMZBYX -j DNAT --to-destination 10.244.0.127:8080
+-A KUBE-SEP-KFZC6V2LQHUAN6SY -j DNAT --to-destination 10.244.0.125:8080
+-A KUBE-SERVICES -d 10.103.84.210/32 --dport 80 -j KUBE-SVC-Q4TU5OA5MHGIX2YG
+-A KUBE-SVC-Q4TU5OA5MHGIX2YG -m statistic --mode random --probability 0.33333333349 -j KUBE-SEP-KFZC6V2LQHUAN6SY
+-A KUBE-SVC-Q4TU5OA5MHGIX2YG -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-23EH3AX3WVRS5NGB
+-A KUBE-SVC-Q4TU5OA5MHGIX2YG -j KUBE-SEP-BL3DL5RI26SMZBYX

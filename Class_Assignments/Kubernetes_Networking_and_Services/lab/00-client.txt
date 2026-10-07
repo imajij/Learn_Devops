@@ -1,0 +1,6 @@
+$ kubectl apply -f client.yaml
+pod/dnsutils unchanged
+pod/curl created
+$ kubectl wait --for=condition=Ready pod/dnsutils pod/curl --timeout=120s
+pod/dnsutils condition met
+pod/curl condition met

@@ -1,0 +1,15 @@
+# LoadBalancer: NodePort + ClusterIP + an external IP handed out by a cloud load balancer.
+# On minikube the external IP comes from "minikube tunnel". Port 18080 (not 80) so the tunnel
+# does not need root to listen on the Mac (and does not clash with other local services).
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: web-loadbalancer
+  ports:
+    - name: http
+      port: 18080
+      targetPort: 8080

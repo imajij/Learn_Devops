@@ -1,0 +1,15 @@
+$ kubectl apply -f 03-loadbalancer/
+deployment.apps/web-loadbalancer created
+service/web-loadbalancer created
+$ kubectl rollout status deployment/web-loadbalancer --timeout=120s
+Waiting for deployment "web-loadbalancer" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "web-loadbalancer" rollout to finish: 1 of 3 updated replicas are available...
+Waiting for deployment "web-loadbalancer" rollout to finish: 2 of 3 updated replicas are available...
+deployment "web-loadbalancer" successfully rolled out
+$ sleep 15; kubectl get svc web-loadbalancer
+NAME               TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)           AGE
+web-loadbalancer   LoadBalancer   10.109.122.97   <pending>     18080:30761/TCP   16s
+$ kubectl describe svc web-loadbalancer | grep -E 'Type|LoadBalancer Ingress|NodePort|Endpoints'
+Type:                     LoadBalancer
+NodePort:                 http  30761/TCP
+Endpoints:                10.244.0.106:8080,10.244.0.105:8080,10.244.0.104:8080

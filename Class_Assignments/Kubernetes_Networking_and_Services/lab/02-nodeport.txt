@@ -1,0 +1,30 @@
+$ kubectl apply -f 02-nodeport/
+deployment.apps/web-nodeport created
+service/web-nodeport created
+$ kubectl rollout status deployment/web-nodeport --timeout=120s
+Waiting for deployment "web-nodeport" rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment "web-nodeport" rollout to finish: 1 of 2 updated replicas are available...
+deployment "web-nodeport" successfully rolled out
+$ sleep 5
+$ kubectl get svc web-nodeport -o wide
+NAME           TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+web-nodeport   NodePort   10.100.56.250   <none>        80:30080/TCP   6s    app=web-nodeport
+$ kubectl get nodes -o wide | awk "{print \$1, \$6}"
+NAME INTERNAL-IP
+k8s-a 192.168.49.2
+### from the node itself and from a pod, via <NodeIP>:30080
+$ minikube -p k8s-a ssh -- curl -s http://192.168.49.2:30080/hostname; echo
+web-nodeport-76c6fc6bfb-k6q7z
+$ kubectl exec curl -- curl -s http://192.168.49.2:30080/hostname; echo
+web-nodeport-76c6fc6bfb-k6q7z
+### from the Mac: the Docker-driver node IP is not routable, so ask minikube for a tunnelled URL
+$ curl -s -m 3 http://192.168.49.2:30080/hostname || echo "curl exit $? (node IP not reachable from macOS)"
+curl exit 28 (node IP not reachable from macOS)
+$ (minikube -p k8s-a service web-nodeport --url > ~/devops-lab/k8s-a/np-url.txt 2>/dev/null &); until grep -q http ~/devops-lab/k8s-a/np-url.txt; do sleep 1; done; cat ~/devops-lab/k8s-a/np-url.txt
+http://127.0.0.1:58935
+$ for i in 1 2 3 4; do curl -s $(head -1 ~/devops-lab/k8s-a/np-url.txt)/hostname; echo; done
+web-nodeport-76c6fc6bfb-k6q7z
+web-nodeport-76c6fc6bfb-k6q7z
+web-nodeport-76c6fc6bfb-k6q7z
+web-nodeport-76c6fc6bfb-k6q7z
+$ pkill -f "minikube -p k8s-a service web-nodeport"; pkill -f "machines/k8s-a/id_rsa -L"; rm ~/devops-lab/k8s-a/np-url.txt

@@ -1,0 +1,19 @@
+### root cause: coredns Deployment at 0 replicas -> kube-dns Service has no endpoints. Fix:
+$ kubectl -n kube-system scale deployment coredns --replicas=1
+deployment.apps/coredns scaled
+$ kubectl -n kube-system rollout status deployment coredns --timeout=120s
+Waiting for deployment "coredns" rollout to finish: 0 out of 1 new replicas have been updated...
+Waiting for deployment "coredns" rollout to finish: 0 of 1 updated replicas are available...
+deployment "coredns" successfully rolled out
+$ kubectl -n kube-system get endpointslices -l kubernetes.io/service-name=kube-dns
+NAME             ADDRESSTYPE   PORTS        ENDPOINTS      AGE
+kube-dns-8q6cz   IPv4          53,53,9153   10.244.0.113   31m
+$ kubectl exec dnsutils -- nslookup web-clusterip
+Server:		10.96.0.10
+Address:	10.96.0.10#53
+
+Name:	web-clusterip.default.svc.cluster.local
+Address: 10.103.84.210
+
+$ kubectl exec curl -- curl -s http://web-clusterip/hostname; echo
+web-clusterip-89dc48646-rjpfg
