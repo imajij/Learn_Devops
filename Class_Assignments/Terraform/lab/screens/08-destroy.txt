@@ -1,0 +1,37 @@
+$ terraform plan -destroy -no-color
+###   ... 127 lines omitted (full output: lab/09-destroy.txt)
+Plan: 0 to add, 0 to change, 5 to destroy.
+
+Changes to Outputs:
+  - bucket_arn        = "arn:aws:s3:::ajij-24bcs10103-tf-demo" -> null
+  - bucket_name       = "ajij-24bcs10103-tf-demo" -> null
+  - bucket_region     = "ap-south-1" -> null
+  - object_url        = "http://localhost:4566/ajij-24bcs10103-tf-demo/hello.txt" -> null
+  - versioning_status = "Enabled" -> null
+
+$ terraform destroy -no-color -auto-approve
+###   ... 127 lines omitted (full output: lab/09-destroy.txt)
+Plan: 0 to add, 0 to change, 5 to destroy.
+
+Changes to Outputs:
+  - bucket_arn        = "arn:aws:s3:::ajij-24bcs10103-tf-demo" -> null
+  - bucket_name       = "ajij-24bcs10103-tf-demo" -> null
+  - bucket_region     = "ap-south-1" -> null
+  - object_url        = "http://localhost:4566/ajij-24bcs10103-tf-demo/hello.txt" -> null
+  - versioning_status = "Enabled" -> null
+aws_s3_bucket_public_access_block.demo: Destroying... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_versioning.demo: Destroying... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_server_side_encryption_configuration.demo: Destroying... [id=ajij-24bcs10103-tf-demo]
+aws_s3_object.hello: Destroying... [id=hello.txt]
+###   ... 4 lines omitted (full output: lab/09-destroy.txt)
+aws_s3_bucket.demo: Destroying... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket.demo: Destruction complete after 0s
+
+Destroy complete! Resources: 5 destroyed.
+
+$ terraform state list
+
+$ aws s3 ls
+
+$ echo "buckets left: $(aws s3 ls | wc -l)"
+buckets left:        0

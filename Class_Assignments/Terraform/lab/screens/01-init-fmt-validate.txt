@@ -1,0 +1,37 @@
+###   ... 4 lines omitted (full output: lab/01-init.txt)
+$ terraform init -no-color
+Initializing the backend...
+
+Initializing provider plugins...
+- Finding hashicorp/aws versions matching "~> 5.0"...
+- Installing hashicorp/aws v5.100.0...
+- Installed hashicorp/aws v5.100.0 (signed by HashiCorp)
+
+Terraform has created a lock file .terraform.lock.hcl to record the provider
+selections it made above. Include this file in your version control repository
+so that Terraform can guarantee to make the same selections by default when
+you run "terraform init" in the future.
+
+Terraform has been successfully initialized!
+
+$ ls -a
+.
+..
+.gitignore
+.terraform
+.terraform.lock.hcl
+main.tf
+outputs.tf
+provider.tf
+terraform.tfvars
+variables.tf
+
+### fmt rewrites badly formatted files and prints their names
+$ terraform fmt
+main.tf
+
+$ terraform fmt -check; echo "fmt -check exit code: $?"
+fmt -check exit code: 0
+
+$ terraform validate -no-color
+Success! The configuration is valid.

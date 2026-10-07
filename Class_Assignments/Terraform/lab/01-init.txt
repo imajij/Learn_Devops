@@ -1,0 +1,31 @@
+$ terraform version
+Terraform v1.16.4
+on darwin_arm64
+
+$ terraform init -no-color
+Initializing the backend...
+
+Initializing provider plugins...
+- Finding hashicorp/aws versions matching "~> 5.0"...
+- Installing hashicorp/aws v5.100.0...
+- Installed hashicorp/aws v5.100.0 (signed by HashiCorp)
+
+Terraform has created a lock file .terraform.lock.hcl to record the provider
+selections it made above. Include this file in your version control repository
+so that Terraform can guarantee to make the same selections by default when
+you run "terraform init" in the future.
+
+Terraform has been successfully initialized!
+
+$ ls -a
+.
+..
+.gitignore
+.terraform
+.terraform.lock.hcl
+main.tf
+outputs.tf
+provider.tf
+terraform.tfvars
+variables.tf
+

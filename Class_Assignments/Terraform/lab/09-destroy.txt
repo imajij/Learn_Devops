@@ -1,0 +1,293 @@
+$ terraform plan -destroy -no-color
+aws_s3_bucket.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_server_side_encryption_configuration.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_public_access_block.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_versioning.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_object.hello: Refreshing state... [id=hello.txt]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # aws_s3_bucket.demo will be destroyed
+  - resource "aws_s3_bucket" "demo" {
+      - arn                         = "arn:aws:s3:::ajij-24bcs10103-tf-demo" -> null
+      - bucket                      = "ajij-24bcs10103-tf-demo" -> null
+      - bucket_domain_name          = "ajij-24bcs10103-tf-demo.s3.amazonaws.com" -> null
+      - bucket_regional_domain_name = "ajij-24bcs10103-tf-demo.s3.ap-south-1.amazonaws.com" -> null
+      - force_destroy               = true -> null
+      - hosted_zone_id              = "Z11RGJOFQNVJUP" -> null
+      - id                          = "ajij-24bcs10103-tf-demo" -> null
+      - object_lock_enabled         = false -> null
+      - region                      = "ap-south-1" -> null
+      - request_payer               = "BucketOwner" -> null
+      - tags                        = {
+          - "Environment" = "dev"
+          - "Name"        = "ajij-24bcs10103-tf-demo"
+        } -> null
+      - tags_all                    = {
+          - "Environment" = "dev"
+          - "ManagedBy"   = "Terraform"
+          - "Name"        = "ajij-24bcs10103-tf-demo"
+          - "Owner"       = "ajij-uttam"
+          - "Session"     = "18"
+        } -> null
+        # (3 unchanged attributes hidden)
+
+      - grant {
+          - id          = "75aa57f09aa0c8caeab4f8c24e99d10f8e7faeebf76c078efc7c6caea54ba06a" -> null
+          - permissions = [
+              - "FULL_CONTROL",
+            ] -> null
+          - type        = "CanonicalUser" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - server_side_encryption_configuration {
+          - rule {
+              - bucket_key_enabled = false -> null
+
+              - apply_server_side_encryption_by_default {
+                  - sse_algorithm     = "AES256" -> null
+                    # (1 unchanged attribute hidden)
+                }
+            }
+        }
+
+      - versioning {
+          - enabled    = true -> null
+          - mfa_delete = false -> null
+        }
+    }
+
+  # aws_s3_bucket_public_access_block.demo will be destroyed
+  - resource "aws_s3_bucket_public_access_block" "demo" {
+      - block_public_acls       = true -> null
+      - block_public_policy     = true -> null
+      - bucket                  = "ajij-24bcs10103-tf-demo" -> null
+      - id                      = "ajij-24bcs10103-tf-demo" -> null
+      - ignore_public_acls      = true -> null
+      - restrict_public_buckets = true -> null
+    }
+
+  # aws_s3_bucket_server_side_encryption_configuration.demo will be destroyed
+  - resource "aws_s3_bucket_server_side_encryption_configuration" "demo" {
+      - bucket                = "ajij-24bcs10103-tf-demo" -> null
+      - id                    = "ajij-24bcs10103-tf-demo" -> null
+        # (1 unchanged attribute hidden)
+
+      - rule {
+          - bucket_key_enabled = false -> null
+
+          - apply_server_side_encryption_by_default {
+              - sse_algorithm     = "AES256" -> null
+                # (1 unchanged attribute hidden)
+            }
+        }
+    }
+
+  # aws_s3_bucket_versioning.demo will be destroyed
+  - resource "aws_s3_bucket_versioning" "demo" {
+      - bucket                = "ajij-24bcs10103-tf-demo" -> null
+      - id                    = "ajij-24bcs10103-tf-demo" -> null
+        # (1 unchanged attribute hidden)
+
+      - versioning_configuration {
+          - status     = "Enabled" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # aws_s3_object.hello will be destroyed
+  - resource "aws_s3_object" "hello" {
+      - arn                           = "arn:aws:s3:::ajij-24bcs10103-tf-demo/hello.txt" -> null
+      - bucket                        = "ajij-24bcs10103-tf-demo" -> null
+      - bucket_key_enabled            = false -> null
+      - content                       = <<-EOT
+            Hello from Terraform! Created by Ajij Uttam (24bcs10103).
+        EOT -> null
+      - content_type                  = "text/plain" -> null
+      - etag                          = "1fb86dd43d4e545f8f313f1c11a9834b" -> null
+      - force_destroy                 = false -> null
+      - id                            = "hello.txt" -> null
+      - key                           = "hello.txt" -> null
+      - metadata                      = {} -> null
+      - server_side_encryption        = "AES256" -> null
+      - storage_class                 = "STANDARD" -> null
+      - tags                          = {} -> null
+      - tags_all                      = {
+          - "ManagedBy" = "Terraform"
+          - "Owner"     = "ajij-uttam"
+          - "Session"   = "18"
+        } -> null
+      - version_id                    = "Uc8AGN4l_9VTXnERcz9f6wHUhpHDvA0S" -> null
+        # (13 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 0 to change, 5 to destroy.
+
+Changes to Outputs:
+  - bucket_arn        = "arn:aws:s3:::ajij-24bcs10103-tf-demo" -> null
+  - bucket_name       = "ajij-24bcs10103-tf-demo" -> null
+  - bucket_region     = "ap-south-1" -> null
+  - object_url        = "http://localhost:4566/ajij-24bcs10103-tf-demo/hello.txt" -> null
+  - versioning_status = "Enabled" -> null
+
+$ terraform destroy -no-color -auto-approve
+aws_s3_bucket.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_public_access_block.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_versioning.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_server_side_encryption_configuration.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_object.hello: Refreshing state... [id=hello.txt]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # aws_s3_bucket.demo will be destroyed
+  - resource "aws_s3_bucket" "demo" {
+      - arn                         = "arn:aws:s3:::ajij-24bcs10103-tf-demo" -> null
+      - bucket                      = "ajij-24bcs10103-tf-demo" -> null
+      - bucket_domain_name          = "ajij-24bcs10103-tf-demo.s3.amazonaws.com" -> null
+      - bucket_regional_domain_name = "ajij-24bcs10103-tf-demo.s3.ap-south-1.amazonaws.com" -> null
+      - force_destroy               = true -> null
+      - hosted_zone_id              = "Z11RGJOFQNVJUP" -> null
+      - id                          = "ajij-24bcs10103-tf-demo" -> null
+      - object_lock_enabled         = false -> null
+      - region                      = "ap-south-1" -> null
+      - request_payer               = "BucketOwner" -> null
+      - tags                        = {
+          - "Environment" = "dev"
+          - "Name"        = "ajij-24bcs10103-tf-demo"
+        } -> null
+      - tags_all                    = {
+          - "Environment" = "dev"
+          - "ManagedBy"   = "Terraform"
+          - "Name"        = "ajij-24bcs10103-tf-demo"
+          - "Owner"       = "ajij-uttam"
+          - "Session"     = "18"
+        } -> null
+        # (3 unchanged attributes hidden)
+
+      - grant {
+          - id          = "75aa57f09aa0c8caeab4f8c24e99d10f8e7faeebf76c078efc7c6caea54ba06a" -> null
+          - permissions = [
+              - "FULL_CONTROL",
+            ] -> null
+          - type        = "CanonicalUser" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - server_side_encryption_configuration {
+          - rule {
+              - bucket_key_enabled = false -> null
+
+              - apply_server_side_encryption_by_default {
+                  - sse_algorithm     = "AES256" -> null
+                    # (1 unchanged attribute hidden)
+                }
+            }
+        }
+
+      - versioning {
+          - enabled    = true -> null
+          - mfa_delete = false -> null
+        }
+    }
+
+  # aws_s3_bucket_public_access_block.demo will be destroyed
+  - resource "aws_s3_bucket_public_access_block" "demo" {
+      - block_public_acls       = true -> null
+      - block_public_policy     = true -> null
+      - bucket                  = "ajij-24bcs10103-tf-demo" -> null
+      - id                      = "ajij-24bcs10103-tf-demo" -> null
+      - ignore_public_acls      = true -> null
+      - restrict_public_buckets = true -> null
+    }
+
+  # aws_s3_bucket_server_side_encryption_configuration.demo will be destroyed
+  - resource "aws_s3_bucket_server_side_encryption_configuration" "demo" {
+      - bucket                = "ajij-24bcs10103-tf-demo" -> null
+      - id                    = "ajij-24bcs10103-tf-demo" -> null
+        # (1 unchanged attribute hidden)
+
+      - rule {
+          - bucket_key_enabled = false -> null
+
+          - apply_server_side_encryption_by_default {
+              - sse_algorithm     = "AES256" -> null
+                # (1 unchanged attribute hidden)
+            }
+        }
+    }
+
+  # aws_s3_bucket_versioning.demo will be destroyed
+  - resource "aws_s3_bucket_versioning" "demo" {
+      - bucket                = "ajij-24bcs10103-tf-demo" -> null
+      - id                    = "ajij-24bcs10103-tf-demo" -> null
+        # (1 unchanged attribute hidden)
+
+      - versioning_configuration {
+          - status     = "Enabled" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # aws_s3_object.hello will be destroyed
+  - resource "aws_s3_object" "hello" {
+      - arn                           = "arn:aws:s3:::ajij-24bcs10103-tf-demo/hello.txt" -> null
+      - bucket                        = "ajij-24bcs10103-tf-demo" -> null
+      - bucket_key_enabled            = false -> null
+      - content                       = <<-EOT
+            Hello from Terraform! Created by Ajij Uttam (24bcs10103).
+        EOT -> null
+      - content_type                  = "text/plain" -> null
+      - etag                          = "1fb86dd43d4e545f8f313f1c11a9834b" -> null
+      - force_destroy                 = false -> null
+      - id                            = "hello.txt" -> null
+      - key                           = "hello.txt" -> null
+      - metadata                      = {} -> null
+      - server_side_encryption        = "AES256" -> null
+      - storage_class                 = "STANDARD" -> null
+      - tags                          = {} -> null
+      - tags_all                      = {
+          - "ManagedBy" = "Terraform"
+          - "Owner"     = "ajij-uttam"
+          - "Session"   = "18"
+        } -> null
+      - version_id                    = "Uc8AGN4l_9VTXnERcz9f6wHUhpHDvA0S" -> null
+        # (13 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 0 to change, 5 to destroy.
+
+Changes to Outputs:
+  - bucket_arn        = "arn:aws:s3:::ajij-24bcs10103-tf-demo" -> null
+  - bucket_name       = "ajij-24bcs10103-tf-demo" -> null
+  - bucket_region     = "ap-south-1" -> null
+  - object_url        = "http://localhost:4566/ajij-24bcs10103-tf-demo/hello.txt" -> null
+  - versioning_status = "Enabled" -> null
+aws_s3_bucket_public_access_block.demo: Destroying... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_versioning.demo: Destroying... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_server_side_encryption_configuration.demo: Destroying... [id=ajij-24bcs10103-tf-demo]
+aws_s3_object.hello: Destroying... [id=hello.txt]
+aws_s3_bucket_server_side_encryption_configuration.demo: Destruction complete after 0s
+aws_s3_bucket_versioning.demo: Destruction complete after 0s
+aws_s3_bucket_public_access_block.demo: Destruction complete after 0s
+aws_s3_object.hello: Destruction complete after 0s
+aws_s3_bucket.demo: Destroying... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket.demo: Destruction complete after 0s
+
+Destroy complete! Resources: 5 destroyed.
+
+$ terraform state list
+
+$ aws s3 ls
+
+$ echo "buckets left: $(aws s3 ls | wc -l)"
+buckets left:        0
+

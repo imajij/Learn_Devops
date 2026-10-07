@@ -1,0 +1,142 @@
+$ terraform state list
+aws_s3_bucket.demo
+aws_s3_bucket_public_access_block.demo
+aws_s3_bucket_server_side_encryption_configuration.demo
+aws_s3_bucket_versioning.demo
+aws_s3_object.hello
+
+$ terraform show -no-color
+# aws_s3_bucket.demo:
+resource "aws_s3_bucket" "demo" {
+    acceleration_status         = null
+    arn                         = "arn:aws:s3:::ajij-24bcs10103-tf-demo"
+    bucket                      = "ajij-24bcs10103-tf-demo"
+    bucket_domain_name          = "ajij-24bcs10103-tf-demo.s3.amazonaws.com"
+    bucket_prefix               = null
+    bucket_regional_domain_name = "ajij-24bcs10103-tf-demo.s3.ap-south-1.amazonaws.com"
+    force_destroy               = true
+    hosted_zone_id              = "Z11RGJOFQNVJUP"
+    id                          = "ajij-24bcs10103-tf-demo"
+    object_lock_enabled         = false
+    policy                      = null
+    region                      = "ap-south-1"
+    request_payer               = "BucketOwner"
+    tags                        = {
+        "Environment" = "dev"
+        "Name"        = "ajij-24bcs10103-tf-demo"
+    }
+    tags_all                    = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Name"        = "ajij-24bcs10103-tf-demo"
+        "Owner"       = "ajij-uttam"
+        "Session"     = "18"
+    }
+
+    grant {
+        id          = "75aa57f09aa0c8caeab4f8c24e99d10f8e7faeebf76c078efc7c6caea54ba06a"
+        permissions = [
+            "FULL_CONTROL",
+        ]
+        type        = "CanonicalUser"
+        uri         = null
+    }
+
+    server_side_encryption_configuration {
+        rule {
+            bucket_key_enabled = false
+
+            apply_server_side_encryption_by_default {
+                kms_master_key_id = null
+                sse_algorithm     = "AES256"
+            }
+        }
+    }
+
+    versioning {
+        enabled    = false
+        mfa_delete = false
+    }
+}
+
+# aws_s3_bucket_public_access_block.demo:
+resource "aws_s3_bucket_public_access_block" "demo" {
+    block_public_acls       = true
+    block_public_policy     = true
+    bucket                  = "ajij-24bcs10103-tf-demo"
+    id                      = "ajij-24bcs10103-tf-demo"
+    ignore_public_acls      = true
+    restrict_public_buckets = true
+}
+
+# aws_s3_bucket_server_side_encryption_configuration.demo:
+resource "aws_s3_bucket_server_side_encryption_configuration" "demo" {
+    bucket                = "ajij-24bcs10103-tf-demo"
+    expected_bucket_owner = null
+    id                    = "ajij-24bcs10103-tf-demo"
+
+    rule {
+        apply_server_side_encryption_by_default {
+            kms_master_key_id = null
+            sse_algorithm     = "AES256"
+        }
+    }
+}
+
+# aws_s3_bucket_versioning.demo:
+resource "aws_s3_bucket_versioning" "demo" {
+    bucket                = "ajij-24bcs10103-tf-demo"
+    expected_bucket_owner = null
+    id                    = "ajij-24bcs10103-tf-demo"
+
+    versioning_configuration {
+        mfa_delete = null
+        status     = "Enabled"
+    }
+}
+
+# aws_s3_object.hello:
+resource "aws_s3_object" "hello" {
+    arn                           = "arn:aws:s3:::ajij-24bcs10103-tf-demo/hello.txt"
+    bucket                        = "ajij-24bcs10103-tf-demo"
+    bucket_key_enabled            = false
+    cache_control                 = null
+    checksum_crc32                = null
+    checksum_crc32c               = null
+    checksum_crc64nvme            = null
+    checksum_sha1                 = null
+    checksum_sha256               = null
+    content                       = <<-EOT
+        Hello from Terraform! Created by Ajij Uttam (24bcs10103).
+    EOT
+    content_disposition           = null
+    content_encoding              = null
+    content_language              = null
+    content_type                  = "text/plain"
+    etag                          = "1fb86dd43d4e545f8f313f1c11a9834b"
+    force_destroy                 = false
+    id                            = "hello.txt"
+    key                           = "hello.txt"
+    object_lock_legal_hold_status = null
+    object_lock_mode              = null
+    object_lock_retain_until_date = null
+    server_side_encryption        = "AES256"
+    storage_class                 = "STANDARD"
+    tags_all                      = {
+        "ManagedBy" = "Terraform"
+        "Owner"     = "ajij-uttam"
+        "Session"   = "18"
+    }
+    version_id                    = "tRYRxQhNEP_p_udYzd2048g.ISGJM21B"
+    website_redirect              = null
+}
+
+
+Outputs:
+
+bucket_arn = "arn:aws:s3:::ajij-24bcs10103-tf-demo"
+bucket_name = "ajij-24bcs10103-tf-demo"
+bucket_region = "ap-south-1"
+object_url = "http://localhost:4566/ajij-24bcs10103-tf-demo/hello.txt"
+versioning_status = "Enabled"
+

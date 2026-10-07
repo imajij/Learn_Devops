@@ -1,0 +1,11 @@
+### fmt rewrites badly formatted files and prints their names
+$ terraform fmt
+main.tf
+
+$ terraform fmt -check; echo "fmt -check exit code: $?"
+fmt -check exit code: 0
+
+$ terraform validate -no-color
+Success! The configuration is valid.
+
+

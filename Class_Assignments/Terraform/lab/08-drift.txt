@@ -1,0 +1,162 @@
+### DRIFT: someone changes the bucket by hand, outside Terraform
+$ aws s3api put-bucket-tagging --bucket ajij-24bcs10103-tf-demo --tagging 'TagSet=[{Key=Environment,Value=prod}]'
+
+$ aws s3 rm s3://ajij-24bcs10103-tf-demo/hello.txt
+delete: s3://ajij-24bcs10103-tf-demo/hello.txt
+
+### terraform plan refreshes state from the real API and shows the difference
+$ terraform plan -no-color
+aws_s3_bucket.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_server_side_encryption_configuration.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_versioning.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_public_access_block.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_object.hello: Refreshing state... [id=hello.txt]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # aws_s3_bucket.demo will be updated in-place
+  ~ resource "aws_s3_bucket" "demo" {
+        id                          = "ajij-24bcs10103-tf-demo"
+      ~ tags                        = {
+          ~ "Environment" = "prod" -> "dev"
+          + "Name"        = "ajij-24bcs10103-tf-demo"
+        }
+      ~ tags_all                    = {
+          ~ "Environment" = "prod" -> "dev"
+          + "ManagedBy"   = "Terraform"
+          + "Name"        = "ajij-24bcs10103-tf-demo"
+          + "Owner"       = "ajij-uttam"
+          + "Session"     = "18"
+        }
+        # (12 unchanged attributes hidden)
+
+        # (3 unchanged blocks hidden)
+    }
+
+  # aws_s3_object.hello will be created
+  + resource "aws_s3_object" "hello" {
+      + acl                    = (known after apply)
+      + arn                    = (known after apply)
+      + bucket                 = "ajij-24bcs10103-tf-demo"
+      + bucket_key_enabled     = (known after apply)
+      + checksum_crc32         = (known after apply)
+      + checksum_crc32c        = (known after apply)
+      + checksum_crc64nvme     = (known after apply)
+      + checksum_sha1          = (known after apply)
+      + checksum_sha256        = (known after apply)
+      + content                = <<-EOT
+            Hello from Terraform! Created by Ajij Uttam (24bcs10103).
+        EOT
+      + content_type           = "text/plain"
+      + etag                   = (known after apply)
+      + force_destroy          = false
+      + id                     = (known after apply)
+      + key                    = "hello.txt"
+      + kms_key_id             = (known after apply)
+      + server_side_encryption = (known after apply)
+      + storage_class          = (known after apply)
+      + tags_all               = {
+          + "ManagedBy" = "Terraform"
+          + "Owner"     = "ajij-uttam"
+          + "Session"   = "18"
+        }
+      + version_id             = (known after apply)
+    }
+
+Plan: 1 to add, 1 to change, 0 to destroy.
+
+### plan -detailed-exitcode returns 2 when there is drift, handy for a nightly CI drift check
+$ terraform plan -no-color -detailed-exitcode >/dev/null; echo "exit code: $?"
+exit code: 2
+
+### apply puts the bucket back to what the code says
+$ terraform apply -no-color -auto-approve
+aws_s3_bucket.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_server_side_encryption_configuration.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_versioning.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket_public_access_block.demo: Refreshing state... [id=ajij-24bcs10103-tf-demo]
+aws_s3_object.hello: Refreshing state... [id=hello.txt]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # aws_s3_bucket.demo will be updated in-place
+  ~ resource "aws_s3_bucket" "demo" {
+        id                          = "ajij-24bcs10103-tf-demo"
+      ~ tags                        = {
+          ~ "Environment" = "prod" -> "dev"
+          + "Name"        = "ajij-24bcs10103-tf-demo"
+        }
+      ~ tags_all                    = {
+          ~ "Environment" = "prod" -> "dev"
+          + "ManagedBy"   = "Terraform"
+          + "Name"        = "ajij-24bcs10103-tf-demo"
+          + "Owner"       = "ajij-uttam"
+          + "Session"     = "18"
+        }
+        # (12 unchanged attributes hidden)
+
+        # (3 unchanged blocks hidden)
+    }
+
+  # aws_s3_object.hello will be created
+  + resource "aws_s3_object" "hello" {
+      + acl                    = (known after apply)
+      + arn                    = (known after apply)
+      + bucket                 = "ajij-24bcs10103-tf-demo"
+      + bucket_key_enabled     = (known after apply)
+      + checksum_crc32         = (known after apply)
+      + checksum_crc32c        = (known after apply)
+      + checksum_crc64nvme     = (known after apply)
+      + checksum_sha1          = (known after apply)
+      + checksum_sha256        = (known after apply)
+      + content                = <<-EOT
+            Hello from Terraform! Created by Ajij Uttam (24bcs10103).
+        EOT
+      + content_type           = "text/plain"
+      + etag                   = (known after apply)
+      + force_destroy          = false
+      + id                     = (known after apply)
+      + key                    = "hello.txt"
+      + kms_key_id             = (known after apply)
+      + server_side_encryption = (known after apply)
+      + storage_class          = (known after apply)
+      + tags_all               = {
+          + "ManagedBy" = "Terraform"
+          + "Owner"     = "ajij-uttam"
+          + "Session"   = "18"
+        }
+      + version_id             = (known after apply)
+    }
+
+Plan: 1 to add, 1 to change, 0 to destroy.
+aws_s3_bucket.demo: Modifying... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket.demo: Modifications complete after 0s [id=ajij-24bcs10103-tf-demo]
+aws_s3_object.hello: Creating...
+aws_s3_object.hello: Creation complete after 0s [id=hello.txt]
+
+Apply complete! Resources: 1 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+bucket_arn = "arn:aws:s3:::ajij-24bcs10103-tf-demo"
+bucket_name = "ajij-24bcs10103-tf-demo"
+bucket_region = "ap-south-1"
+object_url = "http://localhost:4566/ajij-24bcs10103-tf-demo/hello.txt"
+versioning_status = "Enabled"
+
+$ terraform plan -no-color -detailed-exitcode | tail -3; echo "exit code: ${PIPESTATUS[0]}"
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+exit code: 0
+

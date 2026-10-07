@@ -1,0 +1,47 @@
+### DRIFT: someone changes the bucket by hand, outside Terraform
+$ aws s3api put-bucket-tagging --bucket ajij-24bcs10103-tf-demo --tagging 'TagSet=[{Key=Environment,Value=prod}]'
+
+$ aws s3 rm s3://ajij-24bcs10103-tf-demo/hello.txt
+delete: s3://ajij-24bcs10103-tf-demo/hello.txt
+
+### terraform plan refreshes state from the real API and shows the difference
+$ terraform plan -no-color
+###   ... 13 lines omitted (full output: lab/08-drift.txt)
+  # aws_s3_bucket.demo will be updated in-place
+  ~ resource "aws_s3_bucket" "demo" {
+        id                          = "ajij-24bcs10103-tf-demo"
+      ~ tags                        = {
+          ~ "Environment" = "prod" -> "dev"
+          + "Name"        = "ajij-24bcs10103-tf-demo"
+        }
+      ~ tags_all                    = {
+          ~ "Environment" = "prod" -> "dev"
+###   ... 10 lines omitted (full output: lab/08-drift.txt)
+  # aws_s3_object.hello will be created
+###   ... 21 lines omitted (full output: lab/08-drift.txt)
+      + tags_all               = {
+###   ... 7 lines omitted (full output: lab/08-drift.txt)
+Plan: 1 to add, 1 to change, 0 to destroy.
+
+### plan -detailed-exitcode returns 2 when there is drift, handy for a nightly CI drift check
+$ terraform plan -no-color -detailed-exitcode >/dev/null; echo "exit code: $?"
+exit code: 2
+
+### apply puts the bucket back to what the code says
+$ terraform apply -no-color -auto-approve
+###   ... 44 lines omitted (full output: lab/08-drift.txt)
+            Hello from Terraform! Created by Ajij Uttam (24bcs10103).
+###   ... 17 lines omitted (full output: lab/08-drift.txt)
+Plan: 1 to add, 1 to change, 0 to destroy.
+aws_s3_bucket.demo: Modifying... [id=ajij-24bcs10103-tf-demo]
+aws_s3_bucket.demo: Modifications complete after 0s [id=ajij-24bcs10103-tf-demo]
+aws_s3_object.hello: Creating...
+aws_s3_object.hello: Creation complete after 0s [id=hello.txt]
+
+Apply complete! Resources: 1 added, 1 changed, 0 destroyed.
+###   ... 9 lines omitted (full output: lab/08-drift.txt)
+$ terraform plan -no-color -detailed-exitcode | tail -3; echo "exit code: ${PIPESTATUS[0]}"
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+exit code: 0

@@ -1,0 +1,46 @@
+### verify with the AWS CLI (pointed at LocalStack via AWS_ENDPOINT_URL)
+$ aws s3 ls
+2026-10-07 22:04:50 ajij-24bcs10103-tf-demo
+
+$ aws s3 ls s3://ajij-24bcs10103-tf-demo/
+2026-10-07 22:04:50         58 hello.txt
+
+$ aws s3 cp s3://ajij-24bcs10103-tf-demo/hello.txt -
+Hello from Terraform! Created by Ajij Uttam (24bcs10103).
+
+$ aws s3api get-bucket-versioning --bucket ajij-24bcs10103-tf-demo
+{
+    "Status": "Enabled"
+}
+
+$ aws s3api get-bucket-encryption --bucket ajij-24bcs10103-tf-demo --query ServerSideEncryptionConfiguration.Rules[0]
+{
+    "ApplyServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+    },
+    "BucketKeyEnabled": false
+}
+
+$ aws s3api get-public-access-block --bucket ajij-24bcs10103-tf-demo
+{
+    "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": true,
+        "IgnorePublicAcls": true,
+        "BlockPublicPolicy": true,
+        "RestrictPublicBuckets": true
+    }
+}
+
+$ aws s3api get-bucket-tagging --bucket ajij-24bcs10103-tf-demo --output text
+TAGSET	Environment	dev
+TAGSET	ManagedBy	Terraform
+TAGSET	Owner	ajij-uttam
+TAGSET	Session	18
+TAGSET	Name	ajij-24bcs10103-tf-demo
+
+### a second plan right after apply must be empty (state == real world)
+$ terraform plan -no-color -detailed-exitcode | tail -2; echo "exit code: ${PIPESTATUS[0]}"
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+exit code: 0
+

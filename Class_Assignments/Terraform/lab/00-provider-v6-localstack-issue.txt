@@ -1,0 +1,18 @@
+### First attempt used hashicorp/aws v6.67.0 (excerpts from that run, unedited lines)
+- Finding hashicorp/aws versions matching "~> 6.0"...
+- Installing hashicorp/aws v6.67.0...
+- Installed hashicorp/aws v6.67.0 (signed by HashiCorp)
+
+
+$ terraform show -no-color   (excerpt: aws_s3_bucket.demo)
+# aws_s3_bucket.demo:
+    bucket                      = "ajij-24bcs10103-tf-demo"
+    tags                        = {}
+    tags_all                    = {}
+
+$ aws s3api get-bucket-tagging --bucket ajij-24bcs10103-tf-demo --output text
+aws: [ERROR]: An error occurred (NoSuchTagSet) when calling the GetBucketTagging operation: The TagSet does not exist
+
+
+### Cause (from TF_LOG=debug): provider 6.x sends the tags inside the CreateBucket request body and never calls PutBucketTagging;
+### the LocalStack 4.0 community image ignores tags in CreateBucket. Fix: pin the provider to ~> 5.0 for LocalStack.

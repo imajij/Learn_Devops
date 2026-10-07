@@ -1,0 +1,39 @@
+$ terraform output -no-color
+bucket_arn = "arn:aws:s3:::ajij-24bcs10103-tf-demo"
+bucket_name = "ajij-24bcs10103-tf-demo"
+bucket_region = "ap-south-1"
+object_url = "http://localhost:4566/ajij-24bcs10103-tf-demo/hello.txt"
+versioning_status = "Enabled"
+
+$ terraform output -raw bucket_arn
+arn:aws:s3:::ajij-24bcs10103-tf-demo
+
+$ terraform output -json
+{
+  "bucket_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::ajij-24bcs10103-tf-demo"
+  },
+  "bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ajij-24bcs10103-tf-demo"
+  },
+  "bucket_region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ap-south-1"
+  },
+  "object_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "http://localhost:4566/ajij-24bcs10103-tf-demo/hello.txt"
+  },
+  "versioning_status": {
+    "sensitive": false,
+    "type": "string",
+    "value": "Enabled"
+  }
+}
+
