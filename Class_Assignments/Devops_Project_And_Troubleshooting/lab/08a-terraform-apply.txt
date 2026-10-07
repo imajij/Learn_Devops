@@ -1,0 +1,124 @@
+$ terraform version
+Terraform v1.16.4
+on darwin_arm64
++ provider registry.terraform.io/hashicorp/aws v5.100.0
+
+Your version of Terraform is out of date! The latest version
+is 1.16.5. You can update by downloading from https://developer.hashicorp.com/terraform/install
+$ curl -s localhost:4577/_localstack/health | jq -c '{edition, version, services: (.services | with_entries(select(.value != "disabled")) | keys)}'
+{"edition":"community","version":"4.0.3","services":["dynamodb","dynamodbstreams","ec2","iam","kinesis","kms","lambda","logs","s3","secretsmanager","ssm","sts"]}
+$ terraform init -no-color | grep -E 'Initializing|Installed|Installing|successfully'
+Initializing the backend...
+Initializing provider plugins...
+Terraform has been successfully initialized!
+$ terraform validate -no-color
+Success! The configuration is valid.
+
+$ terraform plan -no-color -out=campusdesk.tfplan | grep -E '^  # |Plan:'
+  # aws_cloudwatch_log_group.app will be created
+  # aws_dynamodb_table.tf_locks will be created
+  # aws_eip.nat[0] will be created
+  # aws_iam_role.eks_cluster will be created
+  # aws_iam_role.eks_nodes will be created
+  # aws_iam_role_policy_attachment.eks_cluster will be created
+  # aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"] will be created
+  # aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"] will be created
+  # aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"] will be created
+  # aws_internet_gateway.main will be created
+  # aws_nat_gateway.main[0] will be created
+  # aws_route_table.private will be created
+  # aws_route_table.public will be created
+  # aws_route_table_association.private[0] will be created
+  # aws_route_table_association.private[1] will be created
+  # aws_route_table_association.public[0] will be created
+  # aws_route_table_association.public[1] will be created
+  # aws_s3_bucket.backups will be created
+  # aws_s3_bucket_public_access_block.backups will be created
+  # aws_s3_bucket_server_side_encryption_configuration.backups will be created
+  # aws_s3_bucket_versioning.backups will be created
+  # aws_secretsmanager_secret.db will be created
+  # aws_security_group.ingress_lb will be created
+  # aws_security_group.nodes will be created
+  # aws_ssm_parameter.app_config["APP_ENV"] will be created
+  # aws_ssm_parameter.app_config["DB_NAME"] will be created
+  # aws_ssm_parameter.app_config["DB_PORT"] will be created
+  # aws_subnet.private[0] will be created
+  # aws_subnet.private[1] will be created
+  # aws_subnet.public[0] will be created
+  # aws_subnet.public[1] will be created
+  # aws_vpc.main will be created
+Plan: 32 to add, 0 to change, 0 to destroy.
+$ terraform apply -no-color -auto-approve campusdesk.tfplan | grep -E 'Creation complete|Apply complete' | sed -E 's/\[id=[^]]{40,}\]/[id=...]/'
+aws_iam_role.eks_nodes: Creation complete after 0s [id=campusdesk-dev-eks-nodes]
+aws_secretsmanager_secret.db: Creation complete after 0s [id=...]
+aws_cloudwatch_log_group.app: Creation complete after 0s [id=/campusdesk/dev/app]
+aws_ssm_parameter.app_config["DB_NAME"]: Creation complete after 0s [id=/campusdesk/dev/DB_NAME]
+aws_ssm_parameter.app_config["DB_PORT"]: Creation complete after 0s [id=/campusdesk/dev/DB_PORT]
+aws_ssm_parameter.app_config["APP_ENV"]: Creation complete after 0s [id=/campusdesk/dev/APP_ENV]
+aws_iam_role.eks_cluster: Creation complete after 0s [id=campusdesk-dev-eks-cluster]
+aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"]: Creation complete after 0s [id=...]
+aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"]: Creation complete after 0s [id=...]
+aws_iam_role_policy_attachment.eks_cluster: Creation complete after 0s [id=...]
+aws_eip.nat[0]: Creation complete after 0s [id=eipalloc-30f4c3b3]
+aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"]: Creation complete after 0s [id=...]
+aws_dynamodb_table.tf_locks: Creation complete after 0s [id=campusdesk-dev-tf-locks]
+aws_s3_bucket.backups: Creation complete after 0s [id=campusdesk-dev-db-backups]
+aws_s3_bucket_server_side_encryption_configuration.backups: Creation complete after 0s [id=campusdesk-dev-db-backups]
+aws_s3_bucket_public_access_block.backups: Creation complete after 0s [id=campusdesk-dev-db-backups]
+aws_s3_bucket_versioning.backups: Creation complete after 1s [id=campusdesk-dev-db-backups]
+aws_vpc.main: Creation complete after 10s [id=vpc-844b0429]
+aws_subnet.private[1]: Creation complete after 0s [id=subnet-602f74a9]
+aws_subnet.private[0]: Creation complete after 0s [id=subnet-f1472580]
+aws_internet_gateway.main: Creation complete after 0s [id=igw-1d7ec6a7]
+aws_security_group.ingress_lb: Creation complete after 0s [id=sg-d4c7c9808acb4fda8]
+aws_security_group.nodes: Creation complete after 0s [id=sg-720a8acee39344559]
+aws_route_table.public: Creation complete after 0s [id=rtb-a7b6dd0e]
+aws_subnet.public[0]: Creation complete after 10s [id=subnet-7efe9f9a]
+aws_subnet.public[1]: Creation complete after 10s [id=subnet-55442af9]
+aws_route_table_association.public[0]: Creation complete after 0s [id=rtbassoc-4314a9db]
+aws_route_table_association.public[1]: Creation complete after 0s [id=rtbassoc-11c8a68c]
+aws_nat_gateway.main[0]: Creation complete after 0s [id=nat-f85442b14d9b0a2b5]
+aws_route_table.private: Creation complete after 0s [id=rtb-0f9fbcb9]
+aws_route_table_association.private[1]: Creation complete after 0s [id=rtbassoc-d9acc01a]
+aws_route_table_association.private[0]: Creation complete after 0s [id=rtbassoc-5d01032d]
+Apply complete! Resources: 32 added, 0 changed, 0 destroyed.
+$ terraform output -no-color
+backup_bucket = "campusdesk-dev-db-backups"
+db_secret_arn = "arn:aws:secretsmanager:ap-south-1:000000000000:secret:campusdesk/dev/db-uJKTKJ"
+eks_cluster_name = "not created (create_eks = false)"
+eks_role_arns = {
+  "cluster" = "arn:aws:iam::000000000000:role/campusdesk-dev-eks-cluster"
+  "nodes" = "arn:aws:iam::000000000000:role/campusdesk-dev-eks-nodes"
+}
+kubeconfig_command = "n/a - EKS disabled (LocalStack Community); the lab cluster is minikube"
+nat_gateway_id = "nat-f85442b14d9b0a2b5"
+node_security_group_id = "sg-720a8acee39344559"
+private_subnet_ids = [
+  "subnet-f1472580",
+  "subnet-602f74a9",
+]
+public_subnet_ids = [
+  "subnet-7efe9f9a",
+  "subnet-55442af9",
+]
+ssm_parameters = tolist([
+  "/campusdesk/dev/APP_ENV",
+  "/campusdesk/dev/DB_NAME",
+  "/campusdesk/dev/DB_PORT",
+])
+tf_lock_table = "campusdesk-dev-tf-locks"
+vpc_id = "vpc-844b0429"
+$ terraform plan -no-color -detailed-exitcode | tail -3; echo "plan exit code: ${PIPESTATUS[0]} (0 = no drift)"
+    }
+
+Plan: 0 to add, 4 to change, 0 to destroy.
+plan exit code: 2 (0 = no drift)
+$ terraform apply -no-color -auto-approve | grep -E 'Modifications complete|Apply complete'
+aws_subnet.private[0]: Modifications complete after 0s [id=subnet-f1472580]
+aws_subnet.public[0]: Modifications complete after 0s [id=subnet-7efe9f9a]
+aws_subnet.public[1]: Modifications complete after 0s [id=subnet-55442af9]
+aws_subnet.private[1]: Modifications complete after 0s [id=subnet-602f74a9]
+Apply complete! Resources: 0 added, 4 changed, 0 destroyed.
+$ terraform plan -no-color -detailed-exitcode | tail -1; echo "plan exit code: ${PIPESTATUS[0]} (0 = no drift)"
+and found no differences, so no changes are needed.
+plan exit code: 0 (0 = no drift)

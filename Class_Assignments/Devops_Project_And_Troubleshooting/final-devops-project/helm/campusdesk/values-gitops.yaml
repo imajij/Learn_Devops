@@ -1,0 +1,12 @@
+# Environment values applied by Argo CD (gitops/argocd-application.yaml).
+# In GitOps mode the CI pipeline's last step commits the new image tag here instead of running helm.
+backend:
+  image: {tag: 9e8f63a}
+frontend:
+  image: {tag: 9e8f63a}
+config:
+  APP_VERSION: "1.0.0-9e8f63a"
+  SUPPORT_BANNER: "Exam week (12-16 Oct): Wi-Fi and lab PC tickets are handled first. Helpdesk desk open 8am-8pm."
+monitoring:
+  serviceMonitor:
+    enabled: true

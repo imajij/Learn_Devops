@@ -1,0 +1,34 @@
+flowchart LR
+  dev["Developer<br/>Ajij Uttam"] -->|git commit / push| git[("Git repo - Gitea<br/>(runs in the cluster,<br/>GitHub stand-in)")]
+  git --> ci
+
+  subgraph ci["GitHub Actions workflow (run locally with act)"]
+    direction TB
+    bt["1 Build + pytest<br/>+ frontend build"] --> sast["2 SAST<br/>Bandit"]
+    bt --> sca["3 SCA<br/>pip-audit + npm audit"]
+    bt --> sec["4 Secret scan<br/>Gitleaks"]
+    bt --> db["5 Docker build<br/>backend + frontend"] --> scan["6 Image scan<br/>Trivy"]
+    sast & sca & sec & scan --> gate{"7 Security gate<br/>gate.py + policy"}
+    gate -->|pass| push["8 Push :sha"]
+    push --> dep["9 helm upgrade --install<br/>+ smoke test"]
+  end
+
+  push --> reg[("Registry<br/>ajij-final-registry<br/>localhost:5060")]
+
+  subgraph k8s["Kubernetes - minikube profile final"]
+    direction TB
+    ing["Ingress nginx<br/>campusdesk.localhost"] -->|/| fe["frontend Deployment x2<br/>React + Nginx (non-root)"]
+    ing -->|/api| be["backend Deployment x2-5<br/>FastAPI + HPA"]
+    fe -->|/api proxy| be
+    be --> pg[("PostgreSQL<br/>PVC 1Gi")]
+    cm["ConfigMap + Secret"] -.-> be
+    prom["Prometheus"] -->|ServiceMonitor /metrics| be
+    graf["Grafana"] --> prom
+    argo["Argo CD"] -->|sync helm/campusdesk| be
+  end
+
+  dep --> k8s
+  reg -->|image pull| k8s
+  git -. watched by .-> argo
+
+  tf["Terraform<br/>hashicorp/aws ~> 5.0"] --> ls[("LocalStack 4.0<br/>VPC, subnets, NAT, SGs, IAM,<br/>S3, DynamoDB, SSM, Secrets, Logs<br/>(EKS gated: Pro only)")]

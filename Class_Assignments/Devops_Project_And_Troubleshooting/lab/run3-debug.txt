@@ -1,0 +1,20 @@
+$ kubectl --context final -n campusdesk get pods
+NAME                                   READY   STATUS     RESTARTS        AGE
+campusdesk-backend-657bdb6fdc-d7bbb    1/1     Running    2 (7m34s ago)   8m7s
+campusdesk-backend-657bdb6fdc-p24dn    1/1     Running    2 (7m34s ago)   8m7s
+campusdesk-backend-f955688dc-56cxj     0/1     Init:0/1   0               5m12s
+campusdesk-frontend-575cd5c4b7-568d2   1/1     Running    0               5m11s
+campusdesk-frontend-575cd5c4b7-6rl5h   1/1     Running    0               5m12s
+campusdesk-postgres-7b6ddccb88-8wcsr   1/1     Running    0               8m7s
+$ kubectl --context final -n campusdesk logs campusdesk-backend-f955688dc-56cxj -c wait-for-db --tail=4
+campusdesk-postgres:5432 - no attempt
+waiting for campusdesk-postgres
+campusdesk-postgres:5432 - no attempt
+waiting for campusdesk-postgres
+### pod runs as uid 10001 (no /etc/passwd entry in the postgres image) -> pg_isready cannot pick a user name -> "no attempt" (exit 3)
+$ kubectl --context final -n campusdesk exec campusdesk-backend-f955688dc-56cxj -c wait-for-db -- sh -c "id; pg_isready -h \$DB_HOST; echo exit=\$?; pg_isready -h \$DB_HOST -U campusdesk; echo exit=\$?"
+uid=10001 gid=0(root) groups=0(root)
+campusdesk-postgres:5432 - no attempt
+exit=3
+campusdesk-postgres:5432 - accepting connections
+exit=0

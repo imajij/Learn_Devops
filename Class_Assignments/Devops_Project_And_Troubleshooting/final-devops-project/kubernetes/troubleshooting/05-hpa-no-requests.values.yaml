@@ -1,0 +1,3 @@
+# BREAK 5: "clean up" the backend resources block - HPA can no longer compute CPU utilisation
+backend:
+  resources: null

@@ -1,0 +1,28 @@
+### Git server (Gitea) inside the cluster
+$ kubectl --context final apply -f gitops/git-server.yaml
+namespace/gitops created
+persistentvolumeclaim/gitea-data created
+deployment.apps/gitea created
+service/gitea created
+$ kubectl --context final -n gitops rollout status deploy/gitea --timeout=180s
+Waiting for deployment "gitea" rollout to finish: 0 of 1 updated replicas are available...
+deployment "gitea" successfully rolled out
+$ kubectl --context final -n gitops exec deploy/gitea -- gitea admin user create --username ajij --email ajij@campusdesk.local --password "$GITEA_PW" --admin --must-change-password=false 2>&1 | tail -1
+New user 'ajij' has been successfully created!
+### Argo CD v3.5.4 (dex / notifications / applicationset scaled to 0)
+$ CTX=final gitops/argocd-light.sh 2>&1 | tail -4
+networkpolicy.networking.k8s.io/argocd-server-network-policy serverside-applied
+deployment.apps/argocd-dex-server scaled
+deployment.apps/argocd-notifications-controller scaled
+deployment.apps/argocd-applicationset-controller scaled
+$ kubectl --context final -n argocd rollout status deploy/argocd-server --timeout=300s && kubectl --context final -n argocd rollout status deploy/argocd-repo-server --timeout=300s
+Waiting for deployment "argocd-server" rollout to finish: 0 of 1 updated replicas are available...
+deployment "argocd-server" successfully rolled out
+Waiting for deployment "argocd-repo-server" rollout to finish: 0 of 1 updated replicas are available...
+deployment "argocd-repo-server" successfully rolled out
+$ kubectl --context final -n argocd get pods
+NAME                                 READY   STATUS    RESTARTS   AGE
+argocd-application-controller-0      1/1     Running   0          80s
+argocd-redis-bdbdffcb4-5wztf         1/1     Running   0          80s
+argocd-repo-server-d89c7967d-dchl8   1/1     Running   0          80s
+argocd-server-776b7cdd4d-c8lt5       1/1     Running   0          80s

@@ -1,0 +1,35 @@
+### BREAK: release with backend.resources removed
+$ helm --kube-context final upgrade campusdesk helm/campusdesk -n campusdesk --reuse-values -f kubernetes/troubleshooting/05-hpa-no-requests.values.yaml --wait | grep -E 'STATUS|REVISION'
+STATUS: deployed
+REVISION: 16
+### 1 IDENTIFY
+$ kubectl --context final -n campusdesk get hpa campusdesk-backend
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+campusdesk-backend   Deployment/campusdesk-backend   cpu: <unknown>/60%   2         5         2          45m
+### 2 INVESTIGATE
+$ kubectl --context final -n campusdesk describe hpa campusdesk-backend | grep -E 'ScalingActive|FailedGetResourceMetric' | tail -2 | cut -c1-230
+  Warning  FailedGetResourceMetric       51s                 horizontal-pod-autoscaler  failed to get cpu utilization: missing request for cpu in container api of Pod campusdesk-backend-5bccd99d5d-nsmfv
+  Warning  FailedGetResourceMetric       7s (x11 over 44m)   horizontal-pod-autoscaler  failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+$ kubectl --context final -n campusdesk get deploy campusdesk-backend -o jsonpath='{.spec.template.spec.containers[0].resources}'; echo '<- empty'
+{}<- empty
+$ kubectl --context final top pods -n campusdesk -l app=campusdesk-backend
+NAME                                  CPU(cores)   MEMORY(bytes)   
+campusdesk-backend-5bccd99d5d-94mrd   80m          63Mi            
+campusdesk-backend-5bccd99d5d-nsmfv   85m          63Mi            
+### 3 ROOT CAUSE: HPA target is a % of the CPU *request*. No request -> no denominator -> utilisation unknown -> no scaling (metrics-server itself is fine, see kubectl top)
+### 4 FIX: give the container its requests/limits back
+$ helm --kube-context final upgrade campusdesk helm/campusdesk -n campusdesk --reuse-values --set-json 'backend.resources={"requests":{"cpu":"100m","memory":"128Mi"},"limits":{"cpu":"500m","memory":"256Mi"}}' --wait | grep -E 'STATUS|REVISION'
+STATUS: deployed
+REVISION: 17
+### 5 VERIFY
+$ kubectl --context final -n campusdesk get hpa campusdesk-backend
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+campusdesk-backend   Deployment/campusdesk-backend   cpu: <unknown>/60%   2         5         2          46m
+$ kubectl --context final -n campusdesk describe hpa campusdesk-backend | grep -E 'ScalingActive'
+  ScalingActive   False   FailedGetResourceMetric  the HPA was unable to compute the replica count: failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+### new pods need a few metrics-server scrape cycles; checked again a few minutes later (note HPA AGE 46m -> 53m):
+$ kubectl --context final -n campusdesk get hpa campusdesk-backend
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+campusdesk-backend   Deployment/campusdesk-backend   cpu: 4%/60%   2         5         2          53m
+$ kubectl --context final -n campusdesk describe hpa campusdesk-backend | grep -E "ScalingActive"
+  ScalingActive   True    ValidMetricFound  the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)

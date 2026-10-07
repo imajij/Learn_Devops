@@ -1,0 +1,45 @@
+$ helm --kube-context final list -n campusdesk
+NAME      	NAMESPACE 	REVISION	UPDATED                                	STATUS  	CHART           	APP VERSION
+campusdesk	campusdesk	3       	2026-10-07 17:44:44.552505979 +0000 UTC	deployed	campusdesk-1.0.0	1.0.0      
+$ kubectl --context final -n campusdesk get deploy,pods,svc,endpoints -o wide | cut -c1-170
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                                            SELECTOR
+deployment.apps/campusdesk-backend    2/2     2            2           10m   api          localhost:5060/ajij/campusdesk-backend:9e8f63a    app=campusdesk-backend
+deployment.apps/campusdesk-frontend   2/2     2            2           10m   web          localhost:5060/ajij/campusdesk-frontend:9e8f63a   app=campusdesk-frontend
+deployment.apps/campusdesk-postgres   1/1     1            1           10m   postgres     postgres:17-alpine                                app=campusdesk-postgres
+
+NAME                                       READY   STATUS    RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES
+pod/campusdesk-backend-6656988988-8p2k5    1/1     Running   0          53s   10.244.0.18   final   <none>           <none>
+pod/campusdesk-backend-6656988988-hqdxr    1/1     Running   0          59s   10.244.0.16   final   <none>           <none>
+pod/campusdesk-frontend-55cd7cdc94-748mh   1/1     Running   0          59s   10.244.0.17   final   <none>           <none>
+pod/campusdesk-frontend-55cd7cdc94-pq7jv   1/1     Running   0          60s   10.244.0.15   final   <none>           <none>
+pod/campusdesk-postgres-7b6ddccb88-8wcsr   1/1     Running   0          10m   10.244.0.7    final   <none>           <none>
+
+NAME                          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+service/campusdesk-backend    ClusterIP   10.103.251.106   <none>        8000/TCP   10m   app=campusdesk-backend
+service/campusdesk-frontend   ClusterIP   10.101.62.21     <none>        80/TCP     10m   app=campusdesk-frontend
+service/campusdesk-postgres   ClusterIP   10.107.0.9       <none>        5432/TCP   10m   app=campusdesk-postgres
+
+NAME                            ENDPOINTS                           AGE
+endpoints/campusdesk-backend    10.244.0.16:8000,10.244.0.18:8000   10m
+endpoints/campusdesk-frontend   10.244.0.15:8080,10.244.0.17:8080   10m
+endpoints/campusdesk-postgres   10.244.0.7:5432                     10m
+$ kubectl --context final -n campusdesk get ingress,hpa,pvc,configmap,secret
+NAME                                   CLASS   HOSTS                  ADDRESS        PORTS   AGE
+ingress.networking.k8s.io/campusdesk   nginx   campusdesk.localhost   192.168.49.2   80      10m
+
+NAME                                                     REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/campusdesk-backend   Deployment/campusdesk-backend   cpu: <unknown>/60%   2         5         2          10m
+
+NAME                                      STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+persistentvolumeclaim/campusdesk-pgdata   Bound    pvc-01591ef4-f005-4f6d-bc53-8ddde9d3a15d   1Gi        RWO            standard       <unset>                 10m
+
+NAME                          DATA   AGE
+configmap/campusdesk-config   6      10m
+configmap/kube-root-ca.crt    1      10m
+
+NAME                                      TYPE                 DATA   AGE
+secret/campusdesk-db                      Opaque               2      10m
+secret/sh.helm.release.v1.campusdesk.v1   helm.sh/release.v1   1      10m
+secret/sh.helm.release.v1.campusdesk.v2   helm.sh/release.v1   1      7m59s
+secret/sh.helm.release.v1.campusdesk.v3   helm.sh/release.v1   1      60s

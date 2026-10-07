@@ -1,0 +1,6 @@
+CampusDesk {{ .Chart.AppVersion }} deployed as release "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}".
+  backend image : {{ include "campusdesk.image" (dict "root" . "img" .Values.backend.image) }}
+  frontend image: {{ include "campusdesk.image" (dict "root" . "img" .Values.frontend.image) }}
+{{- if .Values.ingress.enabled }}
+Open http://{{ .Values.ingress.host }}/ (point the host name at the ingress controller).
+{{- end }}

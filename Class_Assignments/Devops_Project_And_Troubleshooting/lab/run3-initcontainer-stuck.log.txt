@@ -1,0 +1,573 @@
+time="2026-10-07T23:06:04+05:30" level=info msg="Using docker host 'unix:///Users/ajijuttam/.colima/docker.sock', and daemon socket '/var/run/docker.sock'"
+level=warning msg= ⚠ You are using Apple M-series chip and you have not specified container architecture, you might encounter issues while running act. If so, try running it with '--container-architecture linux/amd64'. ⚠ 
+
+time="2026-10-07T23:06:04+05:30" level=info msg="Start server on http://100.128.164.188:34567"
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Set up job
+[CampusDesk CI/CD/1 Build & unit tests] 🚀  Start image=catthehacker/ubuntu:act-latest
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Set up job
+[CampusDesk CI/CD/1 Build & unit tests]   ☁  git clone 'https://github.com/actions/setup-python' # ref=v5
+[CampusDesk CI/CD/1 Build & unit tests]   ☁  git clone 'https://github.com/actions/setup-node' # ref=v4
+[CampusDesk CI/CD/1 Build & unit tests]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Main actions/checkout@v4
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker cp src=/Users/ajijuttam/devops-lab/final/ws/. dst=/Users/ajijuttam/devops-lab/final/ws
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Main actions/checkout@v4 [34.796958ms]
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Main actions/setup-python@v5
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-python@v5/ dst=/var/run/act/actions/actions-setup-python@v5/
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/setup/index.js] user= workdir=
+[CampusDesk CI/CD/1 Build & unit tests]   ❓  ::group::Installed versions
+[CampusDesk CI/CD/1 Build & unit tests]   | Successfully set up CPython (3.12.15)
+[CampusDesk CI/CD/1 Build & unit tests]   ❓  ::endgroup::
+[CampusDesk CI/CD/1 Build & unit tests]   ❓ add-matcher /run/act/actions/actions-setup-python@v5/.github/python.json
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Main actions/setup-python@v5 [630.566708ms]
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-env:: Python3_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-env:: LD_LIBRARY_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-env:: pythonLocation=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-env:: PKG_CONFIG_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib/pkgconfig
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-env:: Python_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-env:: Python2_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-output:: python-version=3.12.15
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-output:: python-path=/opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64/bin
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Main Install backend dependencies
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=application/backend
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Main Install backend dependencies [621.571916ms]
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Main Run pytest (fails the pipeline on any failing test)
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=application/backend
+[CampusDesk CI/CD/1 Build & unit tests]   | ============================= test session starts ==============================
+[CampusDesk CI/CD/1 Build & unit tests]   | platform linux -- Python 3.12.15, pytest-8.4.2, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[CampusDesk CI/CD/1 Build & unit tests]   | cachedir: .pytest_cache
+[CampusDesk CI/CD/1 Build & unit tests]   | rootdir: /Users/ajijuttam/devops-lab/final/ws/application/backend
+[CampusDesk CI/CD/1 Build & unit tests]   | configfile: pytest.ini
+[CampusDesk CI/CD/1 Build & unit tests]   | testpaths: tests
+[CampusDesk CI/CD/1 Build & unit tests]   | plugins: cov-7.0.0, platformdirs-4.12.3, anyio-4.15.1
+[CampusDesk CI/CD/1 Build & unit tests]   | collecting ... collected 12 items
+[CampusDesk CI/CD/1 Build & unit tests]   | 
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_health_is_up PASSED                              [  8%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_ready_checks_database PASSED                     [ 16%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_root_and_info PASSED                             [ 25%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_create_ticket PASSED                             [ 33%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_create_ticket_validation PASSED                  [ 41%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_list_and_get_ticket PASSED                       [ 50%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_filter_by_status PASSED                          [ 58%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_update_ticket PASSED                             [ 66%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_delete_ticket PASSED                             [ 75%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_missing_ticket_returns_404 PASSED                [ 83%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_stats PASSED                                     [ 91%]
+[CampusDesk CI/CD/1 Build & unit tests]   | tests/test_api.py::test_metrics_exposed PASSED                           [100%]
+[CampusDesk CI/CD/1 Build & unit tests]   | 
+[CampusDesk CI/CD/1 Build & unit tests]   | -- generated xml file: /Users/ajijuttam/devops-lab/final/ws/reports/junit.xml --
+[CampusDesk CI/CD/1 Build & unit tests]   | ================================ tests coverage ================================
+[CampusDesk CI/CD/1 Build & unit tests]   | _______________ coverage: platform linux, python 3.12.15-final-0 _______________
+[CampusDesk CI/CD/1 Build & unit tests]   | 
+[CampusDesk CI/CD/1 Build & unit tests]   | Name              Stmts   Miss  Cover
+[CampusDesk CI/CD/1 Build & unit tests]   | -------------------------------------
+[CampusDesk CI/CD/1 Build & unit tests]   | app/__init__.py       0      0   100%
+[CampusDesk CI/CD/1 Build & unit tests]   | app/config.py        19      1    95%
+[CampusDesk CI/CD/1 Build & unit tests]   | app/db.py            12      0   100%
+[CampusDesk CI/CD/1 Build & unit tests]   | app/main.py          89      3    97%
+[CampusDesk CI/CD/1 Build & unit tests]   | app/models.py        15      0   100%
+[CampusDesk CI/CD/1 Build & unit tests]   | app/schemas.py       32      0   100%
+[CampusDesk CI/CD/1 Build & unit tests]   | -------------------------------------
+[CampusDesk CI/CD/1 Build & unit tests]   | TOTAL               167      4    98%
+[CampusDesk CI/CD/1 Build & unit tests]   | ============================== 12 passed in 0.20s ==============================
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Main Run pytest (fails the pipeline on any failing test) [1.201314875s]
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Main actions/setup-node@v4
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-node@v4/ dst=/var/run/act/actions/actions-setup-node@v4/
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-node@v4/dist/setup/index.js] user= workdir=
+[CampusDesk CI/CD/1 Build & unit tests]   | Found in cache @ /opt/hostedtoolcache/node/22.23.3/arm64
+[CampusDesk CI/CD/1 Build & unit tests]   ❓  ::group::Environment details
+[CampusDesk CI/CD/1 Build & unit tests]   | node: v22.23.3
+[CampusDesk CI/CD/1 Build & unit tests]   | npm: 10.9.9
+[CampusDesk CI/CD/1 Build & unit tests]   | yarn: 
+[CampusDesk CI/CD/1 Build & unit tests]   ❓  ::endgroup::
+[CampusDesk CI/CD/1 Build & unit tests]   ❓ add-matcher /run/act/actions/actions-setup-node@v4/.github/tsc.json
+[CampusDesk CI/CD/1 Build & unit tests]   ❓ add-matcher /run/act/actions/actions-setup-node@v4/.github/eslint-stylish.json
+[CampusDesk CI/CD/1 Build & unit tests]   ❓ add-matcher /run/act/actions/actions-setup-node@v4/.github/eslint-compact.json
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Main actions/setup-node@v4 [825.203125ms]
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-output:: node-version=v22.23.3
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::add-path:: /opt/hostedtoolcache/node/22.23.3/arm64/bin
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Main Build frontend
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/5] user= workdir=application/frontend
+[CampusDesk CI/CD/1 Build & unit tests]   | 
+[CampusDesk CI/CD/1 Build & unit tests]   | added 19 packages in 3s
+[CampusDesk CI/CD/1 Build & unit tests]   | 
+[CampusDesk CI/CD/1 Build & unit tests]   | > campusdesk-frontend@1.0.0 build
+[CampusDesk CI/CD/1 Build & unit tests]   | > vite build
+[CampusDesk CI/CD/1 Build & unit tests]   | 
+[CampusDesk CI/CD/1 Build & unit tests]   | [36mvite v8.3.3 [32mbuilding client environment for production...[36m[39m
+[CampusDesk CI/CD/1 Build & unit tests]   | transforming...
+[CampusDesk CI/CD/1 Build & unit tests]   | ✓ 15 modules transformed.
+[CampusDesk CI/CD/1 Build & unit tests]   | rendering chunks...
+[CampusDesk CI/CD/1 Build & unit tests]   | computing gzip size...
+[CampusDesk CI/CD/1 Build & unit tests]   | dist/index.html                   0.40 kB │ gzip:  0.27 kB
+[CampusDesk CI/CD/1 Build & unit tests]   | dist/assets/index-BzF_iMqe.css    3.59 kB │ gzip:  1.23 kB
+[CampusDesk CI/CD/1 Build & unit tests]   | dist/assets/index-Dj-0Qpr5.js   225.13 kB │ gzip: 70.48 kB
+[CampusDesk CI/CD/1 Build & unit tests]   | 
+[CampusDesk CI/CD/1 Build & unit tests]   | [32m✓ built in 97ms[39m
+[CampusDesk CI/CD/1 Build & unit tests]   | dist:
+[CampusDesk CI/CD/1 Build & unit tests]   | total 8
+[CampusDesk CI/CD/1 Build & unit tests]   | drwxr-xr-x 2 root root 4096 Oct  7 17:36 assets
+[CampusDesk CI/CD/1 Build & unit tests]   | -rw-r--r-- 1 root root  409 Oct  7 17:36 index.html
+[CampusDesk CI/CD/1 Build & unit tests]   | 
+[CampusDesk CI/CD/1 Build & unit tests]   | dist/assets:
+[CampusDesk CI/CD/1 Build & unit tests]   | total 224
+[CampusDesk CI/CD/1 Build & unit tests]   | -rw-r--r-- 1 root root   3596 Oct  7 17:36 index-BzF_iMqe.css
+[CampusDesk CI/CD/1 Build & unit tests]   | -rw-r--r-- 1 root root 225135 Oct  7 17:36 index-Dj-0Qpr5.js
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Main Build frontend [3.301747291s]
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Main Upload test report + frontend bundle
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[CampusDesk CI/CD/1 Build & unit tests]   | Multiple search paths detected. Calculating the least common ancestor of all paths
+[CampusDesk CI/CD/1 Build & unit tests]   | The least common ancestor is /Users/ajijuttam/devops-lab/final/ws. This will be the root directory of the artifact
+[CampusDesk CI/CD/1 Build & unit tests]   | With the provided path, there will be 4 files uploaded
+[CampusDesk CI/CD/1 Build & unit tests]   | Artifact name is valid!
+[CampusDesk CI/CD/1 Build & unit tests]   | Root directory input is valid!
+[CampusDesk CI/CD/1 Build & unit tests]   | Beginning upload of artifact content to blob storage
+[CampusDesk CI/CD/1 Build & unit tests]   | Uploaded bytes 72227
+[CampusDesk CI/CD/1 Build & unit tests]   | Finished uploading artifact content to blob storage!
+[CampusDesk CI/CD/1 Build & unit tests]   | SHA256 digest of uploaded artifact zip is c588dbcb9304243bda33c181259d650d8a6bb532f0a0acddfb308cab31f3ba78
+[CampusDesk CI/CD/1 Build & unit tests]   | Finalizing artifact upload
+[CampusDesk CI/CD/1 Build & unit tests]   | Artifact build-output.zip successfully finalized. Artifact ID 3868795995
+[CampusDesk CI/CD/1 Build & unit tests]   | Artifact build-output has been successfully uploaded! Final size is 72227 bytes. Artifact ID is 3868795995
+[CampusDesk CI/CD/1 Build & unit tests]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/3868795995
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Main Upload test report + frontend bundle [454.655041ms]
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-output:: artifact-id=3868795995
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-output:: artifact-digest=c588dbcb9304243bda33c181259d650d8a6bb532f0a0acddfb308cab31f3ba78
+[CampusDesk CI/CD/1 Build & unit tests]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/3868795995
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Post actions/setup-node@v4
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-node@v4/dist/cache-save/index.js] user= workdir=
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Post actions/setup-node@v4 [92.408958ms]
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Post actions/setup-python@v5
+[CampusDesk CI/CD/1 Build & unit tests]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/cache-save/index.js] user= workdir=
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Post actions/setup-python@v5 [111.056167ms]
+[CampusDesk CI/CD/1 Build & unit tests] ⭐ Run Complete job
+[CampusDesk CI/CD/1 Build & unit tests] Cleaning up container for job 1 Build & unit tests
+[CampusDesk CI/CD/1 Build & unit tests]   ✅  Success - Complete job
+[CampusDesk CI/CD/1 Build & unit tests] 🏁  Job succeeded
+[CampusDesk CI/CD/2 SAST (Bandit)              ] ⭐ Run Set up job
+[CampusDesk CI/CD/2 SAST (Bandit)              ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ] ⭐ Run Set up job
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[CampusDesk CI/CD/5 Docker build               ] ⭐ Run Set up job
+[CampusDesk CI/CD/5 Docker build               ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] ⭐ Run Set up job
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] 🚀  Start image=catthehacker/ubuntu:act-latest
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[CampusDesk CI/CD/5 Docker build               ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/5 Docker build               ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/5 Docker build               ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/5 Docker build               ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[CampusDesk CI/CD/5 Docker build               ]   ✅  Success - Set up job
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ✅  Success - Set up job
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ✅  Success - Set up job
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ✅  Success - Set up job
+[CampusDesk CI/CD/5 Docker build               ]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ☁  git clone 'https://github.com/actions/setup-python' # ref=v5
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ☁  git clone 'https://github.com/actions/setup-python' # ref=v5
+[CampusDesk CI/CD/5 Docker build               ] ⭐ Run Main actions/checkout@v4
+[CampusDesk CI/CD/5 Docker build               ]   🐳  docker cp src=/Users/ajijuttam/devops-lab/final/ws/. dst=/Users/ajijuttam/devops-lab/final/ws
+[CampusDesk CI/CD/5 Docker build               ]   ✅  Success - Main actions/checkout@v4 [32.230833ms]
+[CampusDesk CI/CD/5 Docker build               ] ⭐ Run Main Build backend + frontend images (tag = short SHA)
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ] ⭐ Run Main actions/checkout@v4
+[CampusDesk CI/CD/5 Docker build               ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/1] user= workdir=
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   🐳  docker cp src=/Users/ajijuttam/devops-lab/final/ws/. dst=/Users/ajijuttam/devops-lab/final/ws
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ✅  Success - Main actions/checkout@v4 [33.604417ms]
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ☁  git clone 'https://github.com/actions/setup-node' # ref=v4
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ] ⭐ Run Main Install Gitleaks
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/1] user= workdir=
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[CampusDesk CI/CD/2 SAST (Bandit)              ] ⭐ Run Main actions/checkout@v4
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker cp src=/Users/ajijuttam/devops-lab/final/ws/. dst=/Users/ajijuttam/devops-lab/final/ws
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ✅  Success - Main actions/checkout@v4 [25.059292ms]
+[CampusDesk CI/CD/2 SAST (Bandit)              ] ⭐ Run Main actions/setup-python@v5
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-python@v5/ dst=/var/run/act/actions/actions-setup-python@v5/
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] ⭐ Run Main actions/checkout@v4
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker cp src=/Users/ajijuttam/devops-lab/final/ws/. dst=/Users/ajijuttam/devops-lab/final/ws
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ✅  Success - Main actions/checkout@v4 [26.392917ms]
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] ⭐ Run Main actions/setup-python@v5
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-python@v5/ dst=/var/run/act/actions/actions-setup-python@v5/
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/setup/index.js] user= workdir=
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/setup/index.js] user= workdir=
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ❓  ::group::Installed versions
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ❓  ::group::Installed versions
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | Successfully set up CPython (3.12.15)
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ❓  ::endgroup::
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ❓ add-matcher /run/act/actions/actions-setup-python@v5/.github/python.json
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Successfully set up CPython (3.12.15)
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ❓  ::endgroup::
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ❓ add-matcher /run/act/actions/actions-setup-python@v5/.github/python.json
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ✅  Success - Main actions/setup-python@v5 [702.446ms]
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-env:: Python2_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-env:: Python3_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-env:: LD_LIBRARY_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-env:: pythonLocation=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-env:: PKG_CONFIG_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib/pkgconfig
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-env:: Python_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ✅  Success - Main actions/setup-python@v5 [629.547875ms]
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-env:: pythonLocation=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-env:: PKG_CONFIG_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib/pkgconfig
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-env:: Python_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-env:: Python2_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-env:: Python3_ROOT_DIR=/opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-env:: LD_LIBRARY_PATH=/opt/hostedtoolcache/Python/3.12.15/arm64/lib
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-output:: python-version=3.12.15
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-output:: python-path=/opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-output:: python-version=3.12.15
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-output:: python-path=/opt/hostedtoolcache/Python/3.12.15/arm64/bin/python
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64/bin
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::add-path:: /opt/hostedtoolcache/Python/3.12.15/arm64/bin
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] ⭐ Run Main actions/setup-node@v4
+[CampusDesk CI/CD/2 SAST (Bandit)              ] ⭐ Run Main Bandit
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-setup-node@v4/ dst=/var/run/act/actions/actions-setup-node@v4/
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-node@v4/dist/setup/index.js] user= workdir=
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Found in cache @ /opt/hostedtoolcache/node/22.23.3/arm64
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ❓  ::group::Environment details
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | node: v22.23.3
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | npm: 10.9.9
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | yarn: 
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ❓  ::endgroup::
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ❓ add-matcher /run/act/actions/actions-setup-node@v4/.github/tsc.json
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ❓ add-matcher /run/act/actions/actions-setup-node@v4/.github/eslint-stylish.json
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ❓ add-matcher /run/act/actions/actions-setup-node@v4/.github/eslint-compact.json
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ✅  Success - Main actions/setup-node@v4 [787.494458ms]
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-output:: node-version=v22.23.3
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::add-path:: /opt/hostedtoolcache/node/22.23.3/arm64/bin
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] ⭐ Run Main pip-audit (Python dependencies, incl. transitive)
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ✅  Success - Main Install Gitleaks [1.892220917s]
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ⚙  ::add-path:: /root/.local/bin
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ] ⭐ Run Main Scan working tree and full Git history
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | bandit: 0 findings  (HIGH=0 MEDIUM=0 LOW=0)
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ✅  Success - Main Bandit [1.106951583s]
+[CampusDesk CI/CD/2 SAST (Bandit)              ] ⭐ Run Main actions/upload-artifact@v4
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | [90m5:36PM[0m [32mINF[0m [1mscanned ~61921 bytes (61.92 KB) in 21.5ms[0m
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | [90m5:36PM[0m [32mINF[0m [1mno leaks found[0m
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | With the provided path, there will be 1 file uploaded
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | Artifact name is valid!
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | Root directory input is valid!
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | [90m5:36PM[0m [32mINF[0m [1m3 commits scanned.[0m
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | [90m5:36PM[0m [32mINF[0m [1mscanned ~89876 bytes (89.88 KB) in 84ms[0m
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | [90m5:36PM[0m [32mINF[0m [1mno leaks found[0m
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | Beginning upload of artifact content to blob storage
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | gitleaks: tree=0 findings, history=0 findings
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ✅  Success - Main Scan working tree and full Git history [565.032708ms]
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | Uploaded bytes 427
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | Finished uploading artifact content to blob storage!
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | SHA256 digest of uploaded artifact zip is 3244876a0f94933f6186fea885cbb2c584c0caa41e8018ead9ca2fb550006b54
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | Finalizing artifact upload
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | Artifact report-sast.zip successfully finalized. Artifact ID 862344689
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | Artifact report-sast has been successfully uploaded! Final size is 427 bytes. Artifact ID is 862344689
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/862344689
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ✅  Success - Main actions/upload-artifact@v4 [391.02425ms]
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-output:: artifact-id=862344689
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-output:: artifact-digest=3244876a0f94933f6186fea885cbb2c584c0caa41e8018ead9ca2fb550006b54
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/862344689
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ] ⭐ Run Main actions/upload-artifact@v4
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[CampusDesk CI/CD/2 SAST (Bandit)              ] ⭐ Run Post actions/setup-python@v5
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/cache-save/index.js] user= workdir=
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ✅  Success - Post actions/setup-python@v5 [127.025875ms]
+[CampusDesk CI/CD/2 SAST (Bandit)              ] ⭐ Run Complete job
+[CampusDesk CI/CD/2 SAST (Bandit)              ] Cleaning up container for job 2 SAST (Bandit)
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | With the provided path, there will be 1 file uploaded
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | Artifact name is valid!
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | Root directory input is valid!
+[CampusDesk CI/CD/2 SAST (Bandit)              ]   ✅  Success - Complete job
+[CampusDesk CI/CD/2 SAST (Bandit)              ] 🏁  Job succeeded
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | Beginning upload of artifact content to blob storage
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | Uploaded bytes 145
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | Finished uploading artifact content to blob storage!
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | SHA256 digest of uploaded artifact zip is cc8d98e4a226f4d83ab69738f40e7c36b4be88be9e0648f5be9beacd52131c2e
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | Finalizing artifact upload
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | Artifact report-secrets.zip successfully finalized. Artifact ID 3564946595
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | Artifact report-secrets has been successfully uploaded! Final size is 145 bytes. Artifact ID is 3564946595
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/3564946595
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ✅  Success - Main actions/upload-artifact@v4 [548.607666ms]
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ⚙  ::set-output:: artifact-id=3564946595
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ⚙  ::set-output:: artifact-digest=cc8d98e4a226f4d83ab69738f40e7c36b4be88be9e0648f5be9beacd52131c2e
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/3564946595
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ] ⭐ Run Complete job
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ] Cleaning up container for job 4 Secret scan (Gitleaks)
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ]   ✅  Success - Complete job
+[CampusDesk CI/CD/4 Secret scan (Gitleaks)     ] 🏁  Job succeeded
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | No known vulnerabilities found
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | pip-audit: 29 packages resolved, 0 vulnerable
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ✅  Success - Main pip-audit (Python dependencies, incl. transitive) [13.451160125s]
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] ⭐ Run Main npm audit (frontend dependencies from package-lock.json)
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/4] user= workdir=application/frontend
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | npm audit: total=0 critical=0 high=0 moderate=0 low=0
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ✅  Success - Main npm audit (frontend dependencies from package-lock.json) [745.852167ms]
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] ⭐ Run Main actions/upload-artifact@v4
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | With the provided path, there will be 2 files uploaded
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Artifact name is valid!
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Root directory input is valid!
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Beginning upload of artifact content to blob storage
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Uploaded bytes 845
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Finished uploading artifact content to blob storage!
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | SHA256 digest of uploaded artifact zip is 9e512e3b27db89a29e857ff1c9e0b04b2f74ccfac638bc733f46cac2073646b7
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Finalizing artifact upload
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Artifact report-sca.zip successfully finalized. Artifact ID 2543950051
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Artifact report-sca has been successfully uploaded! Final size is 845 bytes. Artifact ID is 2543950051
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/2543950051
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ✅  Success - Main actions/upload-artifact@v4 [502.425875ms]
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-output:: artifact-id=2543950051
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-output:: artifact-digest=9e512e3b27db89a29e857ff1c9e0b04b2f74ccfac638bc733f46cac2073646b7
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/2543950051
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] ⭐ Run Post actions/setup-node@v4
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-node@v4/dist/cache-save/index.js] user= workdir=
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ✅  Success - Post actions/setup-node@v4 [84.68075ms]
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] ⭐ Run Post actions/setup-python@v5
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-setup-python@v5/dist/cache-save/index.js] user= workdir=
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ✅  Success - Post actions/setup-python@v5 [94.418834ms]
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] ⭐ Run Complete job
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] Cleaning up container for job 3 SCA (pip-audit + npm audit)
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)]   ✅  Success - Complete job
+[CampusDesk CI/CD/3 SCA (pip-audit + npm audit)] 🏁  Job succeeded
+[CampusDesk CI/CD/5 Docker build               ]   | sha256:0e1a504975942c3f268432c5e080f3e4b3c8d39a1c2eb9e0cfe10e4aaef7f506
+[CampusDesk CI/CD/5 Docker build               ]   | sha256:46e5619361aa6b4fdd847820470dc395d29b59d69df1b6b11e5f75b7a627255e
+[CampusDesk CI/CD/5 Docker build               ]   | campusdesk-backend:1c7d093  339MB
+[CampusDesk CI/CD/5 Docker build               ]   | campusdesk-frontend:1c7d093  95MB
+[CampusDesk CI/CD/5 Docker build               ]   ✅  Success - Main Build backend + frontend images (tag = short SHA) [20.199530375s]
+[CampusDesk CI/CD/5 Docker build               ] ⭐ Run Main actions/upload-artifact@v4
+[CampusDesk CI/CD/5 Docker build               ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[CampusDesk CI/CD/5 Docker build               ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[CampusDesk CI/CD/5 Docker build               ]   | With the provided path, there will be 2 files uploaded
+[CampusDesk CI/CD/5 Docker build               ]   | Artifact name is valid!
+[CampusDesk CI/CD/5 Docker build               ]   | Root directory input is valid!
+[CampusDesk CI/CD/5 Docker build               ]   | Beginning upload of artifact content to blob storage
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 8388608
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 16777216
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 25165824
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 33554432
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 41943040
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 50331648
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 58720256
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 67108864
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 75497472
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 83886080
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 92274688
+[CampusDesk CI/CD/5 Docker build               ]   | Uploaded bytes 98789351
+[CampusDesk CI/CD/5 Docker build               ]   | Finished uploading artifact content to blob storage!
+[CampusDesk CI/CD/5 Docker build               ]   | SHA256 digest of uploaded artifact zip is 07d848442468808274fab23e28be9ada071ed63c3e4f8a6fa2fb93833bc8a04a
+[CampusDesk CI/CD/5 Docker build               ]   | Finalizing artifact upload
+[CampusDesk CI/CD/5 Docker build               ]   | Artifact images.zip successfully finalized. Artifact ID 3520546475
+[CampusDesk CI/CD/5 Docker build               ]   | Artifact images has been successfully uploaded! Final size is 98789351 bytes. Artifact ID is 3520546475
+[CampusDesk CI/CD/5 Docker build               ]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/3520546475
+[CampusDesk CI/CD/5 Docker build               ]   ✅  Success - Main actions/upload-artifact@v4 [2.13099025s]
+[CampusDesk CI/CD/5 Docker build               ]   ⚙  ::set-output:: artifact-digest=07d848442468808274fab23e28be9ada071ed63c3e4f8a6fa2fb93833bc8a04a
+[CampusDesk CI/CD/5 Docker build               ]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/3520546475
+[CampusDesk CI/CD/5 Docker build               ]   ⚙  ::set-output:: artifact-id=3520546475
+[CampusDesk CI/CD/5 Docker build               ] ⭐ Run Complete job
+[CampusDesk CI/CD/5 Docker build               ] Cleaning up container for job 5 Docker build
+[CampusDesk CI/CD/5 Docker build               ]   ✅  Success - Complete job
+[CampusDesk CI/CD/5 Docker build               ] 🏁  Job succeeded
+[CampusDesk CI/CD/6 Image scan (Trivy)         ] ⭐ Run Set up job
+[CampusDesk CI/CD/6 Image scan (Trivy)         ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ✅  Success - Set up job
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ☁  git clone 'https://github.com/actions/download-artifact' # ref=v4
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ☁  git clone 'https://github.com/actions/upload-artifact' # ref=v4
+[CampusDesk CI/CD/6 Image scan (Trivy)         ] ⭐ Run Main actions/checkout@v4
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker cp src=/Users/ajijuttam/devops-lab/final/ws/. dst=/Users/ajijuttam/devops-lab/final/ws
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ✅  Success - Main actions/checkout@v4 [36.540542ms]
+[CampusDesk CI/CD/6 Image scan (Trivy)         ] ⭐ Run Main actions/download-artifact@v4
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-download-artifact@v4/ dst=/var/run/act/actions/actions-download-artifact@v4/
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-download-artifact@v4/dist/index.js] user= workdir=
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Downloading single artifact
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Preparing to download the following artifacts:
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | - images (ID: 3520546475, Size: 96, Expected Digest: undefined)
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Starting download of artifact to: /Users/ajijuttam/devops-lab/final/ws/images
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | SHA256 digest of downloaded artifact is 07d848442468808274fab23e28be9ada071ed63c3e4f8a6fa2fb93833bc8a04a
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Artifact download completed successfully.
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Total of 1 artifact(s) downloaded
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Download artifact has finished successfully
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ✅  Success - Main actions/download-artifact@v4 [1.001431708s]
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ⚙  ::set-output:: download-path=/Users/ajijuttam/devops-lab/final/ws/images
+[CampusDesk CI/CD/6 Image scan (Trivy)         ] ⭐ Run Main Install Trivy
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ✅  Success - Main Install Trivy [9.855816083s]
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ⚙  ::add-path:: /root/.local/bin
+[CampusDesk CI/CD/6 Image scan (Trivy)         ] ⭐ Run Main Scan both images (OS packages + language packages)
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | trivy backend: 44 HIGH/CRITICAL, 0 with a fix
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | trivy frontend: 0 HIGH/CRITICAL, 0 with a fix
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ✅  Success - Main Scan both images (OS packages + language packages) [32.457367792s]
+[CampusDesk CI/CD/6 Image scan (Trivy)         ] ⭐ Run Main actions/upload-artifact@v4
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-upload-artifact@v4/ dst=/var/run/act/actions/actions-upload-artifact@v4/
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-upload-artifact@v4/dist/upload/index.js] user= workdir=
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | With the provided path, there will be 2 files uploaded
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Artifact name is valid!
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Root directory input is valid!
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Beginning upload of artifact content to blob storage
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Uploaded bytes 72711
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Finished uploading artifact content to blob storage!
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | SHA256 digest of uploaded artifact zip is 0d2422ae27c432029f0d60528c5c9832b7b738704f741a016ff53f7cbd8cd3ab
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Finalizing artifact upload
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Artifact report-images.zip successfully finalized. Artifact ID 2557763052
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Artifact report-images has been successfully uploaded! Final size is 72711 bytes. Artifact ID is 2557763052
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   | Artifact download URL: https://github.com/nektos/act/actions/runs/1/artifacts/2557763052
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ✅  Success - Main actions/upload-artifact@v4 [574.68675ms]
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ⚙  ::set-output:: artifact-digest=0d2422ae27c432029f0d60528c5c9832b7b738704f741a016ff53f7cbd8cd3ab
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ⚙  ::set-output:: artifact-url=https://github.com/nektos/act/actions/runs/1/artifacts/2557763052
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ⚙  ::set-output:: artifact-id=2557763052
+[CampusDesk CI/CD/6 Image scan (Trivy)         ] ⭐ Run Complete job
+[CampusDesk CI/CD/6 Image scan (Trivy)         ] Cleaning up container for job 6 Image scan (Trivy)
+[CampusDesk CI/CD/6 Image scan (Trivy)         ]   ✅  Success - Complete job
+[CampusDesk CI/CD/6 Image scan (Trivy)         ] 🏁  Job succeeded
+[CampusDesk CI/CD/7 Security gate              ] ⭐ Run Set up job
+[CampusDesk CI/CD/7 Security gate              ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[CampusDesk CI/CD/7 Security gate              ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[CampusDesk CI/CD/7 Security gate              ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/7 Security gate              ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/7 Security gate              ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[CampusDesk CI/CD/7 Security gate              ]   ✅  Success - Set up job
+[CampusDesk CI/CD/7 Security gate              ]   ☁  git clone 'https://github.com/actions/download-artifact' # ref=v4
+[CampusDesk CI/CD/7 Security gate              ] ⭐ Run Main actions/checkout@v4
+[CampusDesk CI/CD/7 Security gate              ]   🐳  docker cp src=/Users/ajijuttam/devops-lab/final/ws/. dst=/Users/ajijuttam/devops-lab/final/ws
+[CampusDesk CI/CD/7 Security gate              ]   ✅  Success - Main actions/checkout@v4 [37.816875ms]
+[CampusDesk CI/CD/7 Security gate              ] ⭐ Run Main actions/download-artifact@v4
+[CampusDesk CI/CD/7 Security gate              ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-download-artifact@v4/ dst=/var/run/act/actions/actions-download-artifact@v4/
+[CampusDesk CI/CD/7 Security gate              ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-download-artifact@v4/dist/index.js] user= workdir=
+[CampusDesk CI/CD/7 Security gate              ]   | Found 6 artifact(s)
+[CampusDesk CI/CD/7 Security gate              ]   | Filtering artifacts by pattern 'report-*'
+[CampusDesk CI/CD/7 Security gate              ]   | Preparing to download the following artifacts:
+[CampusDesk CI/CD/7 Security gate              ]   | - report-secrets (ID: 3564946595, Size: 96, Expected Digest: undefined)
+[CampusDesk CI/CD/7 Security gate              ]   | - report-images (ID: 2557763052, Size: 96, Expected Digest: undefined)
+[CampusDesk CI/CD/7 Security gate              ]   | - report-sca (ID: 2543950051, Size: 96, Expected Digest: undefined)
+[CampusDesk CI/CD/7 Security gate              ]   | - report-sast (ID: 862344689, Size: 96, Expected Digest: undefined)
+[CampusDesk CI/CD/7 Security gate              ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[CampusDesk CI/CD/7 Security gate              ]   | Starting download of artifact to: /Users/ajijuttam/devops-lab/final/ws/reports
+[CampusDesk CI/CD/7 Security gate              ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[CampusDesk CI/CD/7 Security gate              ]   | Starting download of artifact to: /Users/ajijuttam/devops-lab/final/ws/reports
+[CampusDesk CI/CD/7 Security gate              ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[CampusDesk CI/CD/7 Security gate              ]   | Starting download of artifact to: /Users/ajijuttam/devops-lab/final/ws/reports
+[CampusDesk CI/CD/7 Security gate              ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[CampusDesk CI/CD/7 Security gate              ]   | Starting download of artifact to: /Users/ajijuttam/devops-lab/final/ws/reports
+[CampusDesk CI/CD/7 Security gate              ]   | SHA256 digest of downloaded artifact is 9e512e3b27db89a29e857ff1c9e0b04b2f74ccfac638bc733f46cac2073646b7
+[CampusDesk CI/CD/7 Security gate              ]   | Artifact download completed successfully.
+[CampusDesk CI/CD/7 Security gate              ]   | SHA256 digest of downloaded artifact is cc8d98e4a226f4d83ab69738f40e7c36b4be88be9e0648f5be9beacd52131c2e
+[CampusDesk CI/CD/7 Security gate              ]   | Artifact download completed successfully.
+[CampusDesk CI/CD/7 Security gate              ]   | SHA256 digest of downloaded artifact is 3244876a0f94933f6186fea885cbb2c584c0caa41e8018ead9ca2fb550006b54
+[CampusDesk CI/CD/7 Security gate              ]   | Artifact download completed successfully.
+[CampusDesk CI/CD/7 Security gate              ]   | SHA256 digest of downloaded artifact is 0d2422ae27c432029f0d60528c5c9832b7b738704f741a016ff53f7cbd8cd3ab
+[CampusDesk CI/CD/7 Security gate              ]   | Artifact download completed successfully.
+[CampusDesk CI/CD/7 Security gate              ]   | Total of 4 artifact(s) downloaded
+[CampusDesk CI/CD/7 Security gate              ]   | Download artifact has finished successfully
+[CampusDesk CI/CD/7 Security gate              ]   ✅  Success - Main actions/download-artifact@v4 [329.257625ms]
+[CampusDesk CI/CD/7 Security gate              ]   ⚙  ::set-output:: download-path=/Users/ajijuttam/devops-lab/final/ws/reports
+[CampusDesk CI/CD/7 Security gate              ] ⭐ Run Main Apply security/gate-policy.json
+[CampusDesk CI/CD/7 Security gate              ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[CampusDesk CI/CD/7 Security gate              ]   | bandit.json
+[CampusDesk CI/CD/7 Security gate              ]   | gitleaks.json
+[CampusDesk CI/CD/7 Security gate              ]   | npm-audit.json
+[CampusDesk CI/CD/7 Security gate              ]   | pip-audit.json
+[CampusDesk CI/CD/7 Security gate              ]   | trivy-backend.json
+[CampusDesk CI/CD/7 Security gate              ]   | trivy-frontend.json
+[CampusDesk CI/CD/7 Security gate              ]   | SAST    bandit     : 0 findings, 0 blocking
+[CampusDesk CI/CD/7 Security gate              ]   | SCA     pip-audit  : 29 packages, 0 vulnerable
+[CampusDesk CI/CD/7 Security gate              ]   | SCA     npm audit  : 0 advisories, 0 high/critical
+[CampusDesk CI/CD/7 Security gate              ]   | SECRETS gitleaks   : 0 findings
+[CampusDesk CI/CD/7 Security gate              ]   | IMAGE   trivy-backend.json : 44 HIGH/CRITICAL, 0 with a fix (blocking)
+[CampusDesk CI/CD/7 Security gate              ]   | IMAGE   trivy-frontend.json: 0 HIGH/CRITICAL, 0 with a fix (blocking)
+[CampusDesk CI/CD/7 Security gate              ]   | ------------------------------------------------------------
+[CampusDesk CI/CD/7 Security gate              ]   | SECURITY GATE: PASSED - image may be pushed and deployed
+[CampusDesk CI/CD/7 Security gate              ]   ✅  Success - Main Apply security/gate-policy.json [113.992541ms]
+[CampusDesk CI/CD/7 Security gate              ] ⭐ Run Complete job
+[CampusDesk CI/CD/7 Security gate              ] Cleaning up container for job 7 Security gate
+[CampusDesk CI/CD/7 Security gate              ]   ✅  Success - Complete job
+[CampusDesk CI/CD/7 Security gate              ] 🏁  Job succeeded
+[CampusDesk CI/CD/8 Push images                ] ⭐ Run Set up job
+[CampusDesk CI/CD/8 Push images                ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[CampusDesk CI/CD/8 Push images                ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[CampusDesk CI/CD/8 Push images                ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/8 Push images                ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/8 Push images                ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[CampusDesk CI/CD/8 Push images                ]   ✅  Success - Set up job
+[CampusDesk CI/CD/8 Push images                ]   ☁  git clone 'https://github.com/actions/download-artifact' # ref=v4
+[CampusDesk CI/CD/8 Push images                ] ⭐ Run Main actions/download-artifact@v4
+[CampusDesk CI/CD/8 Push images                ]   🐳  docker cp src=/Users/ajijuttam/.cache/act/actions-download-artifact@v4/ dst=/var/run/act/actions/actions-download-artifact@v4/
+[CampusDesk CI/CD/8 Push images                ]   🐳  docker exec cmd=[/opt/acttoolcache/node/24.19.0/arm64/bin/node /var/run/act/actions/actions-download-artifact@v4/dist/index.js] user= workdir=
+[CampusDesk CI/CD/8 Push images                ]   | Downloading single artifact
+[CampusDesk CI/CD/8 Push images                ]   | Preparing to download the following artifacts:
+[CampusDesk CI/CD/8 Push images                ]   | - images (ID: 3520546475, Size: 96, Expected Digest: undefined)
+[CampusDesk CI/CD/8 Push images                ]   | Redirecting to blob download url: http://100.128.164.188:34567/twirp/github.actions.results.api.v1.ArtifactService/DownloadArtifact
+[CampusDesk CI/CD/8 Push images                ]   | Starting download of artifact to: /Users/ajijuttam/devops-lab/final/ws/images
+[CampusDesk CI/CD/8 Push images                ]   | SHA256 digest of downloaded artifact is 07d848442468808274fab23e28be9ada071ed63c3e4f8a6fa2fb93833bc8a04a
+[CampusDesk CI/CD/8 Push images                ]   | Artifact download completed successfully.
+[CampusDesk CI/CD/8 Push images                ]   | Total of 1 artifact(s) downloaded
+[CampusDesk CI/CD/8 Push images                ]   | Download artifact has finished successfully
+[CampusDesk CI/CD/8 Push images                ]   ✅  Success - Main actions/download-artifact@v4 [986.321708ms]
+[CampusDesk CI/CD/8 Push images                ]   ⚙  ::set-output:: download-path=/Users/ajijuttam/devops-lab/final/ws/images
+[CampusDesk CI/CD/8 Push images                ] ⭐ Run Main Push exactly the images that passed the gate
+[CampusDesk CI/CD/8 Push images                ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/push] user= workdir=
+[CampusDesk CI/CD/8 Push images                ]   | Loaded image: campusdesk-backend:1c7d093
+[CampusDesk CI/CD/8 Push images                ]   | localhost:5060/ajij/campusdesk-backend:1c7d093
+[CampusDesk CI/CD/8 Push images                ]   | Loaded image: campusdesk-frontend:1c7d093
+[CampusDesk CI/CD/8 Push images                ]   | localhost:5060/ajij/campusdesk-frontend:1c7d093
+[CampusDesk CI/CD/8 Push images                ]   ✅  Success - Main Push exactly the images that passed the gate [795.393833ms]
+[CampusDesk CI/CD/8 Push images                ]   ⚙  ::set-output:: tag=1c7d093
+[CampusDesk CI/CD/8 Push images                ] ⭐ Run Complete job
+[CampusDesk CI/CD/8 Push images                ] Cleaning up container for job 8 Push images
+[CampusDesk CI/CD/8 Push images                ]   ✅  Success - Complete job
+[CampusDesk CI/CD/8 Push images                ] 🏁  Job succeeded
+[CampusDesk CI/CD/9 Deploy with Helm           ] ⭐ Run Set up job
+[CampusDesk CI/CD/9 Deploy with Helm           ] 🚀  Start image=catthehacker/ubuntu:act-latest
+[CampusDesk CI/CD/9 Deploy with Helm           ]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=false
+[CampusDesk CI/CD/9 Deploy with Helm           ]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/9 Deploy with Helm           ]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CampusDesk CI/CD/9 Deploy with Helm           ]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[CampusDesk CI/CD/9 Deploy with Helm           ]   ✅  Success - Set up job
+[CampusDesk CI/CD/9 Deploy with Helm           ] ⭐ Run Main actions/checkout@v4
+[CampusDesk CI/CD/9 Deploy with Helm           ]   🐳  docker cp src=/Users/ajijuttam/devops-lab/final/ws/. dst=/Users/ajijuttam/devops-lab/final/ws
+[CampusDesk CI/CD/9 Deploy with Helm           ]   ✅  Success - Main actions/checkout@v4 [31.372708ms]
+[CampusDesk CI/CD/9 Deploy with Helm           ] ⭐ Run Main Install kubectl + Helm
+[CampusDesk CI/CD/9 Deploy with Helm           ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/1] user= workdir=
+[CampusDesk CI/CD/9 Deploy with Helm           ]   ✅  Success - Main Install kubectl + Helm [20.455804375s]
+[CampusDesk CI/CD/9 Deploy with Helm           ]   ⚙  ::add-path:: /root/.local/bin
+[CampusDesk CI/CD/9 Deploy with Helm           ] ⭐ Run Main Cluster access from the KUBE_CONFIG secret
+[CampusDesk CI/CD/9 Deploy with Helm           ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[CampusDesk CI/CD/9 Deploy with Helm           ]   | NAME    STATUS   ROLES           AGE   VERSION
+[CampusDesk CI/CD/9 Deploy with Helm           ]   | final   Ready    control-plane   16m   v1.37.0
+[CampusDesk CI/CD/9 Deploy with Helm           ]   ✅  Success - Main Cluster access from the KUBE_CONFIG secret [132.290084ms]
+[CampusDesk CI/CD/9 Deploy with Helm           ] ⭐ Run Main helm upgrade --install
+[CampusDesk CI/CD/9 Deploy with Helm           ]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[CampusDesk CI/CD/9 Deploy with Helm           ]   | level=WARN msg="upgrade failed" name=campusdesk error="resource Deployment/campusdesk/campusdesk-backend not ready. status: InProgress, message: Updated: 1/2\ncontext deadline exceeded"
+[CampusDesk CI/CD/9 Deploy with Helm           ]   | Error: UPGRADE FAILED: resource Deployment/campusdesk/campusdesk-backend not ready. status: InProgress, message: Updated: 1/2
+[CampusDesk CI/CD/9 Deploy with Helm           ]   | context deadline exceeded
+[CampusDesk CI/CD/9 Deploy with Helm           ]   ❌  Failure - Main helm upgrade --install [4m59.169305333s]
+[CampusDesk CI/CD/9 Deploy with Helm           ] exitcode '1': failure
+[CampusDesk CI/CD/9 Deploy with Helm           ] ⭐ Run Complete job
+[CampusDesk CI/CD/9 Deploy with Helm           ]   ✅  Success - Complete job
+[CampusDesk CI/CD/9 Deploy with Helm           ] 🏁  Job failed
+Error: Job '9 Deploy with Helm' failed

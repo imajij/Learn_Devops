@@ -1,0 +1,39 @@
+# Full local stack:  docker compose -f docker/docker-compose.yml up --build
+# UI http://localhost:3080   API http://localhost:8008/docs
+name: campusdesk
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: campusdesk
+      POSTGRES_USER: campusdesk
+      POSTGRES_PASSWORD: local-dev-only   # gitleaks:allow (throw-away local value)
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campusdesk -d campusdesk"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    build: {context: .., dockerfile: docker/backend.Dockerfile}
+    image: campusdesk-backend:compose
+    environment:
+      APP_ENV: compose
+      DB_HOST: postgres
+      DB_NAME: campusdesk
+      DB_USER: campusdesk
+      DB_PASSWORD: local-dev-only   # gitleaks:allow
+    depends_on:
+      postgres: {condition: service_healthy}
+    ports: ["8008:8000"]
+
+  frontend:
+    build: {context: .., dockerfile: docker/frontend.Dockerfile}
+    image: campusdesk-frontend:compose
+    environment:
+      BACKEND_URL: http://backend:8000
+    depends_on: [backend]
+    ports: ["3080:8080"]
+
+volumes:
+  pgdata:

@@ -1,0 +1,54 @@
+### ConfigMap = plain settings, Secret = credentials (only key names shown)
+$ kubectl --context final -n campusdesk get configmap campusdesk-config -o jsonpath='{.data}' | jq .
+{
+  "APP_ENV": "minikube",
+  "APP_VERSION": "1.0.0-9e8f63a",
+  "DB_HOST": "campusdesk-postgres",
+  "DB_NAME": "campusdesk",
+  "DB_PORT": "5432",
+  "SUPPORT_BANNER": "Campus IT helpdesk - raise a ticket and we will pick it up."
+}
+$ kubectl --context final -n campusdesk get secret campusdesk-db -o json | jq '.data | keys'
+[
+  "db-password",
+  "db-user"
+]
+$ kubectl --context final -n campusdesk exec deploy/campusdesk-backend -- sh -c 'env | grep -E "^(APP_|DB_HOST|DB_NAME|DB_USER)" | sort'
+Defaulted container "api" out of: api, wait-for-db (init)
+APP_ENV=minikube
+APP_VERSION=1.0.0-9e8f63a
+DB_HOST=campusdesk-postgres
+DB_NAME=campusdesk
+DB_USER=campusdesk
+### probes + resources on the backend pod
+$ kubectl --context final -n campusdesk describe deploy campusdesk-backend | grep -E 'Image:|Liveness|Readiness|Startup|Requests|Limits|cpu:|memory:|Init Containers|wait-for-db:' 
+  Init Containers:
+   wait-for-db:
+    Image:      postgres:17-alpine
+    Limits:
+      cpu:     100m
+      memory:  64Mi
+    Requests:
+      cpu:     10m
+      memory:  16Mi
+    Image:      localhost:5060/ajij/campusdesk-backend:9e8f63a
+    Limits:
+      cpu:     500m
+      memory:  256Mi
+    Requests:
+      cpu:      100m
+      memory:   128Mi
+    Liveness:   http-get http://:http/health delay=0s timeout=1s period=10s successThreshold=1 failureThreshold=3
+    Readiness:  http-get http://:http/ready delay=0s timeout=1s period=5s successThreshold=1 failureThreshold=2
+    Startup:    http-get http://:http/health delay=0s timeout=1s period=3s successThreshold=1 failureThreshold=20
+### Ingress routes: /api -> backend Service, / -> frontend Service
+$ kubectl --context final -n campusdesk describe ingress campusdesk | sed -n '/Rules/,/Annotations/p'
+Rules:
+  Host                  Path  Backends
+  ----                  ----  --------
+  campusdesk.localhost  
+                        /api   campusdesk-backend:8000 (10.244.0.16:8000,10.244.0.18:8000)
+                        /      campusdesk-frontend:80 (10.244.0.15:8080,10.244.0.17:8080)
+Annotations:            meta.helm.sh/release-name: campusdesk
+$ curl -s http://campusdesk.localhost:8088/api/tickets/stats; echo
+{"total":0,"open":0,"inProgress":0,"resolved":0,"urgent":0}

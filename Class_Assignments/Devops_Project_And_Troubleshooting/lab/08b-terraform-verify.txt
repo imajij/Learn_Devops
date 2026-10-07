@@ -1,0 +1,33 @@
+$ docker exec ajij-final-localstack awslocal --region ap-south-1 ec2 describe-vpcs --filters Name=tag:Project,Values=campusdesk --query 'Vpcs[].[VpcId,CidrBlock]' --output text
+vpc-844b0429	10.20.0.0/16
+$ docker exec ajij-final-localstack awslocal --region ap-south-1 ec2 describe-subnets --filters Name=tag:Project,Values=campusdesk --query 'Subnets[].[Tags[?Key==`Name`]|[0].Value,CidrBlock,AvailabilityZone,MapPublicIpOnLaunch]' --output text | sort
+campusdesk-dev-private-1	10.20.10.0/24	ap-south-1a	False
+campusdesk-dev-private-2	10.20.11.0/24	ap-south-1b	False
+campusdesk-dev-public-1	10.20.0.0/24	ap-south-1a	True
+campusdesk-dev-public-2	10.20.1.0/24	ap-south-1b	True
+$ docker exec ajij-final-localstack awslocal --region ap-south-1 ec2 describe-nat-gateways --query 'NatGateways[].[NatGatewayId,State,SubnetId]' --output text
+nat-3aa1c2f8d39773c37	deleted	subnet-f5534942
+nat-f85442b14d9b0a2b5	available	subnet-7efe9f9a
+$ docker exec ajij-final-localstack awslocal --region ap-south-1 s3api get-bucket-versioning --bucket campusdesk-dev-db-backups
+{
+    "Status": "Enabled"
+}
+$ docker exec ajij-final-localstack awslocal --region ap-south-1 dynamodb list-tables --query TableNames --output text
+campusdesk-dev-tf-locks
+$ docker exec ajij-final-localstack awslocal --region ap-south-1 ssm get-parameters-by-path --path /campusdesk/dev --query 'Parameters[].[Name,Value]' --output text
+/campusdesk/dev/DB_NAME	campusdesk
+/campusdesk/dev/DB_PORT	5432
+/campusdesk/dev/APP_ENV	dev
+$ terraform state list | wc -l
+      34
+### what real AWS would add with EKS switched on (plan only - EKS is LocalStack Pro):
+$ terraform plan -no-color -var create_eks=true | grep -E '^  # |Plan:|instance_types|desired_size|version  '
+  # aws_eks_cluster.main[0] will be created
+      + platform_version              = (known after apply)
+      + version                       = "1.33"
+  # aws_eks_node_group.main[0] will be created
+      + instance_types         = [
+      + release_version        = (known after apply)
+      + version                = (known after apply)
+          + desired_size = 2
+Plan: 2 to add, 0 to change, 0 to destroy.

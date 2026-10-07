@@ -1,0 +1,41 @@
+$ kubectl --context final top pods -n campusdesk -l app=campusdesk-backend
+NAME                                  CPU(cores)   MEMORY(bytes)   
+campusdesk-backend-6656988988-8p2k5   39m          63Mi            
+campusdesk-backend-6656988988-hqdxr   40m          63Mi            
+$ kubectl --context final -n campusdesk get hpa campusdesk-backend
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+campusdesk-backend   Deployment/campusdesk-backend   cpu: <unknown>/60%   2         5         2          11m
+### start a load generator: 12 parallel loops hitting the API inside the cluster
+$ kubectl --context final -n campusdesk run loadgen --image=postgres:17-alpine --restart=Never --command -- sh -c 'for i in $(seq 12); do (while true; do wget -q -O /dev/null http://campusdesk-backend:8000/api/tickets/stats; done) & done; sleep 150'
+pod/loadgen created
+$ kubectl --context final -n campusdesk get hpa campusdesk-backend --no-headers
+campusdesk-backend   Deployment/campusdesk-backend   cpu: <unknown>/60%   2     5     2     11m
+$ kubectl --context final -n campusdesk get hpa campusdesk-backend --no-headers
+campusdesk-backend   Deployment/campusdesk-backend   cpu: 195%/60%   2     5     2     12m
+$ kubectl --context final -n campusdesk get hpa campusdesk-backend --no-headers
+campusdesk-backend   Deployment/campusdesk-backend   cpu: 195%/60%   2     5     5     12m
+$ kubectl --context final -n campusdesk get hpa campusdesk-backend --no-headers
+campusdesk-backend   Deployment/campusdesk-backend   cpu: 195%/60%   2     5     5     13m
+$ kubectl --context final -n campusdesk get hpa campusdesk-backend --no-headers
+campusdesk-backend   Deployment/campusdesk-backend   cpu: 349%/60%   2     5     5     13m
+$ kubectl --context final -n campusdesk get hpa campusdesk-backend --no-headers
+campusdesk-backend   Deployment/campusdesk-backend   cpu: 349%/60%   2     5     5     13m
+$ kubectl --context final -n campusdesk get pods -l app=campusdesk-backend
+NAME                                  READY   STATUS    RESTARTS   AGE
+campusdesk-backend-6656988988-8p2k5   1/1     Running   0          3m54s
+campusdesk-backend-6656988988-c2hnr   1/1     Running   0          101s
+campusdesk-backend-6656988988-hqdxr   1/1     Running   0          4m
+campusdesk-backend-6656988988-mkwl7   1/1     Running   0          101s
+campusdesk-backend-6656988988-pb24j   1/1     Running   0          101s
+$ kubectl --context final -n campusdesk describe hpa campusdesk-backend | sed -n '/Events/,$p'
+Events:
+  Type     Reason                        Age                  From                       Message
+  ----     ------                        ----                 ----                       -------
+  Normal   SuccessfulRescale             13m                  horizontal-pod-autoscaler  New size: 2; reason: Current number of replicas below Spec.MinReplicas
+  Warning  FailedGetResourceMetric       2m56s (x8 over 13m)  horizontal-pod-autoscaler  failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+  Warning  FailedComputeMetricsReplicas  2m56s (x8 over 13m)  horizontal-pod-autoscaler  invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+  Warning  FailedComputeMetricsReplicas  2m41s (x5 over 12m)  horizontal-pod-autoscaler  invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+  Warning  FailedGetResourceMetric       2m26s (x6 over 12m)  horizontal-pod-autoscaler  failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+  Normal   SuccessfulRescale             101s                 horizontal-pod-autoscaler  New size: 5; reason: cpu resource utilization (percentage of request) above target
+$ kubectl --context final -n campusdesk delete pod loadgen --wait=false
+pod "loadgen" deleted from campusdesk namespace

@@ -1,0 +1,48 @@
+### create the repository through the Gitea API
+$ curl -s -u ajij:"$GITEA_PW" -X POST localhost:3030/api/v1/user/repos -H 'Content-Type: application/json' -d '{"name":"campusdesk","private":false,"default_branch":"main"}' | jq -c '{full_name, private, clone_url}'
+{"full_name":"ajij/campusdesk","private":false,"clone_url":"http://gitea.gitops.svc.cluster.local:3000/ajij/campusdesk.git"}
+$ git add -A && git commit -q -m 'gitops: Argo CD application, values-gitops.yaml, troubleshooting files, terraform, monitoring' && git log --oneline --format='%h %an  %s'
+965e0f0 Ajij Uttam  gitops: Argo CD application, values-gitops.yaml, troubleshooting files, terraform, monitoring
+9e8f63a Ajij Uttam  fix(helm): give pg_isready a user name in wait-for-db init container
+1c7d093 Ajij Uttam  fix(deploy): wait-for-db init container and retrying ingress smoke test
+7e3ff63 Ajij Uttam  fix(frontend): patch libexpat and pcre2 flagged by Trivy security gate
+4366876 Ajij Uttam  CampusDesk: app, Docker, Helm chart, CI/CD + DevSecOps pipeline
+$ git remote add gitea http://localhost:3030/ajij/campusdesk.git 2>/dev/null; git -c credential.helper= push -q http://ajij:$GITEA_PW@localhost:3030/ajij/campusdesk.git main 2>&1 | grep -v '^remote:' ; git ls-remote http://localhost:3030/ajij/campusdesk.git main
+965e0f07834195c52dc8b3e5d852f22f339b7e04	refs/heads/main
+### hand over: remove the Helm-managed release (the PVC is kept by its helm.sh/resource-policy: keep annotation) ...
+$ helm --kube-context final uninstall campusdesk -n campusdesk --wait 2>&1 | tail -2
+
+release "campusdesk" uninstalled
+$ kubectl --context final -n campusdesk get pvc
+NAME                STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+campusdesk-pgdata   Bound    pvc-01591ef4-f005-4f6d-bc53-8ddde9d3a15d   1Gi        RWO            standard       <unset>                 56m
+### ... and let Argo CD create everything from Git
+$ kubectl --context final apply -f /Users/ajijuttam/projects/Learn_DevOps/Class_Assignments/Devops_Project_And_Troubleshooting/final-devops-project/gitops/argocd-application.yaml
+application.argoproj.io/campusdesk created
+$ kubectl --context final -n argocd get application campusdesk -o custom-columns=APP:.metadata.name,SYNC:.status.sync.status,HEALTH:.status.health.status,REVISION:.status.sync.revision
+APP          SYNC     HEALTH    REVISION
+campusdesk   Synced   Healthy   965e0f07834195c52dc8b3e5d852f22f339b7e04
+$ kubectl --context final -n campusdesk get deploy,svc,ingress,hpa,pvc,servicemonitor
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/campusdesk-backend    2/2     2            2           86s
+deployment.apps/campusdesk-frontend   2/2     2            2           86s
+deployment.apps/campusdesk-postgres   1/1     1            1           86s
+
+NAME                          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/campusdesk-backend    ClusterIP   10.111.135.33   <none>        8000/TCP   86s
+service/campusdesk-frontend   ClusterIP   10.111.66.58    <none>        80/TCP     86s
+service/campusdesk-postgres   ClusterIP   10.109.41.51    <none>        5432/TCP   86s
+
+NAME                                   CLASS   HOSTS                  ADDRESS        PORTS   AGE
+ingress.networking.k8s.io/campusdesk   nginx   campusdesk.localhost   192.168.49.2   80      86s
+
+NAME                                                     REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/campusdesk-backend   Deployment/campusdesk-backend   cpu: 6%/60%   2         5         2          86s
+
+NAME                                      STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+persistentvolumeclaim/campusdesk-pgdata   Bound    pvc-01591ef4-f005-4f6d-bc53-8ddde9d3a15d   1Gi        RWO            standard       <unset>                 58m
+
+NAME                                                      AGE
+servicemonitor.monitoring.coreos.com/campusdesk-backend   86s
+$ curl -s http://campusdesk.localhost:8088/api/tickets/stats; echo
+{"total":270,"open":269,"inProgress":1,"resolved":0,"urgent":62}

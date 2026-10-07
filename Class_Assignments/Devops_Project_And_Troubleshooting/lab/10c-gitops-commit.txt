@@ -1,0 +1,38 @@
+$ curl -s http://campusdesk.localhost:8088/api/info | jq -r .banner
+Campus IT helpdesk - raise a ticket and we will pick it up.
+### edit values-gitops.yaml in the repo (no kubectl, no helm)
+$ git diff --stat && git diff helm/campusdesk/values-gitops.yaml | tail -4
+ helm/campusdesk/values-gitops.yaml | 1 +
+ 1 file changed, 1 insertion(+)
++  SUPPORT_BANNER: "Exam week (12-16 Oct): Wi-Fi and lab PC tickets are handled first. Helpdesk desk open 8am-8pm."
+ monitoring:
+   serviceMonitor:
+     enabled: true
+$ git commit -qam 'config: exam-week support banner' && git log -1 --format='%h %an <%ae>  %s'
+b647ad1 Ajij Uttam <ajij@campusdesk.local>  config: exam-week support banner
+$ git -c credential.helper= push -q http://ajij:$GITEA_PW@localhost:3030/ajij/campusdesk.git main 2>&1 | grep -v '^remote:'; date -u +'pushed at %H:%M:%S UTC'
+pushed at 18:33:07 UTC
+### wait for Argo CD to notice the commit on its own (default polling interval ~3 min)
+$ date -u +'synced seen at %H:%M:%S UTC'; kubectl --context final -n argocd get application campusdesk -o custom-columns=SYNC:.status.sync.status,HEALTH:.status.health.status,REVISION:.status.sync.revision
+synced seen at 18:34:48 UTC
+SYNC     HEALTH        REVISION
+Synced   Progressing   b647ad18ef59991d15fbaf5e105cc7d2fb98c2b4
+$ kubectl --context final -n argocd get application campusdesk -o jsonpath='{range .status.history[*]}{.id}  {.revision}  {.deployedAt}{"\n"}{end}'
+0  965e0f07834195c52dc8b3e5d852f22f339b7e04  2026-10-07T18:31:25Z
+1  b647ad18ef59991d15fbaf5e105cc7d2fb98c2b4  2026-10-07T18:34:39Z
+$ kubectl --context final -n campusdesk rollout status deploy/campusdesk-backend --timeout=180s
+Waiting for deployment "campusdesk-backend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "campusdesk-backend" rollout to finish: 1 old replicas are pending termination...
+deployment "campusdesk-backend" successfully rolled out
+$ kubectl --context final -n campusdesk get configmap campusdesk-config -o jsonpath='{.data.SUPPORT_BANNER}'; echo
+Exam week (12-16 Oct): Wi-Fi and lab PC tickets are handled first. Helpdesk desk open 8am-8pm.
+$ sleep 5; curl -s http://campusdesk.localhost:8088/api/info | jq -r .banner
+Exam week (12-16 Oct): Wi-Fi and lab PC tickets are handled first. Helpdesk desk open 8am-8pm.
+### selfHeal: a manual change is reverted to what Git says
+$ kubectl --context final -n campusdesk scale deploy campusdesk-frontend --replicas=1
+deployment.apps/campusdesk-frontend scaled
+$ kubectl --context final -n campusdesk get deploy campusdesk-frontend
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+campusdesk-frontend   2/2     2            2           3m50s
+$ kubectl --context final -n argocd get application campusdesk -o jsonpath='{.status.operationState.message}'; echo
+successfully synced (all tasks run)

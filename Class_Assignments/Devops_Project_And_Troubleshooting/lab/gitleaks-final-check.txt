@@ -1,0 +1,6 @@
+$ gitleaks dir . --no-banner --no-color  # whole Devops_Project_And_Troubleshooting folder
+INF scanned ~560467 bytes (560.47 KB) in 35.2ms
+INF no leaks found
+$ gitleaks dir final-devops-project --config final-devops-project/.gitleaks.toml --no-banner --no-color
+INF scanned ~121108 bytes (121.11 KB) in 7.82ms
+INF no leaks found

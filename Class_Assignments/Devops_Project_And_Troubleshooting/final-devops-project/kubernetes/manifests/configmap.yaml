@@ -1,0 +1,20 @@
+# Rendered from helm/campusdesk (templates/configmap.yaml) for image tag 9e8f63a - reference copy;
+# the cluster is managed with Helm / Argo CD, not with kubectl apply of these files.
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: campusdesk-config
+  labels:
+    app.kubernetes.io/part-of: campusdesk
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: campusdesk-1.0.0
+data:
+  DB_HOST: campusdesk-postgres
+  APP_ENV: "minikube"
+  APP_VERSION: "1.0.0-9e8f63a"
+  DB_NAME: "campusdesk"
+  DB_PORT: "5432"
+  SUPPORT_BANNER: "Campus IT helpdesk - raise a ticket and we will pick it up."
+
+

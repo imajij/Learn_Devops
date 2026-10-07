@@ -1,0 +1,27 @@
+$ lab/act-run.sh        # run 1 - commit 4366876 (push to main)
+[1 Build & unit tests]   | === 12 passed in 0.18s ===
+[1 Build & unit tests] 🏁  Job succeeded
+[4 Secret scan (Gitleaks)]   | gitleaks: tree=0 findings, history=0 findings
+[4 Secret scan (Gitleaks)] 🏁  Job succeeded
+[2 SAST (Bandit)]   | bandit: 0 findings  (HIGH=0 MEDIUM=0 LOW=0)
+[2 SAST (Bandit)] 🏁  Job succeeded
+[3 SCA (pip-audit + npm audit)]   | pip-audit: 29 packages resolved, 0 vulnerable
+[3 SCA (pip-audit + npm audit)]   | npm audit: total=0 critical=0 high=0 moderate=0 low=0
+[3 SCA (pip-audit + npm audit)] 🏁  Job succeeded
+[5 Docker build] 🏁  Job succeeded
+[6 Image scan (Trivy)]   | trivy backend: 44 HIGH/CRITICAL, 0 with a fix
+[6 Image scan (Trivy)]   | trivy frontend: 2 HIGH/CRITICAL, 2 with a fix
+[6 Image scan (Trivy)] 🏁  Job succeeded
+[7 Security gate]   | SAST    bandit     : 0 findings, 0 blocking
+[7 Security gate]   | SCA     pip-audit  : 29 packages, 0 vulnerable
+[7 Security gate]   | SCA     npm audit  : 0 advisories, 0 high/critical
+[7 Security gate]   | SECRETS gitleaks   : 0 findings
+[7 Security gate]   | IMAGE   trivy-backend.json : 44 HIGH/CRITICAL, 0 with a fix (blocking)
+[7 Security gate]   | IMAGE   trivy-frontend.json: 2 HIGH/CRITICAL, 2 with a fix (blocking)
+[7 Security gate]   |           CVE-2026-93990 HIGH libexpat 2.8.4-r0 -> 2.8.5-r0
+[7 Security gate]   |           CVE-2026-103111 HIGH pcre2 10.48-r0 -> 10.49-r0
+[7 Security gate]   | ------------------------------------------------------------
+[7 Security gate]   | SECURITY GATE: FAILED
+[7 Security gate]   |   x IMAGE trivy-frontend.json: 2 fixable HIGH/CRITICAL CVEs
+[7 Security gate]   ❌  Failure - Main Apply security/gate-policy.json [96.226542ms]
+[7 Security gate] 🏁  Job failed

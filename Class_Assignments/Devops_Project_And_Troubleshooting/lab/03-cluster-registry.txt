@@ -1,0 +1,26 @@
+$ minikube -p final status
+final
+type: Control Plane
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+
+$ kubectl --context final get nodes -o wide
+NAME    STATUS   ROLES           AGE     VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION              CONTAINER-RUNTIME
+final   Ready    control-plane   5m59s   v1.37.0   192.168.49.2   <none>        Debian GNU/Linux 12 (bookworm)   6.8.0-117-generic (arm64)   containerd://2.3.4
+$ minikube -p final addons list -o json | jq -r 'to_entries[] | select(.value.Status=="enabled") | .key'
+default-storageclass
+ingress
+metrics-server
+storage-provisioner
+$ docker ps --filter name=ajij-final-registry --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}'
+NAMES                 IMAGE        PORTS
+ajij-final-registry   registry:2   0.0.0.0:5060->5000/tcp, [::]:5060->5000/tcp
+### make localhost:5060 inside the minikube node resolve to the registry container (containerd mirror)
+$ minikube -p final ssh -- 'sudo mkdir -p /etc/containerd/certs.d/localhost:5060 && printf "[host.\"http://ajij-final-registry:5000\"]\n  capabilities = [\"pull\", \"resolve\"]\n" | sudo tee /etc/containerd/certs.d/localhost:5060/hosts.toml'
+[host."http://ajij-final-registry:5000"]
+  capabilities = ["pull", "resolve"]
+$ curl -s localhost:5060/v2/_catalog; echo
+{"repositories":[]}
+

@@ -1,0 +1,43 @@
+### create tickets through the Ingress
+$ curl -s -o /dev/null -w 'HTTP %{http_code}\n' -X POST http://campusdesk.localhost:8088/api/tickets -H 'Content-Type: application/json' -d '{"title":"Lab 3 printer jammed","category":"HARDWARE","priority":"HIGH","requester":"Ajij Uttam","location":"CS Lab 3"}'
+HTTP 201
+$ curl -s -o /dev/null -w 'HTTP %{http_code}\n' -X POST http://campusdesk.localhost:8088/api/tickets -H 'Content-Type: application/json' -d '{"title":"Wi-Fi drops on Library 2nd floor","category":"NETWORK","priority":"URGENT","requester":"Riya Sharma","location":"Library L2"}'
+HTTP 201
+$ curl -s -o /dev/null -w 'HTTP %{http_code}\n' -X POST http://campusdesk.localhost:8088/api/tickets -H 'Content-Type: application/json' -d '{"title":"Reset LMS password","category":"ACCOUNT","priority":"MEDIUM","requester":"Kabir Singh","location":"Hostel C"}'
+HTTP 201
+$ curl -s -o /dev/null -w 'HTTP %{http_code}\n' -X POST http://campusdesk.localhost:8088/api/tickets -H 'Content-Type: application/json' -d '{"title":"Install Python 3.12 on lab PCs","category":"SOFTWARE","priority":"LOW","requester":"Prof. Mehta","location":"CS Lab 1"}'
+HTTP 201
+$ curl -s -X PUT http://campusdesk.localhost:8088/api/tickets/3 -H 'Content-Type: application/json' -d '{"status":"IN_PROGRESS"}' | jq -c '{id,status}'
+{"id":3,"status":"IN_PROGRESS"}
+$ curl -s http://campusdesk.localhost:8088/api/tickets/stats; echo
+{"total":4,"open":3,"inProgress":1,"resolved":0,"urgent":1}
+### kill the database pod - the PVC (and the tickets) must survive
+$ kubectl --context final -n campusdesk delete pod -l app=campusdesk-postgres --wait=true
+pod "campusdesk-postgres-7b6ddccb88-8wcsr" deleted from campusdesk namespace
+$ kubectl --context final -n campusdesk rollout status deploy/campusdesk-postgres --timeout=120s
+Waiting for deployment "campusdesk-postgres" rollout to finish: 0 of 1 updated replicas are available...
+deployment "campusdesk-postgres" successfully rolled out
+$ kubectl --context final -n campusdesk get pods -l app=campusdesk-postgres
+NAME                                   READY   STATUS    RESTARTS   AGE
+campusdesk-postgres-7b6ddccb88-nqw9p   1/1     Running   0          1s
+$ sleep 8; curl -s http://campusdesk.localhost:8088/api/tickets | jq -r '.[] | "#\(.id) \(.status) \(.title)"'
+#4 OPEN Install Python 3.12 on lab PCs
+#3 IN_PROGRESS Reset LMS password
+#2 OPEN Wi-Fi drops on Library 2nd floor
+#1 OPEN Lab 3 printer jammed
+$ kubectl --context final -n campusdesk exec deploy/campusdesk-postgres -- sh -c 'psql -U $POSTGRES_USER -d $POSTGRES_DB -c "select id, priority, status, title from tickets order by id"'
+ id | priority |   status    |              title               
+----+----------+-------------+----------------------------------
+  1 | HIGH     | OPEN        | Lab 3 printer jammed
+  2 | URGENT   | OPEN        | Wi-Fi drops on Library 2nd floor
+  3 | MEDIUM   | IN_PROGRESS | Reset LMS password
+  4 | LOW      | OPEN        | Install Python 3.12 on lab PCs
+(4 rows)
+
+$ kubectl --context final -n campusdesk exec deploy/campusdesk-postgres -- df -h /var/lib/postgresql/data
+Filesystem                Size      Used Available Use% Mounted on
+/dev/vdb1                78.4G     18.7G     56.1G  25% /etc/hosts
+### (hostPath provisioner: df shows the node disk) - the volume behind the claim:
+$ kubectl --context final get pv -o custom-columns=PV:.metadata.name,CLAIM:.spec.claimRef.name,SIZE:.spec.capacity.storage,CLASS:.spec.storageClassName,PATH:.spec.hostPath.path
+PV                                         CLAIM               SIZE   CLASS      PATH
+pvc-01591ef4-f005-4f6d-bc53-8ddde9d3a15d   campusdesk-pgdata   1Gi    standard   /tmp/hostpath-provisioner/campusdesk/campusdesk-pgdata

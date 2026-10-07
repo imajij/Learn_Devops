@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "campusdesk.name" . }}-frontend
+  labels: {{- include "campusdesk.labels" . | nindent 4 }}
+    app: {{ include "campusdesk.name" . }}-frontend
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels: {app: {{ include "campusdesk.name" . }}-frontend}
+  template:
+    metadata:
+      labels:
+        app: {{ include "campusdesk.name" . }}-frontend
+        tier: web
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 101, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: web
+          image: {{ include "campusdesk.image" (dict "root" . "img" .Values.frontend.image) }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          ports: [{name: http, containerPort: {{ .Values.frontend.port }}}]
+          env:
+            - name: BACKEND_URL
+              value: http://{{ include "campusdesk.name" . }}-backend:{{ .Values.backend.port }}
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 5
+          resources: {{- toYaml .Values.frontend.resources | nindent 12 }}
+          securityContext: {allowPrivilegeEscalation: false}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "campusdesk.name" . }}-frontend
+  labels: {{- include "campusdesk.labels" . | nindent 4 }}
+    app: {{ include "campusdesk.name" . }}-frontend
+spec:
+  type: {{ .Values.service.type }}
+  selector: {app: {{ include "campusdesk.name" . }}-frontend}
+  ports:
+    - {name: http, port: 80, targetPort: http}

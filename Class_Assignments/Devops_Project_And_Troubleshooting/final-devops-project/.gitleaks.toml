@@ -1,0 +1,10 @@
+# Gitleaks config: all built-in rules + allowlist for scanner output folders.
+# Fake demo credentials in this repo are marked inline with `gitleaks:allow`.
+title = "campusdesk gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "generated folders that are never committed"
+paths = ['''(^|/)reports/''', '''(^|/)node_modules/''', '''(^|/)dist/''']

@@ -1,0 +1,8 @@
+# Trivy image scan settings (trivy image --config security/trivy.yaml ...)
+# Trivy only REPORTS (exit-code 0); security/gate.py makes the pass/fail decision.
+severity: [CRITICAL, HIGH]
+scan:
+  scanners: [vuln]
+vulnerability:
+  ignore-unfixed: false     # keep unfixed CVEs visible in the report
+exit-code: 0

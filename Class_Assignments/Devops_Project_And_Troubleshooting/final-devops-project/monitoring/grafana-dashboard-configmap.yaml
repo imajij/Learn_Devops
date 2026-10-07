@@ -1,0 +1,278 @@
+# Grafana picks this up through the dashboard sidecar (label grafana_dashboard=1).
+# Regenerate: kubectl create configmap campusdesk-dashboard -n monitoring --from-file=grafana-dashboard-campusdesk.json --dry-run=client -o yaml | kubectl label -f - --local grafana_dashboard=1 -o yaml
+apiVersion: v1
+data:
+  grafana-dashboard-campusdesk.json: |
+    {
+     "title": "CampusDesk - API overview",
+     "uid": "campusdesk-api",
+     "schemaVersion": 39,
+     "time": {
+      "from": "now-30m",
+      "to": "now"
+     },
+     "refresh": "15s",
+     "tags": [
+      "campusdesk"
+     ],
+     "panels": [
+      {
+       "id": 1,
+       "type": "stat",
+       "title": "Backend targets UP",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short"
+        },
+        "overrides": []
+       },
+       "targets": [
+        {
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum(up{job=\"campusdesk-backend\"})",
+         "refId": "A"
+        }
+       ]
+      },
+      {
+       "id": 2,
+       "type": "stat",
+       "title": "Requests / s",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "reqps"
+        },
+        "overrides": []
+       },
+       "targets": [
+        {
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum(rate(http_requests_total{job=\"campusdesk-backend\"}[2m]))",
+         "refId": "A"
+        }
+       ]
+      },
+      {
+       "id": 3,
+       "type": "stat",
+       "title": "5xx error ratio",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "percentunit"
+        },
+        "overrides": []
+       },
+       "targets": [
+        {
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum(rate(http_requests_total{job=\"campusdesk-backend\",status=\"5xx\"}[5m]) or vector(0)) / clamp_min(sum(rate(http_requests_total{job=\"campusdesk-backend\"}[5m])),1e-9)",
+         "refId": "A"
+        }
+       ]
+      },
+      {
+       "id": 4,
+       "type": "stat",
+       "title": "Tickets created (since pod start)",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short"
+        },
+        "overrides": []
+       },
+       "targets": [
+        {
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum(campusdesk_tickets_created_total{job=\"campusdesk-backend\"})",
+         "refId": "A"
+        }
+       ]
+      },
+      {
+       "id": 5,
+       "type": "timeseries",
+       "title": "HTTP requests / s by handler",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 8
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "reqps"
+        },
+        "overrides": []
+       },
+       "targets": [
+        {
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum by (handler) (rate(http_requests_total{job=\"campusdesk-backend\"}[2m]))",
+         "legendFormat": "{{handler}}",
+         "refId": "A"
+        }
+       ]
+      },
+      {
+       "id": 6,
+       "type": "timeseries",
+       "title": "p95 latency by handler",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 8
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "s"
+        },
+        "overrides": []
+       },
+       "targets": [
+        {
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "histogram_quantile(0.95, sum by (le, handler) (rate(http_request_duration_seconds_bucket{job=\"campusdesk-backend\"}[5m])))",
+         "legendFormat": "{{handler}}",
+         "refId": "A"
+        }
+       ]
+      },
+      {
+       "id": 7,
+       "type": "timeseries",
+       "title": "Backend CPU (cores) per pod",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short"
+        },
+        "overrides": []
+       },
+       "targets": [
+        {
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"campusdesk\",container=\"api\"}[2m]))",
+         "legendFormat": "{{pod}}",
+         "refId": "A"
+        }
+       ]
+      },
+      {
+       "id": 8,
+       "type": "timeseries",
+       "title": "Backend replicas (HPA)",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short"
+        },
+        "overrides": []
+       },
+       "targets": [
+        {
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"campusdesk\"}",
+         "legendFormat": "current replicas",
+         "refId": "A"
+        }
+       ]
+      }
+     ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    grafana_dashboard: "1"
+  name: campusdesk-dashboard
+  namespace: monitoring

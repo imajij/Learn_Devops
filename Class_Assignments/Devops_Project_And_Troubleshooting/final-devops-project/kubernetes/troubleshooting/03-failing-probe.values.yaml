@@ -1,0 +1,4 @@
+# BREAK 3: readiness probe points at an endpoint the API does not have
+backend:
+  probes:
+    readinessPath: /readiness

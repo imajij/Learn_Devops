@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Step 2: build both images and run the whole stack with Docker Compose.
+source "$(dirname "$0")/common.sh"
+cd "$APP"
+r "docker-compose -f docker/docker-compose.yml build 2>&1 | grep -E ' FROM |Successfully|Built' | sort -u"
+r "docker image ls --format 'table {{.Repository}}:{{.Tag}}\t{{.Size}}' | grep -E 'REPOSITORY|campusdesk'"
+r "docker-compose -f docker/docker-compose.yml up -d --wait 2>&1 | tail -5"
+r "docker-compose -f docker/docker-compose.yml ps --format 'table {{.Service}}\t{{.Status}}\t{{.Ports}}'"
+note "who does each container run as? (non-root check)"
+r "docker-compose -f docker/docker-compose.yml exec backend id"
+r "docker-compose -f docker/docker-compose.yml exec frontend id"
+note "API directly, then through the Nginx proxy of the UI container"
+r "curl -s localhost:8008/health; echo"
+r "curl -s localhost:8008/ready; echo"
+r "curl -s -X POST localhost:3080/api/tickets -H 'Content-Type: application/json' -d '{\"title\":\"Lab 3 printer jammed\",\"category\":\"HARDWARE\",\"priority\":\"HIGH\",\"requester\":\"Ajij Uttam\",\"location\":\"CS Lab 3\"}'; echo"
+r "curl -s localhost:3080/api/tickets/stats; echo"
+r "docker-compose -f docker/docker-compose.yml logs backend | tail -6"

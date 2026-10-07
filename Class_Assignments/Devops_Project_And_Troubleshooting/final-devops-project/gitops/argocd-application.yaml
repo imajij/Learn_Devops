@@ -1,0 +1,28 @@
+# Argo CD Application: keep namespace campusdesk equal to helm/campusdesk at the head of `main`
+# in the in-cluster Git server. Every commit to main is rolled out automatically.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: campusdesk
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: http://gitea.gitops.svc.cluster.local:3000/ajij/campusdesk.git
+    targetRevision: main
+    path: helm/campusdesk
+    helm:
+      releaseName: campusdesk
+      valueFiles:
+        - values.yaml
+        - values-gitops.yaml        # environment values: image tags, banner, ServiceMonitor
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: campusdesk
+  syncPolicy:
+    automated:
+      prune: true                   # delete what was removed from Git
+      selfHeal: true                # undo manual kubectl changes (drift)
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

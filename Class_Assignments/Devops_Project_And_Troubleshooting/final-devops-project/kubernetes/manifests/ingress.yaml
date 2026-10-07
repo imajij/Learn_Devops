@@ -1,0 +1,26 @@
+# Rendered from helm/campusdesk (templates/ingress.yaml) for image tag 9e8f63a - reference copy;
+# the cluster is managed with Helm / Argo CD, not with kubectl apply of these files.
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: campusdesk
+  labels:
+    app.kubernetes.io/part-of: campusdesk
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: campusdesk-1.0.0
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: campusdesk.localhost
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service: {name: campusdesk-backend, port: {number: 8000}}
+          - path: /
+            pathType: Prefix
+            backend:
+              service: {name: campusdesk-frontend, port: {number: 80}}
+

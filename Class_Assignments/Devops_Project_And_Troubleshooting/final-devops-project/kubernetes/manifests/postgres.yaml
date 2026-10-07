@@ -1,0 +1,86 @@
+# Rendered from helm/campusdesk (templates/postgres.yaml) for image tag 9e8f63a - reference copy;
+# the cluster is managed with Helm / Argo CD, not with kubectl apply of these files.
+---
+# PostgreSQL with persistent storage (PVC). Fine for a classroom cluster;
+# production would use a managed database such as Amazon RDS.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: campusdesk-pgdata
+  labels:
+    app.kubernetes.io/part-of: campusdesk
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: campusdesk-1.0.0
+  annotations:
+    helm.sh/resource-policy: keep      # never delete ticket data on `helm uninstall`
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests: {storage: 1Gi}
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: campusdesk-postgres
+  labels:
+    app.kubernetes.io/part-of: campusdesk
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: campusdesk-1.0.0
+spec:
+  selector: {app: campusdesk-postgres}
+  ports: [{name: pg, port: 5432, targetPort: pg}]
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campusdesk-postgres
+  labels:
+    app.kubernetes.io/part-of: campusdesk
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: campusdesk-1.0.0
+    app: campusdesk-postgres
+spec:
+  replicas: 1
+  strategy: {type: Recreate}       # RWO volume: never run two DB pods at once
+  selector:
+    matchLabels: {app: campusdesk-postgres}
+  template:
+    metadata:
+      labels: {app: campusdesk-postgres, tier: db}
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          ports: [{name: pg, containerPort: 5432}]
+          env:
+            - name: POSTGRES_DB
+              valueFrom: {configMapKeyRef: {name: campusdesk-config, key: DB_NAME}}
+            - name: POSTGRES_USER
+              valueFrom: {secretKeyRef: {name: campusdesk-db, key: db-user}}
+            - name: POSTGRES_PASSWORD
+              valueFrom: {secretKeyRef: {name: campusdesk-db, key: db-password}}
+            - {name: PGDATA, value: /var/lib/postgresql/data/pgdata}
+          readinessProbe:
+            exec: {command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]}
+            periodSeconds: 5
+          livenessProbe:
+            exec: {command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]}
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 96Mi
+          volumeMounts: [{name: data, mountPath: /var/lib/postgresql/data}]
+      volumes:
+        - name: data
+          persistentVolumeClaim: {claimName: campusdesk-pgdata}
+
+

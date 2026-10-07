@@ -1,0 +1,29 @@
+$ minikube delete -p final 2>&1 | tail -3
+* Deleting container "final" ...
+* Removing /Users/ajijuttam/.minikube/machines/final ...
+* Removed all traces of the "final" cluster.
+$ minikube profile list 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | grep -c ' final ' || true
+0
+$ docker rm -f ajij-final-registry ajij-final-localstack 2>&1
+ajij-final-registry
+$ docker rmi campusdesk-backend:compose campusdesk-frontend:compose $(docker images --format '{{.Repository}}:{{.Tag}}' | grep -E '^(localhost:5060/(ajij|mirror)/|campusdesk-(backend|frontend):[0-9a-f]{7}$)') 2>&1 | grep -c -E '^(Untagged|Deleted)'
+45
+$ docker rmi gitea/gitea:1.24.6-rootless localstack/localstack:4.0 postgres:17-alpine nginx:1.31.6-alpine python:3.12.15-slim node:22.23.3-alpine 2>&1 | grep -c -E '^(Untagged|Deleted)'
+9
+$ docker ps -a --format '{{.Names}}' | grep -E 'ajij-final|^final$' || echo 'no project containers left'
+no project containers left
+$ docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'campusdesk|localhost:5060|gitea|localstack' || echo 'no project images left'
+no project images left
+$ docker volume ls --format '{{.Name}}' | grep -E 'campusdesk|^final$' || echo 'no project volumes left'
+no project volumes left
+$ docker network ls --format '{{.Name}}' | grep -E 'campusdesk|^final$' || echo 'no project networks left'
+final
+$ rm -rf /Users/ajijuttam/devops-lab/final/artifacts /Users/ajijuttam/devops-lab/final/tf /Users/ajijuttam/devops-lab/final/tf-plugin-cache /Users/ajijuttam/devops-lab/final/venv /Users/ajijuttam/devops-lab/final/.argo-pw && du -sh /Users/ajijuttam/devops-lab/final
+2.2M	/Users/ajijuttam/devops-lab/final
+### the minikube network survived because the registry had been attached to it - remove it
+$ docker network rm final
+final
+$ docker network ls --format "{{.Name}}" | grep -E "^final$" || echo "no project networks left"
+no project networks left
+$ docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "1.31.6-alpine|3.12.15-slim|22.23.3-alpine|postgres:17-alpine" || echo "pulled base-image tags removed"
+pulled base-image tags removed

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Step 5: what the pipeline deployed - every Kubernetes object, config, probes, storage.
+source "$(dirname "$0")/common.sh"
+r "helm --kube-context final list -n campusdesk"
+r "$K -n campusdesk get deploy,pods,svc,endpoints -o wide | cut -c1-170"
+r "$K -n campusdesk get ingress,hpa,pvc,configmap,secret"
+note "ConfigMap = plain settings, Secret = credentials (only key names shown)"
+r "$K -n campusdesk get configmap campusdesk-config -o jsonpath='{.data}' | jq ."
+r "$K -n campusdesk get secret campusdesk-db -o json | jq '.data | keys'"
+r "$K -n campusdesk exec deploy/campusdesk-backend -- sh -c 'env | grep -E \"^(APP_|DB_HOST|DB_NAME|DB_USER)\" | sort'"
+note "probes + resources on the backend pod"
+r "$K -n campusdesk describe deploy campusdesk-backend | grep -E 'Image:|Liveness|Readiness|Startup|Requests|Limits|cpu:|memory:|Init Containers|wait-for-db:' "
+note "Ingress routes: /api -> backend Service, / -> frontend Service"
+r "$K -n campusdesk describe ingress campusdesk | sed -n '/Rules/,/Annotations/p'"
+r "curl -s http://campusdesk.localhost:8088/api/tickets/stats; echo"

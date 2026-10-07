@@ -1,0 +1,4 @@
+# BREAK 4: Service selector no longer matches the pod labels (backend vs api naming mix-up)
+spec:
+  selector:
+    app: campusdesk-api

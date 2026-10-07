@@ -1,0 +1,45 @@
+### the app's own /metrics endpoint (not routed by the Ingress, so read it via the Service)
+$ kubectl --context final -n campusdesk exec deploy/campusdesk-frontend -- wget -qO- http://campusdesk-backend:8000/metrics | grep -E '^(campusdesk_tickets_created_total|http_requests_total\{handler="/api/tickets")' | head -8
+campusdesk_tickets_created_total{category="NETWORK",priority="URGENT"} 9.0
+campusdesk_tickets_created_total{category="SOFTWARE",priority="LOW"} 2.0
+campusdesk_tickets_created_total{category="HARDWARE",priority="LOW"} 8.0
+campusdesk_tickets_created_total{category="NETWORK",priority="MEDIUM"} 6.0
+campusdesk_tickets_created_total{category="ACCOUNT",priority="URGENT"} 3.0
+campusdesk_tickets_created_total{category="SOFTWARE",priority="HIGH"} 5.0
+campusdesk_tickets_created_total{category="HARDWARE",priority="MEDIUM"} 7.0
+campusdesk_tickets_created_total{category="NETWORK",priority="HIGH"} 6.0
+### Prometheus (port-forward localhost:9091) - scrape targets for the app
+$ curl -s 'localhost:9091/api/v1/targets?state=active' | jq -r '.data.activeTargets[] | select(.labels.job=="campusdesk-backend") | "\(.labels.pod)  \(.scrapeUrl)  health=\(.health)"'
+campusdesk-backend-6656988988-hqdxr  http://10.244.0.16:8000/metrics  health=up
+campusdesk-backend-6656988988-8p2k5  http://10.244.0.18:8000/metrics  health=up
+$ curl -s localhost:9091/api/v1/query --data-urlencode 'query=sum by (handler) (rate(http_requests_total{job="campusdesk-backend"}[2m]))' | jq -r '.data.result[] | "\(.metric.handler // "total")  \(.value[1] | tonumber | . * 1000 | round / 1000)"'
+/health  0.2
+/ready  0.401
+/api/info  7.005
+/api/tickets  7.358
+/api/tickets/{ticket_id}  1.393
+/api/tickets/stats  7.015
+$ curl -s localhost:9091/api/v1/query --data-urlencode 'query=sum by (status) (rate(http_requests_total{job="campusdesk-backend"}[2m]))' | jq -r '.data.result[] | "\(.metric.status // "total")  \(.value[1] | tonumber | . * 1000 | round / 1000)"'
+2xx  21.979
+4xx  1.393
+$ curl -s localhost:9091/api/v1/query --data-urlencode 'query=histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{job="campusdesk-backend"}[5m])))' | jq -r '.data.result[] | "\(.metric.x // "total")  \(.value[1] | tonumber | . * 1000 | round / 1000)"'
+total  0.095
+$ curl -s localhost:9091/api/v1/query --data-urlencode 'query=sum by (category) (campusdesk_tickets_created_total)' | jq -r '.data.result[] | "\(.metric.category // "total")  \(.value[1] | tonumber | . * 1000 | round / 1000)"'
+NETWORK  45
+SOFTWARE  31
+HARDWARE  41
+ACCOUNT  47
+### logs: structured app log lines from every backend pod
+$ kubectl --context final -n campusdesk logs -l app=campusdesk-backend --prefix --tail=4 -c api | cut -c1-160
+[pod/campusdesk-backend-6656988988-hqdxr/api] 2026-10-07 18:10:47,135 INFO campusdesk ticket created id=161 category=ACCOUNT priority=MEDIUM
+[pod/campusdesk-backend-6656988988-hqdxr/api] 2026-10-07 18:10:49,926 INFO campusdesk ticket created id=163 category=ACCOUNT priority=MEDIUM
+[pod/campusdesk-backend-6656988988-hqdxr/api] 2026-10-07 18:10:58,744 INFO campusdesk ticket created id=165 category=NETWORK priority=MEDIUM
+[pod/campusdesk-backend-6656988988-hqdxr/api] 2026-10-07 18:11:00,952 INFO campusdesk ticket created id=166 category=SOFTWARE priority=MEDIUM
+[pod/campusdesk-backend-6656988988-8p2k5/api] 2026-10-07 18:10:49,239 INFO campusdesk ticket created id=162 category=SOFTWARE priority=LOW
+[pod/campusdesk-backend-6656988988-8p2k5/api] 2026-10-07 18:10:51,474 INFO campusdesk ticket created id=164 category=NETWORK priority=URGENT
+[pod/campusdesk-backend-6656988988-8p2k5/api] 2026-10-07 18:11:01,687 INFO campusdesk ticket created id=167 category=SOFTWARE priority=MEDIUM
+[pod/campusdesk-backend-6656988988-8p2k5/api] 2026-10-07 18:11:03,815 INFO campusdesk ticket created id=168 category=HARDWARE priority=URGENT
+$ kubectl --context final -n ingress-nginx logs deploy/ingress-nginx-controller --tail=3 | cut -c1-200
+127.0.0.1 - - [07/Oct/2026:18:11:05 +0000] "GET /api/tickets/stats HTTP/1.1" 200 64 "-" "curl/8.7.1" 105 0.003 [campusdesk-campusdesk-backend-8000] [] 10.244.0.16:8000 64 0.003 200 8ef296bcbd2afb63760
+127.0.0.1 - - [07/Oct/2026:18:11:05 +0000] "GET /api/info HTTP/1.1" 200 194 "-" "curl/8.7.1" 96 0.002 [campusdesk-campusdesk-backend-8000] [] 10.244.0.18:8000 194 0.002 200 59e4fc3d874bfb4f6062ebe73af
+127.0.0.1 - - [07/Oct/2026:18:11:05 +0000] "GET /api/tickets/999 HTTP/1.1" 404 29 "-" "curl/8.7.1" 103 0.002 [campusdesk-campusdesk-backend-8000] [] 10.244.0.18:8000 29 0.002 404 f8d2205c0aa7a9c840f19

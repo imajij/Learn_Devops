@@ -1,0 +1,10 @@
+$ terraform plan -no-color -destroy | grep -E 'Plan:'
+Plan: 0 to add, 0 to change, 32 to destroy.
+$ terraform destroy -no-color -auto-approve | grep -E 'Destroy complete|Destruction complete' | tail -5
+aws_subnet.public[0]: Destruction complete after 0s
+aws_internet_gateway.main: Destruction complete after 0s
+aws_subnet.public[1]: Destruction complete after 0s
+aws_vpc.main: Destruction complete after 0s
+Destroy complete! Resources: 32 destroyed.
+$ terraform state list | wc -l
+       0

@@ -1,0 +1,8 @@
+{
+  "sast":    {"report": "bandit.json",     "block_severities": ["HIGH", "MEDIUM"]},
+  "sca_py":  {"report": "pip-audit.json",  "max_vulnerable_packages": 0},
+  "sca_js":  {"report": "npm-audit.json",  "block_severities": ["critical", "high"]},
+  "secrets": {"report": "gitleaks.json",   "max_findings": 0},
+  "images":  {"reports": ["trivy-backend.json", "trivy-frontend.json"],
+              "block_severities": ["CRITICAL", "HIGH"], "block_only_if_fix_available": true}
+}

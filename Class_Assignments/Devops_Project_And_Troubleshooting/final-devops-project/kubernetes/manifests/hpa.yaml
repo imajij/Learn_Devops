@@ -1,0 +1,27 @@
+# Rendered from helm/campusdesk (templates/hpa.yaml) for image tag 9e8f63a - reference copy;
+# the cluster is managed with Helm / Argo CD, not with kubectl apply of these files.
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: campusdesk-backend
+  labels:
+    app.kubernetes.io/part-of: campusdesk
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: campusdesk-1.0.0
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: campusdesk-backend
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: {type: Utilization, averageUtilization: 60}
+  behavior:
+    scaleDown: {stabilizationWindowSeconds: 60}
+
+

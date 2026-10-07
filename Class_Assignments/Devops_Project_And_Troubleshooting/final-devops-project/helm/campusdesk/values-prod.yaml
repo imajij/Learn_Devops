@@ -1,0 +1,8 @@
+# What a real (EKS) environment would change
+imageRegistry: ghcr.io/ajij-uttam
+imagePullPolicy: Always
+config: {APP_ENV: prod}
+ingress: {host: campusdesk.example.edu}
+hpa: {enabled: true, minReplicas: 3, maxReplicas: 10}
+postgres: {storage: 20Gi, storageClass: gp3}
+database: {password: ""}     # supplied at deploy time: --set database.password=... from a CI secret

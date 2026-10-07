@@ -1,0 +1,11 @@
+$ git log --format="%h %an <%ae> %ad  %s" --date=format:"%Y-%m-%d %H:%M"
+acc6c2f Ajij Uttam <ajij@campusdesk.local> 2026-10-08 00:08  gitops: disable Gitea Actions (CI runs with act, no runners in the cluster)
+b647ad1 Ajij Uttam <ajij@campusdesk.local> 2026-10-08 00:03  config: exam-week support banner
+965e0f0 Ajij Uttam <ajij@campusdesk.local> 2026-10-08 00:01  gitops: Argo CD application, values-gitops.yaml, troubleshooting files, terraform, monitoring
+9e8f63a Ajij Uttam <ajij@campusdesk.local> 2026-10-07 23:13  fix(helm): give pg_isready a user name in wait-for-db init container
+1c7d093 Ajij Uttam <ajij@campusdesk.local> 2026-10-07 23:06  fix(deploy): wait-for-db init container and retrying ingress smoke test
+7e3ff63 Ajij Uttam <ajij@campusdesk.local> 2026-10-07 23:03  fix(frontend): patch libexpat and pcre2 flagged by Trivy security gate
+4366876 Ajij Uttam <ajij@campusdesk.local> 2026-10-07 22:59  CampusDesk: app, Docker, Helm chart, CI/CD + DevSecOps pipeline
+$ git remote -v
+gitea	http://localhost:3030/ajij/campusdesk.git (fetch)
+gitea	http://localhost:3030/ajij/campusdesk.git (push)

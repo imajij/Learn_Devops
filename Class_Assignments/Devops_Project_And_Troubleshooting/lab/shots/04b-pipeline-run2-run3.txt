@@ -1,0 +1,27 @@
+$ lab/act-run.sh --action-offline-mode   # run 2 - commit 7e3ff63 (gate fixed)
+[1 Build & unit tests] 🏁  Job succeeded
+[2 SAST (Bandit)] 🏁  Job succeeded
+[4 Secret scan (Gitleaks)] 🏁  Job succeeded
+[5 Docker build] 🏁  Job succeeded
+[3 SCA (pip-audit + npm audit)] 🏁  Job succeeded
+[6 Image scan (Trivy)] 🏁  Job succeeded
+[7 Security gate] 🏁  Job succeeded
+[8 Push images] 🏁  Job succeeded
+[9 Deploy with Helm]   | pod/campusdesk-backend-657bdb6fdc-d7bbb    1/1     Running   2 (16s ago)   49s
+[9 Deploy with Helm]   | pod/campusdesk-backend-657bdb6fdc-p24dn    1/1     Running   2 (16s ago)   49s
+[9 Deploy with Helm]   | curl: (22) The requested URL returned error: 503
+[9 Deploy with Helm]   ❌  Failure - Main Smoke test through the Ingress [138.771167ms]
+[9 Deploy with Helm] 🏁  Job failed
+
+$ lab/act-run.sh --action-offline-mode   # run 3 - commit 1c7d093
+[1 Build & unit tests] 🏁  Job succeeded
+[2 SAST (Bandit)] 🏁  Job succeeded
+[4 Secret scan (Gitleaks)] 🏁  Job succeeded
+[3 SCA (pip-audit + npm audit)] 🏁  Job succeeded
+[5 Docker build] 🏁  Job succeeded
+[6 Image scan (Trivy)] 🏁  Job succeeded
+[7 Security gate] 🏁  Job succeeded
+[8 Push images] 🏁  Job succeeded
+[9 Deploy with Helm]   | Error: UPGRADE FAILED: resource Deployment/campusdesk/campusdesk-backend not ready. status: InProgress, message: Updated: 1/2
+[9 Deploy with Helm]   ❌  Failure - Main helm upgrade --install [4m59.169305333s]
+[9 Deploy with Helm] 🏁  Job failed

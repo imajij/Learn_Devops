@@ -1,0 +1,52 @@
+$ docker-compose -f docker/docker-compose.yml build 2>&1 | grep -E ' FROM |Successfully|Built' | sort -u
+ Image campusdesk-backend:compose Built 
+ Image campusdesk-frontend:compose Built 
+Step 1/14 : FROM node:22.23.3-alpine AS build
+Step 1/14 : FROM python:3.12.15-slim
+Step 7/14 : FROM nginx:1.31.6-alpine
+Successfully built 5cfbb378acaf
+Successfully built 7a62cf534221
+Successfully tagged campusdesk-backend:compose
+Successfully tagged campusdesk-frontend:compose
+$ docker image ls --format 'table {{.Repository}}:{{.Tag}}\t{{.Size}}' | grep -E 'REPOSITORY|campusdesk'
+REPOSITORY:TAG                        SIZE
+campusdesk-frontend:compose           93.4MB
+campusdesk-backend:compose            339MB
+$ docker-compose -f docker/docker-compose.yml up -d --wait 2>&1 | tail -5
+ Container campusdesk-backend-1 Waiting 
+ Container campusdesk-frontend-1 Waiting 
+ Container campusdesk-frontend-1 Healthy 
+ Container campusdesk-postgres-1 Healthy 
+ Container campusdesk-backend-1 Healthy 
+$ docker-compose -f docker/docker-compose.yml ps --format 'table {{.Service}}\t{{.Status}}\t{{.Ports}}'
+SERVICE    STATUS                    PORTS
+backend    Up 30 seconds (healthy)   0.0.0.0:8008->8000/tcp, [::]:8008->8000/tcp
+frontend   Up 30 seconds             80/tcp, 0.0.0.0:3080->8080/tcp, [::]:3080->8080/tcp
+postgres   Up 36 seconds (healthy)   5432/tcp
+### who does each container run as? (non-root check)
+$ docker-compose -f docker/docker-compose.yml exec backend id
+uid=10001(campusdesk) gid=10001(campusdesk) groups=10001(campusdesk)
+$ docker-compose -f docker/docker-compose.yml exec frontend id
+uid=101(nginx) gid=101(nginx) groups=101(nginx)
+### API directly, then through the Nginx proxy of the UI container
+$ curl -s localhost:8008/health; echo
+{"status":"UP"}
+$ curl -s localhost:8008/ready; echo
+{"status":"READY"}
+$ curl -s -X POST localhost:3080/api/tickets -H 'Content-Type: application/json' -d '{"title":"Lab 3 printer jammed","category":"HARDWARE","priority":"HIGH","requester":"Ajij Uttam","location":"CS Lab 3"}'; echo
+{"title":"Lab 3 printer jammed","description":"","category":"HARDWARE","priority":"HIGH","status":"OPEN","requester":"Ajij Uttam","location":"CS Lab 3","id":1,"created_at":"2026-10-07T17:26:33.782559Z"}
+$ curl -s localhost:3080/api/tickets/stats; echo
+{"total":1,"open":1,"inProgress":0,"resolved":0,"urgent":0}
+$ docker-compose -f docker/docker-compose.yml logs backend | tail -6
+backend-1  | INFO:     Started server process [1]
+backend-1  | INFO:     Waiting for application startup.
+backend-1  | 2026-10-07 17:26:05,608 INFO campusdesk CampusDesk 1.0.0 starting (env=compose, db_host=postgres)
+backend-1  | INFO:     Application startup complete.
+backend-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+backend-1  | 2026-10-07 17:26:33,788 INFO campusdesk ticket created id=1 category=HARDWARE priority=HIGH
+### UI screenshot taken (images/02-compose-ui.png), then tear the stack down
+$ docker-compose -f docker/docker-compose.yml down -v 2>&1 | tail -4
+ Volume campusdesk_pgdata Removing 
+ Network campusdesk_default Removing 
+ Volume campusdesk_pgdata Removed 
+ Network campusdesk_default Removed 

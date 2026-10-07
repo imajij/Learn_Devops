@@ -1,0 +1,40 @@
+$ terraform output -no-color
+backup_bucket = "campusdesk-dev-db-backups"
+db_secret_arn = "arn:aws:secretsmanager:ap-south-1:000000000000:secret:campusdesk/dev/db-uJKTKJ"
+eks_cluster_name = "not created (create_eks = false)"
+eks_role_arns = {
+  "cluster" = "arn:aws:iam::000000000000:role/campusdesk-dev-eks-cluster"
+  "nodes" = "arn:aws:iam::000000000000:role/campusdesk-dev-eks-nodes"
+}
+kubeconfig_command = "n/a - EKS disabled (LocalStack Community); the lab cluster is minikube"
+nat_gateway_id = "nat-f85442b14d9b0a2b5"
+node_security_group_id = "sg-720a8acee39344559"
+private_subnet_ids = [
+  "subnet-f1472580",
+  "subnet-602f74a9",
+]
+public_subnet_ids = [
+  "subnet-7efe9f9a",
+  "subnet-55442af9",
+]
+ssm_parameters = tolist([
+  "/campusdesk/dev/APP_ENV",
+  "/campusdesk/dev/DB_NAME",
+  "/campusdesk/dev/DB_PORT",
+])
+tf_lock_table = "campusdesk-dev-tf-locks"
+vpc_id = "vpc-844b0429"
+$ terraform plan -no-color -detailed-exitcode | tail -3; echo "plan exit code: ${PIPESTATUS[0]} (0 = no drift)"
+    }
+
+Plan: 0 to add, 4 to change, 0 to destroy.
+plan exit code: 2 (0 = no drift)
+$ terraform apply -no-color -auto-approve | grep -E 'Modifications complete|Apply complete'
+aws_subnet.private[0]: Modifications complete after 0s [id=subnet-f1472580]
+aws_subnet.public[0]: Modifications complete after 0s [id=subnet-7efe9f9a]
+aws_subnet.public[1]: Modifications complete after 0s [id=subnet-55442af9]
+aws_subnet.private[1]: Modifications complete after 0s [id=subnet-602f74a9]
+Apply complete! Resources: 0 added, 4 changed, 0 destroyed.
+$ terraform plan -no-color -detailed-exitcode | tail -1; echo "plan exit code: ${PIPESTATUS[0]} (0 = no drift)"
+and found no differences, so no changes are needed.
+plan exit code: 0 (0 = no drift)

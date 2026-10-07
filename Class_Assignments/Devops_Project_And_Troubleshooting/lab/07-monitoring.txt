@@ -1,0 +1,31 @@
+$ helm --kube-context final upgrade --install monitoring kube-prometheus-stack --repo https://prometheus-community.github.io/helm-charts --version 92.1.0 -n monitoring --create-namespace -f monitoring/kube-prometheus-stack-values.yaml --wait --timeout 8m 2>&1 | grep -vE '^(W|I)[0-9]{4}' | head -12
+Release "monitoring" does not exist. Installing it now.
+NAME: monitoring
+LAST DEPLOYED: Wed Oct  7 23:19:48 2026
+NAMESPACE: monitoring
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+NOTES:
+kube-prometheus-stack has been installed. Check its status by running:
+  kubectl --namespace monitoring get pods -l "release=monitoring"
+
+Get Grafana 'admin' user password by running:
+$ kubectl --context final -n monitoring get pods
+NAME                                                   READY   STATUS            RESTARTS   AGE
+monitoring-grafana-6868bd7bfc-5pxmv                    3/3     Running           0          3m27s
+monitoring-kube-prometheus-operator-76dcffb746-4v2j7   1/1     Running           0          3m27s
+monitoring-kube-state-metrics-6455c4bc76-sv99z         1/1     Running           0          3m27s
+prometheus-monitoring-kube-prometheus-prometheus-0     0/2     PodInitializing   0          2m
+$ kubectl --context final apply -f monitoring/grafana-dashboard-configmap.yaml
+configmap/campusdesk-dashboard created
+### turn on the chart's ServiceMonitor now that the Prometheus Operator CRDs exist (helm upgrade by hand)
+$ helm --kube-context final upgrade campusdesk helm/campusdesk -n campusdesk --reuse-values --set monitoring.serviceMonitor.enabled=true --wait | head -6
+Release "campusdesk" has been upgraded. Happy Helming!
+NAME: campusdesk
+LAST DEPLOYED: Wed Oct  7 23:23:28 2026
+NAMESPACE: campusdesk
+STATUS: deployed
+REVISION: 4
+$ kubectl --context final -n campusdesk get servicemonitor campusdesk-backend -o jsonpath='{.spec}' | jq -c .
+{"endpoints":[{"interval":"15s","path":"/metrics","port":"http"}],"selector":{"matchLabels":{"app":"campusdesk-backend"}}}

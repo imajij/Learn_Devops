@@ -1,0 +1,37 @@
+### excerpt of lab/08a-terraform-apply.txt (full output in that file)
+$ terraform version
+Terraform v1.16.4
+on darwin_arm64
++ provider registry.terraform.io/hashicorp/aws v5.100.0
+$ curl -s localhost:4577/_localstack/health | jq -c '{edition, version, services: (.services | with_entries(select(.value != "disabled")) | keys)}'
+{"edition":"community","version":"4.0.3","services":["dynamodb","dynamodbstreams","ec2","iam","kinesis","kms","lambda","logs","s3","secretsmanager","ssm","sts"]}
+$ terraform init -no-color | grep -E 'Initializing|Installed|Installing|successfully'
+Initializing the backend...
+Initializing provider plugins...
+Terraform has been successfully initialized!
+$ terraform validate -no-color
+Success! The configuration is valid.
+$ terraform plan -no-color -out=campusdesk.tfplan | grep -E '^  # |Plan:'
+  # aws_cloudwatch_log_group.app will be created
+  # aws_dynamodb_table.tf_locks will be created
+  # aws_eip.nat[0] will be created
+  # aws_iam_role.eks_cluster will be created
+  # aws_iam_role.eks_nodes will be created
+  # aws_iam_role_policy_attachment.eks_cluster will be created
+  # aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"] will be created
+  # aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"] will be created
+  ... (24 more)
+Plan: 32 to add, 0 to change, 0 to destroy.
+$ terraform apply -no-color -auto-approve campusdesk.tfplan | grep -E 'Creation complete|Apply complete' | sed -E 's/\[id=[^]]{40,}\]/[id=...]/'
+aws_iam_role.eks_nodes: Creation complete after 0s [id=campusdesk-dev-eks-nodes]
+aws_iam_role.eks_cluster: Creation complete after 0s [id=campusdesk-dev-eks-cluster]
+aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"]: Creation complete after 0s [id=...]
+aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"]: Creation complete after 0s [id=...]
+aws_iam_role_policy_attachment.eks_cluster: Creation complete after 0s [id=...]
+aws_iam_role_policy_attachment.eks_nodes["arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"]: Creation complete after 0s [id=...]
+aws_dynamodb_table.tf_locks: Creation complete after 0s [id=campusdesk-dev-tf-locks]
+aws_s3_bucket.backups: Creation complete after 0s [id=campusdesk-dev-db-backups]
+aws_vpc.main: Creation complete after 10s [id=vpc-844b0429]
+aws_subnet.public[0]: Creation complete after 10s [id=subnet-7efe9f9a]
+aws_nat_gateway.main[0]: Creation complete after 0s [id=nat-f85442b14d9b0a2b5]
+Apply complete! Resources: 32 added, 0 changed, 0 destroyed.

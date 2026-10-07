@@ -1,0 +1,87 @@
+# Rendered from helm/campusdesk (templates/backend.yaml) for image tag 9e8f63a - reference copy;
+# the cluster is managed with Helm / Argo CD, not with kubectl apply of these files.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: campusdesk-backend
+  labels:
+    app.kubernetes.io/part-of: campusdesk
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: campusdesk-1.0.0
+    app: campusdesk-backend
+spec:
+  type: ClusterIP
+  selector: {app: campusdesk-backend}
+  ports:
+    - {name: http, port: 8000, targetPort: http}
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campusdesk-backend
+  labels:
+    app.kubernetes.io/part-of: campusdesk
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: campusdesk-1.0.0
+    app: campusdesk-backend
+spec:
+  selector:
+    matchLabels: {app: campusdesk-backend}
+  template:
+    metadata:
+      labels:
+        app: campusdesk-backend
+        tier: api
+      annotations:
+        # roll the pods when the ConfigMap or Secret content changes
+        checksum/config: 331fb95fd29be86c8ab140b1b8700450c6034b249c3d322e004207f5b38b9098
+        checksum/secret: e178c6b45beeca1f0e7a1edc0c71d83c890ed50d266dbc5390c270fdbe62359e   # gitleaks:allow (sha256 of the rendered Secret, not a credential)
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, seccompProfile: {type: RuntimeDefault}}
+      initContainers:
+        # Wait for PostgreSQL so `alembic upgrade head` does not crash-loop on a cold start.
+        # -U is required: uid 10001 has no passwd entry, without it pg_isready says "no attempt".
+        - name: wait-for-db
+          image: postgres:17-alpine
+          envFrom:
+            - configMapRef: {name: campusdesk-config}
+          command: ["sh", "-c", "until pg_isready -h \"$DB_HOST\" -p \"$DB_PORT\" -U healthcheck; do echo waiting for $DB_HOST; sleep 2; done"]
+          resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 100m, memory: 64Mi}}
+          securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+      containers:
+        - name: api
+          image: localhost:5060/ajij/campusdesk-backend:9e8f63a
+          imagePullPolicy: IfNotPresent
+          ports: [{name: http, containerPort: 8000}]
+          envFrom:
+            - configMapRef: {name: campusdesk-config}
+          env:
+            - name: DB_USER
+              valueFrom: {secretKeyRef: {name: campusdesk-db, key: db-user}}
+            - name: DB_PASSWORD
+              valueFrom: {secretKeyRef: {name: campusdesk-db, key: db-password}}
+          startupProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 3
+            failureThreshold: 20
+          livenessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: {path: /ready, port: http}
+            periodSeconds: 5
+            failureThreshold: 2
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+
+

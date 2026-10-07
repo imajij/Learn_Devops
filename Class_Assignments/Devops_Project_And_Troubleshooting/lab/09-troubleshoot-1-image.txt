@@ -1,0 +1,41 @@
+### BREAK: helm upgrade with a backend tag that was never pushed
+$ helm --kube-context final upgrade campusdesk helm/campusdesk -n campusdesk --reuse-values -f kubernetes/troubleshooting/01-bad-image-tag.values.yaml | grep -E 'STATUS|REVISION'
+STATUS: deployed
+REVISION: 7
+### 1 IDENTIFY
+$ kubectl --context final -n campusdesk get pods -l app=campusdesk-backend
+NAME                                  READY   STATUS         RESTARTS   AGE
+campusdesk-backend-6656988988-8p2k5   1/1     Running        0          30m
+campusdesk-backend-6656988988-hqdxr   1/1     Running        0          30m
+campusdesk-backend-7b46597b6c-s4xhs   0/1     ErrImagePull   0          40s
+### 2 INVESTIGATE
+$ kubectl --context final -n campusdesk describe $(kubectl --context final -n campusdesk get pods -l app=campusdesk-backend --field-selector=status.phase=Pending -o name | head -1) | grep -E 'Image:|Reason|Failed|Back-off' | cut -c1-230
+    Image:         postgres:17-alpine
+      Reason:       Completed
+    Image:          localhost:5060/ajij/campusdesk-backend:9e8f63b
+      Reason:       ErrImagePull
+  Type     Reason     Age                From               Message
+  Warning  Failed     27s (x2 over 39s)  kubelet            spec.containers{api}: Failed to pull image "localhost:5060/ajij/campusdesk-backend:9e8f63b": rpc error: code = NotFound desc = failed to pull and unpack image "localhost:
+  Warning  Failed     27s (x2 over 39s)  kubelet            spec.containers{api}: Error: ErrImagePull
+  Normal   BackOff    14s                kubelet            spec.containers{api}: Back-off pulling image "localhost:5060/ajij/campusdesk-backend:9e8f63b"
+  Warning  Failed     14s                kubelet            spec.containers{api}: Error: ImagePullBackOff
+$ curl -s localhost:5060/v2/ajij/campusdesk-backend/tags/list; echo
+{"name":"ajij/campusdesk-backend","tags":["7e3ff63","9e8f63a","1c7d093"]}
+
+### 3 ROOT CAUSE: tag 9e8f63b does not exist in the registry (CI pushed 9e8f63a). Old pods keep serving because the rolling update never got a Ready new pod:
+$ curl -s -o /dev/null -w 'ingress /api/info -> HTTP %{http_code}\n' http://campusdesk.localhost:8088/api/info
+ingress /api/info -> HTTP 200
+### 4 FIX: roll back to the last good Helm revision
+$ helm --kube-context final history campusdesk -n campusdesk --max 2 | cut -c1-100
+REVISION	UPDATED                 	STATUS    	CHART           	APP VERSION	DESCRIPTION     
+6       	Wed Oct  7 23:44:16 2026	superseded	campusdesk-1.0.0	1.0.0      	Rollback to 4   
+7       	Wed Oct  7 23:44:29 2026	deployed  	campusdesk-1.0.0	1.0.0      	Upgrade complete
+$ helm --kube-context final rollback campusdesk -n campusdesk --wait   # no revision = the previous one
+Rollback was a success! Happy Helming!
+### 5 VERIFY
+$ kubectl --context final -n campusdesk rollout status deploy/campusdesk-backend --timeout=120s
+deployment "campusdesk-backend" successfully rolled out
+$ kubectl --context final -n campusdesk get pods -l app=campusdesk-backend -o custom-columns=POD:.metadata.name,IMAGE:.spec.containers[0].image,READY:.status.containerStatuses[0].ready
+POD                                   IMAGE                                            READY
+campusdesk-backend-6656988988-8p2k5   localhost:5060/ajij/campusdesk-backend:9e8f63a   true
+campusdesk-backend-6656988988-hqdxr   localhost:5060/ajij/campusdesk-backend:9e8f63a   true

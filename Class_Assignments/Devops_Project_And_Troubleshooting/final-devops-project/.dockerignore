@@ -1,0 +1,15 @@
+**/node_modules
+**/dist
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/*.pyc
+.git
+.github
+terraform
+helm
+kubernetes
+gitops
+monitoring
+security
+README.md

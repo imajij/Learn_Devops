@@ -1,0 +1,40 @@
+### BREAK: release with readinessPath=/readiness
+$ helm --kube-context final upgrade campusdesk helm/campusdesk -n campusdesk --reuse-values -f kubernetes/troubleshooting/03-failing-probe.values.yaml | grep -E 'STATUS|REVISION'
+STATUS: deployed
+REVISION: 12
+### 1 IDENTIFY
+$ kubectl --context final -n campusdesk get pods -l app=campusdesk-backend
+NAME                                  READY   STATUS    RESTARTS   AGE
+campusdesk-backend-6656988988-8p2k5   1/1     Running   0          33m
+campusdesk-backend-6656988988-hqdxr   1/1     Running   0          33m
+campusdesk-backend-84b87f8b9f-ssj7m   0/1     Running   0          45s
+$ kubectl --context final -n campusdesk rollout status deploy/campusdesk-backend --timeout=5s
+Waiting for deployment "campusdesk-backend" rollout to finish: 1 out of 2 new replicas have been updated...
+error: timed out waiting for the condition
+### 2 INVESTIGATE
+$ kubectl --context final -n campusdesk describe pod/campusdesk-backend-84b87f8b9f-ssj7m | grep -E '^ +Readiness|Unhealthy' | cut -c1-200
+    Readiness:  http-get http://:http/readiness delay=0s timeout=1s period=5s successThreshold=1 failureThreshold=2
+  Warning  Unhealthy  47s               kubelet            spec.containers{api}: Startup probe failed: Get "http://10.244.0.33:8000/health": dial tcp 10.244.0.33:8000: connect: connection refused
+  Warning  Unhealthy  4s (x9 over 44s)  kubelet            spec.containers{api}: Readiness probe failed: HTTP probe failed with statuscode: 404
+$ kubectl --context final -n campusdesk logs pod/campusdesk-backend-84b87f8b9f-ssj7m -c api --tail=3 | cut -c1-160
+2026-10-07 18:17:28,647 INFO campusdesk CampusDesk 1.0.0-9e8f63a starting (env=minikube, db_host=campusdesk-postgres)
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+$ kubectl --context final -n campusdesk exec pod/campusdesk-backend-84b87f8b9f-ssj7m -c api -- python -c "import urllib.request as u
+for p in ('/readiness','/ready'):
+    try: print(p, u.urlopen('http://127.0.0.1:8000'+p).status)
+    except Exception as e: print(p, e)"
+/readiness HTTP Error 404: Not Found
+/ready 200
+### 3 ROOT CAUSE: the app is healthy, but the probe asks for /readiness which returns 404; the API's readiness endpoint is /ready
+### 4 FIX: correct the value (reuse-values would keep the bad path) and roll out
+$ helm --kube-context final upgrade campusdesk helm/campusdesk -n campusdesk --reuse-values --set backend.probes.readinessPath=/ready --wait | grep -E 'STATUS|REVISION'
+STATUS: deployed
+REVISION: 13
+### 5 VERIFY
+$ kubectl --context final -n campusdesk get pods -l app=campusdesk-backend
+NAME                                  READY   STATUS    RESTARTS   AGE
+campusdesk-backend-6656988988-8p2k5   1/1     Running   0          33m
+campusdesk-backend-6656988988-hqdxr   1/1     Running   0          33m
+$ kubectl --context final -n campusdesk describe deploy campusdesk-backend | grep Readiness
+    Readiness:  http-get http://:http/ready delay=0s timeout=1s period=5s successThreshold=1 failureThreshold=2

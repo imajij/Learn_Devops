@@ -1,0 +1,33 @@
+### BREAK: /api backend port changed to 8080 (the instructor's sample ingress.yaml used 8080)
+$ kubectl --context final -n campusdesk patch ingress campusdesk --type=json --patch-file kubernetes/troubleshooting/06-ingress-wrong-port.patch.json
+ingress.networking.k8s.io/campusdesk patched
+### 1 IDENTIFY: the UI (/) still loads, every /api call fails
+$ curl -s -o /dev/null -w '/          -> HTTP %{http_code}\n' http://campusdesk.localhost:8088/
+/          -> HTTP 200
+$ curl -s -o /dev/null -w '/api/info  -> HTTP %{http_code}\n' http://campusdesk.localhost:8088/api/info
+/api/info  -> HTTP 503
+### 2 INVESTIGATE
+$ kubectl --context final -n campusdesk describe ingress campusdesk | sed -n '/Rules/,/Annotations/p'
+Rules:
+  Host                  Path  Backends
+  ----                  ----  --------
+  campusdesk.localhost  
+                        /api   campusdesk-backend:8080 ()
+                        /      campusdesk-frontend:80 (10.244.0.15:8080,10.244.0.17:8080)
+Annotations:            meta.helm.sh/release-name: campusdesk
+$ kubectl --context final -n campusdesk get svc campusdesk-backend -o custom-columns=NAME:.metadata.name,PORT:.spec.ports[0].port,TARGET:.spec.ports[0].targetPort
+NAME                 PORT   TARGET
+campusdesk-backend   8000   http
+$ kubectl --context final -n ingress-nginx logs deploy/ingress-nginx-controller --since=40s | grep -E 'GET /api/info' | tail -1 | cut -c1-200
+127.0.0.1 - - [07/Oct/2026:18:28:56 +0000] "GET /api/info HTTP/1.1" 503 190 "-" "curl/8.7.1" 96 0.000 [campusdesk-campusdesk-backend-8080] [] - - - - a2853df531a18f7f42e71cb9e56a8875
+### 3 ROOT CAUSE: the Service only exposes port 8000; port 8080 has no endpoints, so ingress-nginx has no upstream and answers 503
+### 4 FIX: re-apply the chart (port comes from backend.port = 8000)
+$ helm --kube-context final upgrade campusdesk helm/campusdesk -n campusdesk --reuse-values --force-conflicts --wait | grep -E 'STATUS|REVISION'
+STATUS: deployed
+REVISION: 18
+### 5 VERIFY
+$ kubectl --context final -n campusdesk get ingress campusdesk -o jsonpath='{range .spec.rules[0].http.paths[*]}{.path} -> {.backend.service.name}:{.backend.service.port.number}{"\n"}{end}'
+/api -> campusdesk-backend:8000
+/ -> campusdesk-frontend:80
+$ sleep 5; curl -s -w '  <- HTTP %{http_code}\n' http://campusdesk.localhost:8088/api/info
+{"service":"CampusDesk API","version":"1.0.0-9e8f63a","environment":"minikube","banner":"Campus IT helpdesk - raise a ticket and we will pick it up.","pod":"campusdesk-backend-6656988988-t2dzg"}  <- HTTP 200

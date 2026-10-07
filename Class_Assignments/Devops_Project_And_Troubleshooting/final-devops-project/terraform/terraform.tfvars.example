@@ -1,0 +1,6 @@
+# Copy to terraform.tfvars and adjust. Never put AWS keys in this file.
+aws_region          = "ap-south-1"
+environment         = "dev"
+localstack_endpoint = "http://localhost:4577" # "" for real AWS
+enable_nat_gateway  = true
+create_eks          = false # true on real AWS (EKS is LocalStack Pro only)

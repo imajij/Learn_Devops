@@ -1,0 +1,41 @@
+### BREAK: Service selector changed to app=campusdesk-api
+$ kubectl --context final -n campusdesk patch svc campusdesk-backend --patch-file kubernetes/troubleshooting/04-service-selector.patch.yaml
+service/campusdesk-backend patched
+### 1 IDENTIFY: users get errors, but every pod is Running and Ready
+$ curl -s -w '  <- HTTP %{http_code}\n' http://campusdesk.localhost:8088/api/tickets/stats
+<html>
+<head><title>503 Service Temporarily Unavailable</title></head>
+<body>
+<center><h1>503 Service Temporarily Unavailable</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>
+  <- HTTP 503
+$ kubectl --context final -n campusdesk get pods -l app=campusdesk-backend
+NAME                                  READY   STATUS    RESTARTS   AGE
+campusdesk-backend-6656988988-8p2k5   1/1     Running   0          34m
+campusdesk-backend-6656988988-hqdxr   1/1     Running   0          34m
+### 2 INVESTIGATE
+$ kubectl --context final -n campusdesk get endpointslices -l kubernetes.io/service-name=campusdesk-backend
+NAME                       ADDRESSTYPE   PORTS     ENDPOINTS   AGE
+campusdesk-backend-s867w   IPv4          <unset>   <unset>     44m
+$ kubectl --context final -n campusdesk get svc campusdesk-backend -o jsonpath='{.spec.selector}'; echo
+{"app":"campusdesk-api"}
+$ kubectl --context final -n campusdesk get pods -l tier=api -o custom-columns=POD:.metadata.name,APP_LABEL:.metadata.labels.app
+POD                                   APP_LABEL
+campusdesk-backend-6656988988-8p2k5   campusdesk-backend
+campusdesk-backend-6656988988-hqdxr   campusdesk-backend
+$ kubectl --context final -n ingress-nginx logs deploy/ingress-nginx-controller --since=60s | grep -m1 'does not have any active Endpoint'
+W1007 18:18:47.413360       7 controller.go:1241] Service "campusdesk/campusdesk-backend" does not have any active Endpoint.
+### 3 ROOT CAUSE: selector app=campusdesk-api matches no pod (pods are labelled app=campusdesk-backend) -> 0 endpoints -> ingress returns 503
+### 4 FIX: re-apply the chart, taking the selector field back from the kubectl-patch manager
+$ helm --kube-context final upgrade campusdesk helm/campusdesk -n campusdesk --reuse-values --force-conflicts --wait | grep -E 'STATUS|REVISION'
+STATUS: deployed
+REVISION: 15
+### 5 VERIFY
+$ kubectl --context final -n campusdesk get endpointslices -l kubernetes.io/service-name=campusdesk-backend
+NAME                       ADDRESSTYPE   PORTS   ENDPOINTS                 AGE
+campusdesk-backend-s867w   IPv4          8000    10.244.0.16,10.244.0.18   44m
+### (the ingress controller picks up new endpoints within a few seconds)
+$ sleep 5; curl -s -w '  <- HTTP %{http_code}\n' http://campusdesk.localhost:8088/api/tickets/stats
+{"total":270,"open":269,"inProgress":1,"resolved":0,"urgent":62}  <- HTTP 200

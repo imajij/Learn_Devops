@@ -1,0 +1,64 @@
+# Rendered from helm/campusdesk (templates/frontend.yaml) for image tag 9e8f63a - reference copy;
+# the cluster is managed with Helm / Argo CD, not with kubectl apply of these files.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: campusdesk-frontend
+  labels:
+    app.kubernetes.io/part-of: campusdesk
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: campusdesk-1.0.0
+    app: campusdesk-frontend
+spec:
+  type: ClusterIP
+  selector: {app: campusdesk-frontend}
+  ports:
+    - {name: http, port: 80, targetPort: http}
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campusdesk-frontend
+  labels:
+    app.kubernetes.io/part-of: campusdesk
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: campusdesk-1.0.0
+    app: campusdesk-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: campusdesk-frontend}
+  template:
+    metadata:
+      labels:
+        app: campusdesk-frontend
+        tier: web
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 101, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: web
+          image: localhost:5060/ajij/campusdesk-frontend:9e8f63a
+          imagePullPolicy: IfNotPresent
+          ports: [{name: http, containerPort: 8080}]
+          env:
+            - name: BACKEND_URL
+              value: http://campusdesk-backend:8000
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: 200m
+              memory: 64Mi
+            requests:
+              cpu: 25m
+              memory: 32Mi
+          securityContext: {allowPrivilegeEscalation: false}
+
+

@@ -1,0 +1,5 @@
+# Small footprint for a laptop cluster
+backend: {replicas: 1}
+frontend: {replicas: 1}
+hpa: {enabled: false}
+config: {APP_ENV: dev}
